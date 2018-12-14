@@ -15,6 +15,22 @@ namespace Listrr.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult List()
+        {
+            ViewData["Message"] = "Overview of your lists";
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult List(string list)
+        {
+            ViewData["Message"] = "Overview of your lists";
+
+            return View();
+        }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
