@@ -13,4 +13,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="AspNet.Security.OAuth.Trakt">
+      <HintPath>..\..\..\Github\AspNet.Security.OAuth.Providers\src\AspNet.Security.OAuth.Trakt\bin\Release\netstandard2.0\AspNet.Security.OAuth.Trakt.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Identity\Services\" />
+  </ItemGroup>
+
 </Project>

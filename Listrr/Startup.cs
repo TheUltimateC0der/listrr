@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Listrr.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AspNet.Security.OAuth.Trakt;
 
 namespace Listrr
 {
@@ -39,6 +40,8 @@ namespace Listrr
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
