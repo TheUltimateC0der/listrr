@@ -9,6 +9,11 @@ namespace Listrr.API.Trakt.Models.Filters
     public class NetworksShowFilter
     {
 
+        public NetworksShowFilter()
+        {
+            
+        }
+
         [AliasAs("networks")]
         public string[] Networks { get; set; }
 

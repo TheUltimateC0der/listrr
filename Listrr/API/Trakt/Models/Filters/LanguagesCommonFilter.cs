@@ -9,6 +9,17 @@ namespace Listrr.API.Trakt.Models.Filters
     public class LanguagesCommonFilter
     {
 
+        public LanguagesCommonFilter()
+        {
+            
+        }
+
+        public LanguagesCommonFilter(string csv)
+        {
+            Languages = csv.Split(",");
+        }
+
+
         [AliasAs("languages")]
         public string[] Languages { get; set; }
 
