@@ -35,3 +35,14 @@ body {
         display: none;
     }
 }
+
+.input-group-addon {
+    border-left-width: 0;
+    border-right-width: 0;
+}
+.input-group-addon:first-child {
+    border-left-width: 1px;
+}
+.input-group-addon:last-child {
+    border-right-width: 1px;
+}

@@ -1,0 +1,24 @@
+﻿@model List<Listrr.Data.Trakt.TraktList>
+@{
+    ViewData["Title"] = "List";
+}
+
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+
+<div class="row">
+    @if (Model.Count == 0)
+    {
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert">
+                #FeelsBadMan You currently have exactly 0 lists. I am pretty sure you want to <a class="btn btn-xs btn-primary" asp-action="MovieList" role="button">create one!</a>
+            </div>
+        </div>
+    }
+    
+    <div class="col-md-12">
+
+    </div>
+
+</div>

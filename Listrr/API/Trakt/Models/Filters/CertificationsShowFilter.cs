@@ -8,6 +8,11 @@ namespace Listrr.API.Trakt.Models.Filters
 {
     public class CertificationsShowFilter
     {
+        public CertificationsShowFilter()
+        {
+            
+        }
+
 
         [AliasAs("certifications")]
         public string[] Certifications { get; set; }

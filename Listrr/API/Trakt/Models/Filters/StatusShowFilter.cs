@@ -9,6 +9,11 @@ namespace Listrr.API.Trakt.Models.Filters
     public class StatusShowFilter
     {
 
+        public StatusShowFilter()
+        {
+            
+        }
+
         [AliasAs("status")]
         public string[] Status { get; set; }
 

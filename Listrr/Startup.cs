@@ -14,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AspNet.Security.OAuth.Trakt;
 using Hangfire;
+using Listrr.Repositories;
+using Listrr.Services;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Listrr
 {
@@ -46,10 +49,27 @@ namespace Listrr
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddHangfire(x =>
-                x.UseSqlServerStorage("DefaultConnection"));
+                x.UseSqlServerStorage(connectionString));
+
+            services.AddAuthentication()
+                .AddTrakt(options =>
+                {
+                    options.ClientId = Configuration["Trakt:ClientID"];
+                    options.ClientSecret = Configuration["Trakt:ClientSecret"];
+                });
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDbContext<AppDbContext>(options => 
+                options.UseSqlServer(connectionString));
+
+            services.AddHttpContextAccessor();
+
+            services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
+            services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
+            services.AddScoped<ITraktService, TraktService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
