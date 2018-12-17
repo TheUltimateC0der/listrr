@@ -4,16 +4,14 @@ using Listrr.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Listrr.Data.Migrations
+namespace Listrr.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20181215044505_Added TraktLists")]
-    partial class AddedTraktLists
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,12 +19,35 @@ namespace Listrr.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Listrr.Data.CountryCode", b =>
+                {
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Code");
+
+                    b.HasKey("Name", "Code");
+
+                    b.HasIndex("Code");
+
+                    b.ToTable("CountryCodes");
+                });
+
+            modelBuilder.Entity("Listrr.Data.LanguageCode", b =>
+                {
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Code");
+
+                    b.HasKey("Name", "Code");
+
+                    b.HasIndex("Code");
+
+                    b.ToTable("LanguageCodes");
+                });
+
             modelBuilder.Entity("Listrr.Data.Trakt.TraktList", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Filter_Aliases");
+                    b.Property<long>("Id");
 
                     b.Property<string>("Filter_Certifications");
 
@@ -36,17 +57,11 @@ namespace Listrr.Data.Migrations
 
                     b.Property<string>("Filter_Languages");
 
-                    b.Property<string>("Filter_Overview");
-
-                    b.Property<string>("Filter_People");
-
                     b.Property<string>("Filter_Ratings");
 
                     b.Property<string>("Filter_Runtimes");
 
-                    b.Property<string>("Filter_Tagline");
-
-                    b.Property<string>("Filter_Title");
+                    b.Property<string>("Filter_SearchField");
 
                     b.Property<string>("Filter_Translations");
 
@@ -60,6 +75,8 @@ namespace Listrr.Data.Migrations
 
                     b.Property<bool>("Process");
 
+                    b.Property<string>("Query");
+
                     b.Property<string>("Slug");
 
                     b.Property<int>("Type");
@@ -68,7 +85,75 @@ namespace Listrr.Data.Migrations
 
                     b.HasIndex("OwnerId");
 
+                    b.HasIndex("Slug", "Name")
+                        .IsUnique()
+                        .HasFilter("[Slug] IS NOT NULL AND [Name] IS NOT NULL");
+
                     b.ToTable("TraktLists");
+                });
+
+            modelBuilder.Entity("Listrr.Data.Trakt.TraktMovieCertification", b =>
+                {
+                    b.Property<string>("Slug")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("TraktMovieCertifications");
+                });
+
+            modelBuilder.Entity("Listrr.Data.Trakt.TraktMovieGenre", b =>
+                {
+                    b.Property<string>("Slug")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("TraktMovieGenres");
+                });
+
+            modelBuilder.Entity("Listrr.Data.Trakt.TraktShowCertification", b =>
+                {
+                    b.Property<string>("Slug")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("TraktShowCertifications");
+                });
+
+            modelBuilder.Entity("Listrr.Data.Trakt.TraktShowGenre", b =>
+                {
+                    b.Property<string>("Slug")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("TraktShowGenres");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

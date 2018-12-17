@@ -12,10 +12,8 @@ namespace Listrr.Repositories
 
         Task<TraktList> Get(uint id);
         Task<List<TraktList>> Get(IdentityUser user);
-        //Task<TraktList> GetShared();
 
-        //Task<IEnumerable<TraktList>> Get(IEnumerable<int> ids);
-        //Task<IEnumerable<TraktList>> Get(IEnumerable<int> ids, int userId);
+        Task<List<TraktList>> GetProcessable();
 
         Task<TraktList> Create(TraktList model);
         Task<TraktList> Update(TraktList model);

@@ -32,17 +32,17 @@ namespace Listrr.Repositories
 
         public async Task<TraktList> Get(uint id)
         {
-            return await appDbContext.TraktLists.FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.TraktLists.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<TraktList>> Get(IdentityUser user)
         {
-            //if (await appDbContext.TraktLists.AnyAsync(x => x.Owner.Id == user.Id))
-            //{
-                return await appDbContext.TraktLists.Where(x => x.Owner.Id == user.Id)?.ToListAsync();
-            //}
+            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Owner.Id == user.Id).ToListAsync();
+        }
 
-            return null;
+        public async Task<List<TraktList>> GetProcessable()
+        {
+            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Process).ToListAsync();
         }
 
         public async Task<TraktList> Update(TraktList model)

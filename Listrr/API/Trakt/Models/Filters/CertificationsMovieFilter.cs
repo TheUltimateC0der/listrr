@@ -16,7 +16,14 @@ namespace Listrr.API.Trakt.Models.Filters
 
         public CertificationsMovieFilter(string csv)
         {
-            Certifications = csv.Split(",");
+            if (csv.Length > 0 || csv.Contains(","))
+            {
+                Certifications = csv.Split(",");
+            }
+            else
+            {
+                Certifications = null;
+            }
         }
 
 

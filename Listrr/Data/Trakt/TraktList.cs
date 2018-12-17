@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Listrr.API.Trakt.Models.Filters;
 using Microsoft.AspNetCore.Identity;
+using TraktNet.Enums;
 
 namespace Listrr.Data.Trakt
 {
@@ -17,6 +19,7 @@ namespace Listrr.Data.Trakt
     public class TraktList
     {
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public uint Id { get; set; }
 
         public string Name { get; set; }
@@ -34,12 +37,11 @@ namespace Listrr.Data.Trakt
 
         #region Basic Filter
 
-        public string Filter_Title { get; set; }
-        public string Filter_Tagline { get; set; }
-        public string Filter_Overview { get; set; }
-        public string Filter_People { get; set; }
-        public string Filter_Translations { get; set; }
-        public string Filter_Aliases { get; set; }
+        public string Query { get; set; }
+
+        public TraktSearchField Filter_SearchField { get; set; }
+
+        public TranslationsBasicFilter Filter_Translations { get; set; }
 
         #endregion
 

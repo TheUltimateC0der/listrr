@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Listrr.Data.Trakt;
+using Listrr.Models;
+using TraktNet.Objects.Get.Movies;
+using TraktNet.Objects.Post.Scrobbles;
 
 namespace Listrr.Repositories
 {
@@ -10,13 +13,16 @@ namespace Listrr.Repositories
     {
 
         Task<TraktList> Get(uint id);
-        //Task<TraktList> GetShared();
-
-        //Task<IEnumerable<TraktList>> Get(IEnumerable<int> ids);
-        //Task<IEnumerable<TraktList>> Get(IEnumerable<int> ids, int userId);
-
+        Task<List<ITraktMovie>> GetMovies(TraktList model);
+        
         Task<TraktList> Create(TraktList model);
         Task<TraktList> Update(TraktList model);
-        
+
+        Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list);
+
+        Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list);
+
+        Task<List<ITraktMovie>> MovieSearch(TraktList model);
+
     }
 }

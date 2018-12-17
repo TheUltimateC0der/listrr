@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
 using Microsoft.AspNetCore.Identity;
+using TraktNet.Objects.Get.Movies;
 
 namespace Listrr.Services
 {
@@ -20,6 +21,10 @@ namespace Listrr.Services
             this.traktListApiRepository = traktListApiRepository;
         }
 
+        public async Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list)
+        {
+            await traktListApiRepository.AddMovies(movies, list);
+        }
 
         public async Task<TraktList> Create(TraktList model)
         {
@@ -50,6 +55,26 @@ namespace Listrr.Services
         public Task<List<TraktList>> Get(IdentityUser user)
         {
             return traktListDbRepository.Get(user);
+        }
+
+        public async Task<List<ITraktMovie>> GetMovies(TraktList model)
+        {
+            return await traktListApiRepository.GetMovies(model);
+        }
+
+        public async Task<List<TraktList>> GetProcessable()
+        {
+            return await traktListDbRepository.GetProcessable();
+        }
+
+        public Task<List<ITraktMovie>> MovieSearch(TraktList model)
+        {
+            return traktListApiRepository.MovieSearch(model);
+        }
+
+        public async Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list)
+        {
+            await traktListApiRepository.RemoveMovies(movies, list);
         }
 
         public async Task<TraktList> Update(TraktList model)

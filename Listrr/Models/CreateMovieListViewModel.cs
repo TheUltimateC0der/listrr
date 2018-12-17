@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Listrr.API.Trakt.Models.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using TraktNet.Enums;
 
 namespace Listrr.Models
 {
@@ -13,7 +15,30 @@ namespace Listrr.Models
         [Display(Name = "List Name", Prompt = "List Name")]
         public string Name { get; set; }
 
+        [Display(Name = "Search query", Prompt = "Search query")]
+        public string Query { get; set; }
+
+        [Display(Name = "Search by title", Prompt = "Search by title")]
+        public bool SearchByTitle { get; set; }
+        [Display(Name = "Search by tagline", Prompt = "Search by tagline")]
+        public bool SearchByTagline { get; set; }
+        [Display(Name = "Search by overview", Prompt = "Search by overview")]
+        public bool SearchByOverview { get; set; }
+        [Display(Name = "Search by people", Prompt = "Search by people")]
+        public bool SearchByPeople { get; set; }
+        [Display(Name = "Search by translations", Prompt = "Search by translations")]
+        public bool SearchByTranslations { get; set; }
+        [Display(Name = "Search by alias", Prompt = "Search by alias")]
+        public bool SearchByAliases { get; set; }
+        [Display(Name = "Search by name", Prompt = "Search by name")]
+        public bool SearchByName { get; set; }
+        [Display(Name = "Search by biography", Prompt = "Search by biography")]
+        public bool SearchByBiography { get; set; }
+        [Display(Name = "Search by description", Prompt = "Search by description")]
+        public bool SearchByDescription { get; set; }
+
         #region Basic Filter
+
         [Display(Name = "Movie title", Prompt = "Movie title")]
         public string Filter_Title { get; set; }
 
@@ -26,8 +51,10 @@ namespace Listrr.Models
         [Display(Name = "Movie people", Prompt = "Movie people")]
         public string Filter_People { get; set; }
 
-        [Display(Name = "Movie translation", Prompt = "Movie translation")]
-        public string Filter_Translations { get; set; }
+        [Display(Name = "Movie translation", Prompt = "de,en,ru")]
+        public IEnumerable<string> Filter_Translations { get; set; }
+
+        public MultiSelectList Translations { get; set; }
 
         [Display(Name = "Movie aliases", Prompt = "Movie aliases")]
         public string Filter_Aliases { get; set; }
@@ -46,20 +73,25 @@ namespace Listrr.Models
         public RatingsCommonFilter Filter_Ratings { get; set; }
 
         [Display(Name = "Movie language", Prompt = "en,de,ru")]
-        public LanguagesCommonFilter Filter_Languages { get; set; }
+        public IEnumerable<string> Filter_Languages { get; set; }
+        public MultiSelectList Languages { get; set; }
 
         [Display(Name = "Movie genres", Prompt = "action,adventure")]
-        public GenresCommonFilter Filter_Genres { get; set; }
+        public IEnumerable<string> Filter_Genres { get; set; }
+        public MultiSelectList Genres { get; set; }
 
         [Display(Name = "Movie countries", Prompt = "uk,us,de,ru")]
-        public CountriesCommonFilter Filter_Countries { get; set; }
+        public IEnumerable<string> Filter_Countries { get; set; }
+        public MultiSelectList Countries { get; set; }
 
         #endregion
 
         #region Movie Filter
 
         [Display(Name = "Movie certification", Prompt = "r,pg-13")]
-        public CertificationsMovieFilter Filter_Certifications { get; set; }
+        public IEnumerable<string>  Filter_Certifications { get; set; }
+
+        public MultiSelectList Certifications { get; set; }
 
         #endregion
 

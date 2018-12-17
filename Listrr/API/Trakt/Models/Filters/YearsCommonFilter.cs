@@ -19,21 +19,21 @@ namespace Listrr.API.Trakt.Models.Filters
         {
             if (rating.Contains("-"))
             {
-                From = Convert.ToUInt32(rating.Split("-")[0]);
-                To = Convert.ToUInt32(rating.Split("-")[1]);
+                From = Convert.ToInt32(rating.Split("-")[0]);
+                To = Convert.ToInt32(rating.Split("-")[1]);
             }
             else
             {
                 From = 0;
-                To = Convert.ToUInt32(rating);
+                To = Convert.ToInt32(rating);
             }
         }
 
         [Display(Name = "Min year", Prompt = "1990")]
-        public uint From { get; set; } = 0;
+        public int? From { get; set; }
 
         [Display(Name = "Max year", Prompt = "2018")]
-        public uint To { get; set; } = 0;
+        public int? To { get; set; }
 
     }
 }

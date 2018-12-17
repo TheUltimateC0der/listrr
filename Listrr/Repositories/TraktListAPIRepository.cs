@@ -8,16 +8,21 @@ using System.Threading.Tasks;
 using Listrr.API.Trakt;
 using Listrr.Data;
 using Listrr.Data.Trakt;
+using Listrr.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Rewrite.Internal.ApacheModRewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Refit;
 using TraktNet;
 using TraktNet.Enums;
 using TraktNet.Objects.Authentication;
+using TraktNet.Objects.Get.Movies;
+using TraktNet.Objects.Post.Users.CustomListItems;
 using TraktNet.Requests.Parameters;
+using TraktNet.Utils;
 
 namespace Listrr.Repositories
 {
@@ -78,6 +83,51 @@ namespace Listrr.Repositories
             };
         }
 
+        public async Task<List<ITraktMovie>> MovieSearch(TraktList model)
+        {
+            var list = new List<ITraktMovie>();
+
+            await MovieSearch(model, 0, 100, list);
+
+            return list;
+        }
+
+        private async Task MovieSearch(TraktList model, uint? page, uint? limit, List<ITraktMovie> list)
+        {
+            var result = await traktClient.Search.GetTextQueryResultsAsync(
+                TraktSearchResultType.Movie,
+                model.Query,
+                model.Filter_SearchField,
+                new TraktSearchFilter(
+                    model.Filter_Years.From,
+                    model.Filter_Years.To,
+                    model.Filter_Genres.Genres,
+                    model.Filter_Languages.Languages,
+                    model.Filter_Countries.Languages,
+                    new Range<int>(
+                        model.Filter_Runtimes.From,
+                        model.Filter_Runtimes.To
+                    ),
+                    new Range<int>(
+                        model.Filter_Ratings.From,
+                        model.Filter_Ratings.To
+                    )
+                ), new TraktExtendedInfo().SetMetadata(),
+                new TraktPagedParameters(page, limit)
+            );
+
+
+            if (!result.IsSuccess) throw result.Exception;
+
+            foreach (var traktSearchResult in result.Value)
+            {
+                list.Add(traktSearchResult.Movie);
+            }
+
+            if (result.PageCount > page) await MovieSearch(model, page + 1, limit, list);
+
+        }
+
         public async Task<TraktList> Update(TraktList model)
         {
             await PrepareForAPIRequest();
@@ -95,9 +145,80 @@ namespace Listrr.Repositories
             return model;
         }
 
-        private async Task PrepareForAPIRequest()
+        
+        public async Task<List<ITraktMovie>> GetMovies(TraktList model)
         {
-            var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+            await PrepareForAPIRequest(model.Owner);
+
+            var result = new List<ITraktMovie>();
+
+            await GetMovies(model, null, null, result);
+
+            return result;
+        }
+
+        private async Task GetMovies(TraktList model, uint? page, uint? limit, List<ITraktMovie> list)
+        {
+            var result = await traktClient.Users.GetCustomListItemsAsync(
+                model.Owner.UserName,
+                model.Slug,
+                TraktListItemType.Movie,
+                new TraktExtendedInfo().SetMetadata(),
+                new TraktPagedParameters(
+                    page,
+                    limit
+                )
+            );
+
+            if (!result.IsSuccess) throw result.Exception;
+
+            foreach (var traktSearchResult in result.Value)
+            {
+                list.Add(traktSearchResult.Movie);
+            }
+
+            if (result.PageCount > page) await GetMovies(model, page + 1, limit, list);
+
+        }
+
+        public async Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list)
+        {
+            await PrepareForAPIRequest(list.Owner);
+
+            var result = await traktClient.Users.AddCustomListItemsAsync(
+                list.Owner.UserName,
+                list.Slug,
+                TraktUserCustomListItemsPost.Builder().AddMovies(movies).Build(),
+                TraktListItemType.Movie
+            );
+
+            if (!result.IsSuccess) throw result.Exception;
+        }
+
+
+        public async Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list)
+        {
+            await PrepareForAPIRequest(list.Owner);
+
+            var builder = new TraktUserCustomListItemsPostBuilder();
+            builder.AddMovies(movies);
+
+            var result = await traktClient.Users.RemoveCustomListItemsAsync(
+                list.Owner.UserName,
+                list.Slug,
+                builder.Build()
+            );
+
+            if (!result.IsSuccess) throw result.Exception;
+        }
+
+
+        private async Task PrepareForAPIRequest(IdentityUser user = null)
+        {
+            if (user == null)
+            {
+                user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+            }    
 
             var expiresAtToken = await userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt);
             var access_token = await userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
@@ -112,5 +233,7 @@ namespace Listrr.Repositories
 
             traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
         }
+
+        
     }
 }
