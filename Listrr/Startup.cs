@@ -14,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AspNet.Security.OAuth.Trakt;
 using Hangfire;
+using Hangfire.Storage;
+using Listrr.BackgroundJob;
 using Listrr.Repositories;
 using Listrr.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -56,6 +58,18 @@ namespace Listrr
                 {
                     options.ClientId = Configuration["Trakt:ClientID"];
                     options.ClientSecret = Configuration["Trakt:ClientSecret"];
+                    options.SaveTokens = true;
+                    options.Events.OnCreatingTicket = ctx =>
+                    {
+                        List<AuthenticationToken> tokens = ctx.Properties.GetTokens() as List<AuthenticationToken>;
+                        tokens.Add(new AuthenticationToken()
+                        {
+                            Name = "TicketCreated",
+                            Value = DateTime.Now.ToString()
+                        });
+                        ctx.Properties.StoreTokens(tokens);
+                        return Task.CompletedTask;
+                    };
                 });
 
             services.AddMvc()
@@ -98,6 +112,21 @@ namespace Listrr
             app.UseHangfireServer();
             if(env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
                 app.UseHangfireDashboard();
+
+            //RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
+            //RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
+            //RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
+            //RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
+            //RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
+            //RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
+            //RecurringJob.AddOrUpdate<ProcessListsRecurringJob>((x) => x.Execute(), Cron.Daily);
+
+
+            ////Starting all jobs here for initial db fill
+            //foreach (var recurringJob in JobStorage.Current.GetConnection().GetRecurringJobs())
+            //{
+            //    RecurringJob.Trigger(recurringJob.Id);
+            //}
 
             app.UseMvc(routes =>
             {

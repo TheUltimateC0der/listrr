@@ -16,7 +16,14 @@ namespace Listrr.API.Trakt.Models.Filters
 
         public LanguagesCommonFilter(string csv)
         {
-            Languages = csv.Split(",");
+            if (csv.Length > 0 || csv.Contains(","))
+            {
+                Languages = csv.Split(",");
+            }
+            else
+            {
+                Languages = null;
+            }
         }
 
 

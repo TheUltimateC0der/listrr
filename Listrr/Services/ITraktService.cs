@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Listrr.Data.Trakt;
 using Microsoft.AspNetCore.Identity;
+using TraktNet.Objects.Get.Movies;
 
 namespace Listrr.Services
 {
@@ -12,13 +13,22 @@ namespace Listrr.Services
 
         Task<TraktList> Get(uint id, bool forceAPI = false);
         Task<List<TraktList>> Get(IdentityUser user);
-        //Task<TraktList> GetShared();
 
-        //Task<IEnumerable<TraktList>> Get(IEnumerable<int> ids);
-        //Task<IEnumerable<TraktList>> Get(IEnumerable<int> ids, int userId);
+        Task<List<ITraktMovie>> GetMovies(TraktList model);
+
+        Task<List<TraktList>> GetProcessable();
+
+
+        Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list);
+
+        Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list);
+
 
         Task<TraktList> Create(TraktList model);
         Task<TraktList> Update(TraktList model);
+
+
+        Task<List<ITraktMovie>> MovieSearch(TraktList model);
 
     }
 }

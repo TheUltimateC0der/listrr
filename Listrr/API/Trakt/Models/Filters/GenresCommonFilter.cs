@@ -16,7 +16,14 @@ namespace Listrr.API.Trakt.Models.Filters
 
         public GenresCommonFilter(string csv)
         {
-            Genres = csv.Split(",");
+            if (csv.Length > 0 || csv.Contains(","))
+            {
+                Genres = csv.Split(",");
+            }
+            else
+            {
+                Genres = null;
+            }
         }
 
 

@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 namespace Listrr.Data.Trakt
 {
-    public class TraktMovie
+    public class TraktMovieGenre
     {
 
-        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public string Slug { get; set; }
 
     }
 }

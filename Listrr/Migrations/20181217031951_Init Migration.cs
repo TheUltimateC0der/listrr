@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Listrr.Data.Migrations
+namespace Listrr.Migrations
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class InitMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -45,6 +45,80 @@ namespace Listrr.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CountryCodes",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: false),
+                    Code = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CountryCodes", x => new { x.Name, x.Code });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LanguageCodes",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: false),
+                    Code = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LanguageCodes", x => new { x.Name, x.Code });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TraktMovieCertifications",
+                columns: table => new
+                {
+                    Slug = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TraktMovieCertifications", x => x.Slug);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TraktMovieGenres",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: true),
+                    Slug = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TraktMovieGenres", x => x.Slug);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TraktShowCertifications",
+                columns: table => new
+                {
+                    Slug = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TraktShowCertifications", x => x.Slug);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TraktShowGenres",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: true),
+                    Slug = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TraktShowGenres", x => x.Slug);
                 });
 
             migrationBuilder.CreateTable(
@@ -153,6 +227,39 @@ namespace Listrr.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TraktLists",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Type = table.Column<int>(nullable: false),
+                    Slug = table.Column<string>(nullable: true),
+                    Process = table.Column<bool>(nullable: false),
+                    LastProcessed = table.Column<DateTime>(nullable: false),
+                    OwnerId = table.Column<string>(nullable: true),
+                    Query = table.Column<string>(nullable: true),
+                    Filter_SearchField = table.Column<string>(nullable: true),
+                    Filter_Translations = table.Column<string>(nullable: true),
+                    Filter_Years = table.Column<string>(nullable: true),
+                    Filter_Runtimes = table.Column<string>(nullable: true),
+                    Filter_Ratings = table.Column<string>(nullable: true),
+                    Filter_Languages = table.Column<string>(nullable: true),
+                    Filter_Genres = table.Column<string>(nullable: true),
+                    Filter_Countries = table.Column<string>(nullable: true),
+                    Filter_Certifications = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TraktLists", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TraktLists_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -191,6 +298,52 @@ namespace Listrr.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CountryCodes_Code",
+                table: "CountryCodes",
+                column: "Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LanguageCodes_Code",
+                table: "LanguageCodes",
+                column: "Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TraktLists_OwnerId",
+                table: "TraktLists",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TraktLists_Slug_Name",
+                table: "TraktLists",
+                columns: new[] { "Slug", "Name" },
+                unique: true,
+                filter: "[Slug] IS NOT NULL AND [Name] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TraktMovieCertifications_Slug",
+                table: "TraktMovieCertifications",
+                column: "Slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TraktMovieGenres_Slug",
+                table: "TraktMovieGenres",
+                column: "Slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TraktShowCertifications_Slug",
+                table: "TraktShowCertifications",
+                column: "Slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TraktShowGenres_Slug",
+                table: "TraktShowGenres",
+                column: "Slug",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -209,6 +362,27 @@ namespace Listrr.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "CountryCodes");
+
+            migrationBuilder.DropTable(
+                name: "LanguageCodes");
+
+            migrationBuilder.DropTable(
+                name: "TraktLists");
+
+            migrationBuilder.DropTable(
+                name: "TraktMovieCertifications");
+
+            migrationBuilder.DropTable(
+                name: "TraktMovieGenres");
+
+            migrationBuilder.DropTable(
+                name: "TraktShowCertifications");
+
+            migrationBuilder.DropTable(
+                name: "TraktShowGenres");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
