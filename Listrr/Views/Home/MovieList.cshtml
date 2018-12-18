@@ -7,7 +7,6 @@
 <h3>@ViewData["Message"]</h3>
 
 <div class="row">
-
     <div class="col-md-12">
         <form asp-action="MovieList" method="post">
             <div class="row">
@@ -116,11 +115,11 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-addon">Between</span>
-                            <input asp-for="Filter_Ratings.From" value="5" class="form-control" />
+                            <input asp-for="Filter_Ratings.From" value="75" class="form-control" />
                             <span class="input-group-addon" style="border-left: 0; border-right: 0;">and</span>
-                            <input asp-for="Filter_Ratings.To" value="10" class="form-control" />
+                            <input asp-for="Filter_Ratings.To" value="100" class="form-control" />
                         </div>
-                        <small class="form-text text-muted">Ratings filter e.g. <code>5-10</code> for a rating between 5-10</small>
+                        <small class="form-text text-muted">Ratings filter e.g. <code>75-100</code> for a rating between 75-100</small>
                         <span asp-validation-for="Filter_Ratings.From" class="text-danger"></span>
                         <span asp-validation-for="Filter_Ratings.To" class="text-danger"></span>
                     </div>
@@ -145,9 +144,4 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-
-    <div class="col-md-12">
-
-    </div>
-
 </div>

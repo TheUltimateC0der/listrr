@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Listrr.Comparer;
 using Listrr.Services;
+using TraktNet.Objects.Get.Movies;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
@@ -21,14 +24,30 @@ namespace Listrr.Jobs.BackgroundJobs
             var foundMovies = await traktService.MovieSearch(list);
             var existingMovies = await traktService.GetMovies(list);
 
-            var moviesToRemove = existingMovies.Except(foundMovies, new TraktMovieComparer()).ToList();
-            var moviesToAdd = foundMovies.Except(existingMovies, new TraktMovieComparer()).ToList();
+            List<ITraktMovie> moviesToRemove = new List<ITraktMovie>();
+            foreach (var existingMovie in existingMovies)
+            {
+                if(!foundMovies.Contains(existingMovie, new TraktMovieComparer()))
+                    moviesToRemove.Add(existingMovie);
+            }
 
-            if(moviesToAdd.Any())
+            List<ITraktMovie> moviesToAdd = new List<ITraktMovie>();
+            foreach (var foundMovie in foundMovies)
+            {
+                if (!existingMovies.Contains(foundMovie, new TraktMovieComparer()))
+                    moviesToAdd.Add(foundMovie);
+            }
+
+            if (moviesToAdd.Any())
                 await traktService.AddMovies(moviesToAdd, list);
 
             if(moviesToRemove.Any())
                 await traktService.RemoveMovies(moviesToRemove, list);
+
+            list.Items = (existingMovies.Count + moviesToAdd.Count - moviesToRemove.Count);
+            list.LastProcessed = DateTime.Now;
+
+            await traktService.Update(list);
         }
     }
 }
