@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters
@@ -12,6 +10,11 @@ namespace Listrr.API.Trakt.Models.Filters
         public StatusShowFilter()
         {
             
+        }
+
+        public StatusShowFilter(IEnumerable<string> status)
+        {
+            this.Status = status?.ToArray();
         }
 
         [AliasAs("status")]

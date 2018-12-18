@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters
@@ -13,16 +11,9 @@ namespace Listrr.API.Trakt.Models.Filters
             
         }
 
-        public CertificationsShowFilter(string csv)
+        public CertificationsShowFilter(IEnumerable<string> certifications)
         {
-            if (csv.Length > 0 || csv.Contains(","))
-            {
-                Certifications = csv.Split(",");
-            }
-            else
-            {
-                Certifications = null;
-            }
+            this.Certifications = certifications?.ToArray();
         }
 
 

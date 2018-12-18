@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Listrr.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AspNet.Security.OAuth.Trakt;
 using Hangfire;
-using Hangfire.Storage;
 using Listrr.BackgroundJob;
 using Listrr.Repositories;
 using Listrr.Services;
@@ -113,13 +109,15 @@ namespace Listrr
             if(env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
                 app.UseHangfireDashboard();
 
-            //RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            //RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            //RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
-            //RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
-            //RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
-            //RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
-            //RecurringJob.AddOrUpdate<ProcessListsRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<ProcessListsRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>((x) => x.Execute(), Cron.Daily);
 
 
             ////Starting all jobs here for initial db fill
@@ -132,7 +130,7 @@ namespace Listrr
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Lists}/{id?}");
             });
         }
     }

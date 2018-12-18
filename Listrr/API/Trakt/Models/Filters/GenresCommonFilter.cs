@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters
@@ -14,18 +12,10 @@ namespace Listrr.API.Trakt.Models.Filters
             
         }
 
-        public GenresCommonFilter(string csv)
+        public GenresCommonFilter(IEnumerable<string> genres)
         {
-            if (csv.Length > 0 || csv.Contains(","))
-            {
-                Genres = csv.Split(",");
-            }
-            else
-            {
-                Genres = null;
-            }
+            this.Genres = genres?.ToArray();
         }
-
 
         [AliasAs("genres")]
         public string[] Genres { get; set; }

@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Listrr.API.Trakt.Models.Filters;
 using Listrr.Data;
 using Listrr.Data.Trakt;
+using Listrr.Jobs.BackgroundJobs;
 using Microsoft.AspNetCore.Mvc;
 using Listrr.Models;
-using Listrr.Repositories;
 using Listrr.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using TraktNet;
 using TraktNet.Enums;
-using TraktNet.Objects.Authentication;
+using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
 namespace Listrr.Controllers
 {
@@ -36,8 +30,7 @@ namespace Listrr.Controllers
             this.userManager = userManager;
             this.appDbContext = appDbContext;
         }
-
-
+        
 
         public IActionResult Index()
         {
@@ -73,8 +66,6 @@ namespace Listrr.Controllers
                 Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name))
             };
 
-            var test = TraktSearchField.Name | TraktSearchField.Biography;
-
             return View(model);
         }
 
@@ -95,14 +86,8 @@ namespace Listrr.Controllers
             model.Languages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name));
             model.Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name));
 
-            //if (!ModelState.IsValid) return BadRequest(ModelState);
             if (!ModelState.IsValid) return View(model);
 
-            var certifications = model.Filter_Certifications != null ? string.Join(',', model.Filter_Certifications) : "";
-            var countries = model.Filter_Countries != null ? string.Join(',', model.Filter_Countries) : "";
-            var genres = model.Filter_Genres != null ? string.Join(',', model.Filter_Genres) : "";
-            var languages = model.Filter_Languages != null ? string.Join(',', model.Filter_Languages) : "";
-            var translations = model.Filter_Translations != null ? string.Join(',', model.Filter_Translations) : "";
             TraktSearchField searchFields = new TraktSearchField();
 
             if (model.SearchByAliases) searchFields = searchFields | TraktSearchField.Aliases;
@@ -115,32 +100,111 @@ namespace Listrr.Controllers
             if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
             if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
             
-            await traktService.Create(new TraktList()
+            var result = await traktService.Create(new TraktList()
             {
                 Name = model.Name,
                 Query = model.Query ?? "",
+                Type = ListType.Movie,
                 Filter_SearchField = searchFields,
                 Filter_Years = model.Filter_Years,
                 Filter_Ratings = model.Filter_Ratings,
                 Filter_Runtimes = model.Filter_Runtimes,
-                Filter_Genres = new GenresCommonFilter(genres),
-                Filter_Languages = new LanguagesCommonFilter(languages),
-                Filter_Translations = new TranslationsBasicFilter(translations),
-                Filter_Certifications = new CertificationsMovieFilter(certifications),
-                Filter_Countries = new CountriesCommonFilter(countries),
+                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
+                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
                 Owner = await userManager.GetUserAsync(User)
             });
+
+            Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(result.Id));
 
             return RedirectToAction(nameof(MovieList));
         }
 
         [HttpGet]
         [Authorize]
-        public IActionResult ShowList()
+        public async Task<IActionResult> ShowList()
         {
-            ViewData["Message"] = "Overview of your lists";
+            ViewData["Message"] = "Create a new list for shows";
 
-            return View();
+            var dbGenres = await appDbContext.TraktShowGenres.ToListAsync();
+            var dbCertifications = await appDbContext.TraktShowCertifications.ToListAsync();
+            var dbCountryCodes = await appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbLanguageCodes = await appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbNetworks = await appDbContext.TraktShowNetworks.ToListAsync();
+            var dbStatus = await appDbContext.TraktShowStatuses.ToListAsync();
+
+            var model = new CreateShowListViewModel()
+            {
+                Genres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
+                Certifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description)),
+                Countries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
+                Languages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name)),
+                Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name)),
+                Networks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name)),
+                Status = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name)),
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ShowList(CreateShowListViewModel model)
+        {
+            ViewData["Message"] = "Create a new list for shows";
+
+            var dbGenres = await appDbContext.TraktShowGenres.ToListAsync();
+            var dbCertifications = await appDbContext.TraktShowCertifications.ToListAsync();
+            var dbCountryCodes = await appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbLanguageCodes = await appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbNetworks = await appDbContext.TraktShowNetworks.ToListAsync();
+            var dbStatus = await appDbContext.TraktShowStatuses.ToListAsync();
+
+            model.Genres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name));
+            model.Certifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description));
+            model.Countries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name));
+            model.Languages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name));
+            model.Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Name));
+            model.Networks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name));
+            model.Status = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name));
+
+            if (!ModelState.IsValid) return View(model);
+
+            TraktSearchField searchFields = new TraktSearchField();
+
+            if (model.SearchByAliases) searchFields = searchFields | TraktSearchField.Aliases;
+            if (model.SearchByBiography) searchFields = searchFields | TraktSearchField.Biography;
+            if (model.SearchByDescription) searchFields = searchFields | TraktSearchField.Description;
+            if (model.SearchByName) searchFields = searchFields | TraktSearchField.Name;
+            if (model.SearchByOverview) searchFields = searchFields | TraktSearchField.Overview;
+            if (model.SearchByPeople) searchFields = searchFields | TraktSearchField.People;
+            if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
+            if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
+
+            var result = await traktService.Create(new TraktList()
+            {
+                Name = model.Name,
+                Query = model.Query ?? "",
+                Type = ListType.Show,
+                Filter_SearchField = searchFields,
+                Filter_Years = model.Filter_Years,
+                Filter_Ratings = model.Filter_Ratings,
+                Filter_Runtimes = model.Filter_Runtimes,
+                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
+                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
+                Filter_Status = new StatusShowFilter(model.Filter_Status),
+                Owner = await userManager.GetUserAsync(User)
+            });
+
+            Hangfire.BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(result.Id));
+
+            return RedirectToAction(nameof(ShowList));
         }
 
         public IActionResult About()

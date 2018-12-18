@@ -5,7 +5,7 @@ EXPOSE 443
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY ["Listrr/Listrr.csproj", "Listrr/"]
+COPY ["Listrr.csproj", "Listrr/"]
 RUN dotnet restore "Listrr/Listrr.csproj"
 COPY . .
 WORKDIR "/src/Listrr"

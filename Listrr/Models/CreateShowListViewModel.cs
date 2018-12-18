@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Listrr.Models
 {
-    public class CreateMovieListViewModel
+    public class CreateShowListViewModel
     {
         [Required]
         [Display(Name = "List Name", Prompt = "List Name")]
@@ -16,8 +16,6 @@ namespace Listrr.Models
 
         [Display(Name = "Search by title", Prompt = "Search by title")]
         public bool SearchByTitle { get; set; }
-        [Display(Name = "Search by tagline", Prompt = "Search by tagline")]
-        public bool SearchByTagline { get; set; }
         [Display(Name = "Search by overview", Prompt = "Search by overview")]
         public bool SearchByOverview { get; set; }
         [Display(Name = "Search by people", Prompt = "Search by people")]
@@ -35,24 +33,24 @@ namespace Listrr.Models
 
         #region Basic Filter
 
-        [Display(Name = "Movie title", Prompt = "Movie title")]
+        [Display(Name = "Show title", Prompt = "Show title")]
         public string Filter_Title { get; set; }
 
-        [Display(Name = "Movie tagline", Prompt = "Movie tagline")]
+        [Display(Name = "Show tagline", Prompt = "Show tagline")]
         public string Filter_Tagline { get; set; }
 
-        [Display(Name = "Movie overview", Prompt = "Movie overview")]
+        [Display(Name = "Show overview", Prompt = "Show overview")]
         public string Filter_Overview { get; set; }
 
-        [Display(Name = "Movie people", Prompt = "Movie people")]
+        [Display(Name = "Show people", Prompt = "Show people")]
         public string Filter_People { get; set; }
 
-        [Display(Name = "Movie translation", Prompt = "de,en,ru")]
+        [Display(Name = "Show translation", Prompt = "de,en,ru")]
         public IEnumerable<string> Filter_Translations { get; set; }
 
         public MultiSelectList Translations { get; set; }
 
-        [Display(Name = "Movie aliases", Prompt = "Movie aliases")]
+        [Display(Name = "Show aliases", Prompt = "Show aliases")]
         public string Filter_Aliases { get; set; }
 
         #endregion
@@ -62,32 +60,44 @@ namespace Listrr.Models
         [Display(Name = "Release year", Prompt = "2010 or 1990-2000")]
         public YearsCommonFilter Filter_Years { get; set; }
 
-        [Display(Name = "Movie runtime", Prompt = "30-200")]
+        [Display(Name = "Show runtime", Prompt = "30-200")]
         public RuntimesCommonFilter Filter_Runtimes { get; set; }
 
-        [Display(Name = "Movie rating", Prompt = "0-10 or 5")]
+        [Display(Name = "Show rating", Prompt = "0-10 or 5")]
         public RatingsCommonFilter Filter_Ratings { get; set; }
 
-        [Display(Name = "Movie language", Prompt = "en,de,ru")]
+        [Display(Name = "Show language", Prompt = "en,de,ru")]
         public IEnumerable<string> Filter_Languages { get; set; }
         public MultiSelectList Languages { get; set; }
 
-        [Display(Name = "Movie genres", Prompt = "action,adventure")]
+        [Display(Name = "Show genres", Prompt = "action,adventure")]
         public IEnumerable<string> Filter_Genres { get; set; }
         public MultiSelectList Genres { get; set; }
 
-        [Display(Name = "Movie countries", Prompt = "uk,us,de,ru")]
+        [Display(Name = "Show countries", Prompt = "uk,us,de,ru")]
         public IEnumerable<string> Filter_Countries { get; set; }
         public MultiSelectList Countries { get; set; }
 
         #endregion
 
-        #region Movie Filter
+        #region Show Filter
 
-        [Display(Name = "Movie certification", Prompt = "r,pg-13")]
+        [Display(Name = "Show certification", Prompt = "r,pg-13")]
         public IEnumerable<string>  Filter_Certifications { get; set; }
 
         public MultiSelectList Certifications { get; set; }
+
+
+        [Display(Name = "Show networks", Prompt = "netflix,amazon")]
+        public IEnumerable<string> Filter_Networks { get; set; }
+
+        public MultiSelectList Networks { get; set; }
+
+
+        [Display(Name = "Show status", Prompt = "planned,in production")]
+        public IEnumerable<string> Filter_Status { get; set; }
+
+        public MultiSelectList Status { get; set; }
 
         #endregion
 

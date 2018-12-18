@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters
@@ -12,6 +10,11 @@ namespace Listrr.API.Trakt.Models.Filters
         public NetworksShowFilter()
         {
             
+        }
+
+        public NetworksShowFilter(IEnumerable<string> networks)
+        {
+            this.Networks = networks?.ToArray();
         }
 
         [AliasAs("networks")]

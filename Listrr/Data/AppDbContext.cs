@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Data.Trakt;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TraktNet.Enums;
+using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
 namespace Listrr.Data
 {
@@ -19,6 +17,10 @@ namespace Listrr.Data
         public DbSet<TraktShowCertification> TraktShowCertifications { get; set; }
         public DbSet<TraktShowGenre> TraktShowGenres { get; set; }
         public DbSet<TraktMovieGenre> TraktMovieGenres { get; set; }
+
+
+        public DbSet<TraktShowNetwork> TraktShowNetworks { get; set; }
+        public DbSet<TraktShowStatus> TraktShowStatuses { get; set; }
 
 
         public DbSet<CountryCode> CountryCodes { get; set; }
@@ -84,6 +86,32 @@ namespace Listrr.Data
 
             #endregion
 
+            #region TraktShowNetwork
+
+            builder
+                .Entity<TraktShowNetwork>()
+                .HasIndex(x => x.Name)
+                .IsUnique();
+
+            builder
+                .Entity<TraktShowNetwork>()
+                .HasKey(x => x.Name);
+
+            #endregion
+
+            #region TraktShowStatus
+
+            builder
+                .Entity<TraktShowStatus>()
+                .HasIndex(x => x.Name)
+                .IsUnique();
+
+            builder
+                .Entity<TraktShowStatus>()
+                .HasKey(x => x.Name);
+
+            #endregion
+
             #region TraktList
 
             builder
@@ -101,10 +129,34 @@ namespace Listrr.Data
 
             builder
                 .Entity<TraktList>()
-                .Property(x => x.Filter_Certifications)
+                .Property(x => x.Filter_Certifications_Movie)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.Filter_Certifications_Show)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.Filter_Networks)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.Filter_Status)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
                 );
 
             builder
@@ -188,8 +240,6 @@ namespace Listrr.Data
                 .HasKey(x => new { x.Name, x.Code });
 
             #endregion
-
-
 
             base.OnModelCreating(builder);
         }

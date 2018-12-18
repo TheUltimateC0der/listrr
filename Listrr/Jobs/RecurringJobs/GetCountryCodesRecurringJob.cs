@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Listrr.Data;
-using Listrr.Data.Trakt;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using TraktNet;
 
 namespace Listrr.BackgroundJob
 {
