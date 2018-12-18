@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Listrr.API.Trakt;
+using Listrr.Comparer;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Models;
@@ -18,8 +19,11 @@ using Newtonsoft.Json;
 using Refit;
 using TraktNet;
 using TraktNet.Enums;
+using TraktNet.Exceptions;
 using TraktNet.Objects.Authentication;
 using TraktNet.Objects.Get.Movies;
+using TraktNet.Objects.Get.People;
+using TraktNet.Objects.Get.Shows;
 using TraktNet.Objects.Post.Users.CustomListItems;
 using TraktNet.Requests.Parameters;
 using TraktNet.Utils;
@@ -121,11 +125,15 @@ namespace Listrr.Repositories
 
             foreach (var traktSearchResult in result.Value)
             {
-                list.Add(traktSearchResult.Movie);
+                if(!list.Contains(traktSearchResult.Movie, new TraktMovieComparer()))
+                    list.Add(traktSearchResult.Movie);
             }
 
-            if (result.PageCount > page) await MovieSearch(model, page + 1, limit, list);
-
+            if (result.PageCount > page)
+            {
+                //await Task.Delay(500); //Since we dont want to destroy the trakt.tv API
+                await MovieSearch(model, page + 1, limit, list);
+            }
         }
 
         public async Task<TraktList> Update(TraktList model)
@@ -183,16 +191,48 @@ namespace Listrr.Repositories
 
         public async Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list)
         {
-            await PrepareForAPIRequest(list.Owner);
+            try
+            {
+                await PrepareForAPIRequest(list.Owner);
 
-            var result = await traktClient.Users.AddCustomListItemsAsync(
-                list.Owner.UserName,
-                list.Slug,
-                TraktUserCustomListItemsPost.Builder().AddMovies(movies).Build(),
-                TraktListItemType.Movie
-            );
+                var builder = TraktUserCustomListItemsPost.Builder();
 
-            if (!result.IsSuccess) throw result.Exception;
+                builder.AddMovies(movies);
+                builder.AddPersons(new List<ITraktPerson>());
+                builder.AddShows(new List<ITraktShow>());
+
+
+                var result = await traktClient.Users.AddCustomListItemsAsync(
+                    list.Owner.UserName,
+                    list.Slug,
+                    builder.Build(),
+                    TraktListItemType.Movie
+                );
+
+                if (!result.IsSuccess)
+                {
+                    var ex = (TraktBadRequestException)result.Exception;
+
+
+
+                    //result.Exception;
+                }
+            }
+            catch (TraktBadRequestException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
+
+            //if (!result.IsSuccess)
+            //{
+            //    var ex = (TraktBadRequestException) result.Exception;
+
+
+
+            //    //result.Exception;
+            //}
         }
 
 

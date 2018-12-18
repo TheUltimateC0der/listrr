@@ -118,7 +118,7 @@ namespace Listrr.Controllers
             await traktService.Create(new TraktList()
             {
                 Name = model.Name,
-                Query = model.Query,
+                Query = model.Query ?? "",
                 Filter_SearchField = searchFields,
                 Filter_Years = model.Filter_Years,
                 Filter_Ratings = model.Filter_Ratings,

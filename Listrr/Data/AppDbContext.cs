@@ -127,24 +127,24 @@ namespace Listrr.Data
                 .Entity<TraktList>()
                 .Property(x => x.Filter_Ratings)
                 .HasConversion(
-                    x => $"{x.From}-{x.To}",
-                    x => new RatingsCommonFilter(x)
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RatingsCommonFilter>(x)
                 );
 
             builder
                 .Entity<TraktList>()
                 .Property(x => x.Filter_Runtimes)
                 .HasConversion(
-                    x => $"{x.From}-{x.To}",
-                    x => new RuntimesCommonFilter(x)
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RuntimesCommonFilter>(x)
                 );
 
             builder
                 .Entity<TraktList>()
                 .Property(x => x.Filter_Years)
                 .HasConversion(
-                    x => $"{x.From}-{x.To}",
-                    x => new YearsCommonFilter(x)
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<YearsCommonFilter>(x)
                 );
 
             builder

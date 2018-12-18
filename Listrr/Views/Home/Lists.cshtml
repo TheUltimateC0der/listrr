@@ -12,13 +12,32 @@
     {
         <div class="col-md-12">
             <div class="alert alert-info" role="alert">
-                #FeelsBadMan You currently have exactly 0 lists. I am pretty sure you want to <a class="btn btn-xs btn-primary" asp-action="MovieList" role="button">create one!</a>
+                #FeelsBadMan You currently have exactly 0 lists. I am pretty sure you want to create a new <a class="btn btn-xs btn-primary" asp-action="MovieList" role="button">movie list</a> or a new <a class="btn btn-xs btn-primary" asp-action="ShowList" role="button">show list</a>
             </div>
         </div>
     }
-    
-    <div class="col-md-12">
-
-    </div>
-
+    else
+    {
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <td><b>Name</b></td>
+                    <td><b>Last processed</b></td>
+                    <td><b>Type</b></td>
+                    <td><b>Items</b></td>
+                </tr>
+                </thead>
+                @foreach (var list in Model)
+                {
+                    <tr>
+                        <td>@list.Name</td>
+                        <td>@list.LastProcessed</td>
+                        <td>@list.Type</td>
+                        <td>@list.Items</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
 </div>

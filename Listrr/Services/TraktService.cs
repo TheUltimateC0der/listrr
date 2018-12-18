@@ -79,7 +79,7 @@ namespace Listrr.Services
 
         public async Task<TraktList> Update(TraktList model)
         {
-            model = await traktListApiRepository.Update(model);
+            //model = await traktListApiRepository.Update(model);
             model = await traktListDbRepository.Update(model);
 
             return model;

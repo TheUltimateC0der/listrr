@@ -18,12 +18,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Refit" Version="4.6.58" />
-    <PackageReference Include="Trakt.NET" Version="1.0.0-alpha3" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="AspNet.Security.OAuth.Trakt">
       <HintPath>..\..\..\Github\AspNet.Security.OAuth.Providers\src\AspNet.Security.OAuth.Trakt\bin\Release\netstandard2.0\AspNet.Security.OAuth.Trakt.dll</HintPath>
+    </Reference>
+    <Reference Include="Trakt.NET">
+      <HintPath>..\..\..\Github\Trakt.NET\Build\Lib\Debug\netstandard1.1\Trakt.NET.dll</HintPath>
     </Reference>
   </ItemGroup>
 
