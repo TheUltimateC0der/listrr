@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Jobs.BackgroundJobs;
 using Listrr.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using TraktNet;
-using TraktNet.Objects.Authentication;
 
 namespace Listrr.BackgroundJob
 {
@@ -33,7 +26,20 @@ namespace Listrr.BackgroundJob
 
             foreach (var traktList in lists)
             {
-                Hangfire.BackgroundJob.Enqueue<ProcessListBackgroundJob>(x => x.Execute(traktList.Id));
+                switch (traktList.Type)
+                {
+                    case ListType.Movie:
+                        Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id));
+
+                        break;
+                    case ListType.Show:
+                        Hangfire.BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id));
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                
             }
 
         }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 using Listrr.API.Trakt.Models.Filters;
 using Microsoft.AspNetCore.Identity;
 using TraktNet.Enums;
@@ -65,7 +62,17 @@ namespace Listrr.Data.Trakt
 
         #region Movie Filter
 
-        public CertificationsMovieFilter Filter_Certifications { get; set; }
+        public CertificationsMovieFilter Filter_Certifications_Movie { get; set; }
+
+        #endregion
+
+        #region Show Filter
+
+        public CertificationsShowFilter Filter_Certifications_Show { get; set; }
+
+        public NetworksShowFilter Filter_Networks { get; set; }
+
+        public StatusShowFilter Filter_Status { get; set; }
 
         #endregion
 

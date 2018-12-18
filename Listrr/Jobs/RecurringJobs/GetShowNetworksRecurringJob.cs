@@ -8,14 +8,14 @@ using TraktNet;
 
 namespace Listrr.BackgroundJob
 {
-    public class GetMovieGenresRecurringJob : IRecurringJob
+    public class GetShowNetworksRecurringJob : IRecurringJob
     {
 
         private readonly TraktClient traktClient;
         private readonly IConfiguration configuration;
         private readonly AppDbContext appDbContext;
 
-        public GetMovieGenresRecurringJob(AppDbContext appDbContext, IConfiguration configuration)
+        public GetShowNetworksRecurringJob(AppDbContext appDbContext, IConfiguration configuration)
         {
             this.configuration = configuration;
             this.appDbContext = appDbContext;
@@ -26,20 +26,19 @@ namespace Listrr.BackgroundJob
 
         public async Task Execute()
         {
-            var result = await traktClient.Genres.GetMovieGenresAsync();
+            var result = await traktClient.Networks.GetNetworksAsync();
 
             if (result.IsSuccess)
             {
-                var currentGenres = await appDbContext.TraktMovieGenres.ToListAsync();
+                var currentNetworks = await appDbContext.TraktShowNetworks.ToListAsync();
 
-                foreach (var traktGenre in result.Value)
+                foreach (var traktNetwork in result.Value)
                 {
-                    if (currentGenres.All(x => x.Slug != traktGenre.Slug))
+                    if (currentNetworks.All(x => x.Name != traktNetwork.Network))
                     {
-                        await appDbContext.TraktMovieGenres.AddAsync(new TraktMovieGenre()
+                        await appDbContext.TraktShowNetworks.AddAsync(new TraktShowNetwork()
                         {
-                            Name = traktGenre.Name,
-                            Slug = traktGenre.Slug
+                            Name = traktNetwork.Network
                         });
                         await appDbContext.SaveChangesAsync();
                     }

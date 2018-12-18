@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters
@@ -14,16 +12,9 @@ namespace Listrr.API.Trakt.Models.Filters
             
         }
 
-        public LanguagesCommonFilter(string csv)
+        public LanguagesCommonFilter(IEnumerable<string> languages)
         {
-            if (csv.Length > 0 || csv.Contains(","))
-            {
-                Languages = csv.Split(",");
-            }
-            else
-            {
-                Languages = null;
-            }
+            this.Languages = languages?.ToArray();
         }
 
 

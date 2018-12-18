@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
 using Microsoft.AspNetCore.Identity;
 using TraktNet.Objects.Get.Movies;
+using TraktNet.Objects.Get.Shows;
 
 namespace Listrr.Services
 {
@@ -24,6 +23,11 @@ namespace Listrr.Services
         public async Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list)
         {
             await traktListApiRepository.AddMovies(movies, list);
+        }
+
+        public async Task AddShows(IEnumerable<ITraktShow> shows, TraktList list)
+        {
+            await traktListApiRepository.AddShows(shows, list);
         }
 
         public async Task<TraktList> Create(TraktList model)
@@ -67,9 +71,14 @@ namespace Listrr.Services
             return await traktListDbRepository.GetProcessable();
         }
 
-        public Task<List<ITraktMovie>> MovieSearch(TraktList model)
+        public async Task<List<ITraktShow>> GetShows(TraktList model)
         {
-            return traktListApiRepository.MovieSearch(model);
+            return await traktListApiRepository.GetShows(model);
+        }
+
+        public async Task<List<ITraktMovie>> MovieSearch(TraktList model)
+        {
+            return await traktListApiRepository.MovieSearch(model);
         }
 
         public async Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list)
@@ -77,12 +86,19 @@ namespace Listrr.Services
             await traktListApiRepository.RemoveMovies(movies, list);
         }
 
+        public async Task RemoveShows(IEnumerable<ITraktShow> shows, TraktList list)
+        {
+            await traktListApiRepository.RemoveShows(shows, list);
+        }
+
+        public async Task<List<ITraktShow>> ShowSearch(TraktList model)
+        {
+            return await traktListApiRepository.ShowSearch(model);
+        }
+
         public async Task<TraktList> Update(TraktList model)
         {
-            //model = await traktListApiRepository.Update(model);
-            model = await traktListDbRepository.Update(model);
-
-            return model;
+            return await traktListDbRepository.Update(model);
         }
     }
 }

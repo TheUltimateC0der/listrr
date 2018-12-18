@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters
@@ -15,16 +12,9 @@ namespace Listrr.API.Trakt.Models.Filters
             
         }
 
-        public CountriesCommonFilter(string csv)
+        public CountriesCommonFilter(IEnumerable<string> countries)
         {
-            if (csv.Length > 0 || csv.Contains(","))
-            {
-                Languages = csv.Split(",");
-            }
-            else
-            {
-                Languages = null;
-            }
+            this.Languages = countries?.ToArray();
         }
 
 

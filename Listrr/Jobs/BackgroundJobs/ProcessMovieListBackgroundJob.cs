@@ -8,12 +8,12 @@ using TraktNet.Objects.Get.Movies;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
-    public class ProcessListBackgroundJob : IBackgroundJob<uint>
+    public class ProcessMovieListBackgroundJob : IBackgroundJob<uint>
     {
 
         private readonly ITraktService traktService;
 
-        public ProcessListBackgroundJob(ITraktService traktService)
+        public ProcessMovieListBackgroundJob(ITraktService traktService)
         {
             this.traktService = traktService;
         }
