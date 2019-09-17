@@ -1,5 +1,3 @@
-using System;
-
 namespace Listrr.Models
 {
     public class ErrorViewModel
