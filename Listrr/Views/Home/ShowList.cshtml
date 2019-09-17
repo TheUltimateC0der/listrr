@@ -18,7 +18,7 @@
                     </div>
                     <div class="form-group">
                         <input asp-for="Query" class="form-control" />
-                        <small class="form-text text-muted">Query e.g. <code>disney</code> for kids movies</small>
+                        <small class="form-text text-muted">Query e.g. <code>disney</code> for kids shows</small>
                         <span asp-validation-for="Query" class="text-danger"></span>
                     </div>
                     <div class="checkbox">
@@ -80,23 +80,18 @@
                     </div>
                     <div class="form-group">
                         <select asp-for="Filter_Translations" asp-items="Model.Languages" class="form-control" multiple></select>
-                        <small class="form-text text-muted">Select the languages that a movie has to have translatins for</small>
+                        <small class="form-text text-muted">Select the languages that a show has to have translatins for</small>
                         <span asp-validation-for="Filter_Translations" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <select asp-for="Filter_Genres" asp-items="Model.Genres" class="form-control" multiple></select>
-                        <small class="form-text text-muted">Select the genres a movie should have</small>
+                        <small class="form-text text-muted">Select the genres a show should have</small>
                         <span asp-validation-for="Filter_Genres" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <select asp-for="Filter_Networks" asp-items="Model.Networks" class="form-control" multiple></select>
                         <small class="form-text text-muted">Networks filter e.g. <code>netflix,amazon</code> for shows that are available on netflix and amazon</small>
                         <span asp-validation-for="Filter_Networks" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <select asp-for="Filter_Status" asp-items="Model.Status" class="form-control" multiple></select>
-                        <small class="form-text text-muted">Status filter e.g. <code>planned,in production</code> for shows coming in near future.</small>
-                        <span asp-validation-for="Filter_Status" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -118,7 +113,7 @@
                             <span class="input-group-addon" style="border-left: 0; border-right: 0;">and</span>
                             <input asp-for="Filter_Runtimes.To" value="250" class="form-control" />
                         </div>
-                        <small class="form-text text-muted">Runtime filter e.g. <code>30-200</code> for movies with a runtime min. 30 and max. 200 minutes</small>
+                        <small class="form-text text-muted">Runtime filter e.g. <code>30-200</code> for shows with a runtime min. 30 and max. 200 minutes</small>
                         <span asp-validation-for="Filter_Runtimes.From" class="text-danger"></span>
                         <span asp-validation-for="Filter_Runtimes.To" class="text-danger"></span>
                     </div>
@@ -135,18 +130,23 @@
                     </div>
                     <div class="form-group">
                         <select asp-for="Filter_Languages" asp-items="Model.Languages" class="form-control" multiple></select>
-                        <small class="form-text text-muted">Languages filter e.g. <code>en,de</code> for movies that are available in english and german</small>
+                        <small class="form-text text-muted">Languages filter e.g. <code>en,de</code> for shows that are available in english and german</small>
                         <span asp-validation-for="Filter_Languages" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <select asp-for="Filter_Countries" asp-items="Model.Countries" class="form-control" multiple></select>
-                        <small class="form-text text-muted">Countries filter e.g. <code>us,de</code> for movies that are available in the US and germany</small>
+                        <small class="form-text text-muted">Countries filter e.g. <code>us,de</code> for shows that are available in the US and germany</small>
                         <span asp-validation-for="Filter_Countries" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <select asp-for="Filter_Certifications" asp-items="Model.Certifications" class="form-control" multiple></select>
-                        <small class="form-text text-muted">Certifications filter e.g. <code>g,pg</code> for kids movies.</small>
+                        <small class="form-text text-muted">Certifications filter e.g. <code>g,pg</code> for kids shows.</small>
                         <span asp-validation-for="Filter_Certifications" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <select asp-for="Filter_Status" asp-items="Model.Status" class="form-control" multiple></select>
+                        <small class="form-text text-muted">Status filter e.g. <code>planned,in production</code> for shows coming in near future.</small>
+                        <span asp-validation-for="Filter_Status" class="text-danger"></span>
                     </div>
                 </div>
             </div>
