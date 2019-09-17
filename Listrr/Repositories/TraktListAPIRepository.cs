@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Listrr.Comparer;
+﻿using Listrr.Comparer;
 using Listrr.Data.Trakt;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TraktNet;
 using TraktNet.Enums;
 using TraktNet.Objects.Authentication;
@@ -21,30 +21,32 @@ namespace Listrr.Repositories
     public class TraktListAPIRepository : ITraktListAPIRepository
     {
 
-        private readonly TraktClient traktClient;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IConfiguration configuration;
+        private readonly TraktClient _traktClient;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _configuration;
+
+        private readonly uint? fetchLimit = 100;
 
         public TraktListAPIRepository(UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
-            this.userManager = userManager;
-            this.httpContextAccessor = httpContextAccessor;
-            this.configuration = configuration;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
 
-            traktClient = new TraktClient(configuration["Trakt:ClientID"], configuration["Trakt:ClientSecret"]);
+            _traktClient = new TraktClient(configuration["Trakt:ClientID"], configuration["Trakt:ClientSecret"]);
         }
 
 
         public async Task<TraktList> Create(TraktList model)
         {
-            await PrepareForAPIRequest(model.Owner);
+            await PrepareForApiRequest(model.Owner);
 
-            var response = await traktClient.Users.CreateCustomListAsync(
+            var response = await _traktClient.Users.CreateCustomListAsync(
                 "me",
                 model.Name,
                 Constants.LIST_Description,
-                TraktAccessScope.Private,
+                TraktAccessScope.Public,
                 false,
                 false
             );
@@ -59,11 +61,18 @@ namespace Listrr.Repositories
             return model;
         }
 
+        public async Task Delete(TraktList model)
+        {
+            await PrepareForApiRequest(model.Owner);
+
+            await _traktClient.Users.DeleteCustomListAsync(model.Owner.UserName, model.Slug);
+        }
+
         public async Task<TraktList> Get(uint id)
         {
-            await PrepareForAPIRequest();
+            await PrepareForApiRequest();
 
-            var response = await traktClient.Users.GetCustomListAsync("me", id.ToString());
+            var response = await _traktClient.Users.GetCustomListAsync("me", id.ToString());
 
             if (!response.IsSuccess) throw response.Exception;
 
@@ -75,65 +84,67 @@ namespace Listrr.Repositories
             };
         }
 
-        public async Task<List<ITraktMovie>> MovieSearch(TraktList model)
+        public async Task<IList<ITraktMovie>> MovieSearch(TraktList model)
         {
             var list = new List<ITraktMovie>();
 
-            await MovieSearch(model, 0, 100, list);
+            await MovieSearch(model, list);
 
             return list;
         }
 
-        private async Task MovieSearch(TraktList model, uint? page, uint? limit, List<ITraktMovie> list)
+        private async Task MovieSearch(TraktList model, IList<ITraktMovie> list)
         {
-            var result = await traktClient.Search.GetTextQueryResultsAsync(
-                TraktSearchResultType.Movie,
-                model.Query,
-                model.Filter_SearchField,
-                new TraktSearchFilter(
-                    model.Filter_Years.From,
-                    model.Filter_Years.To,
-                    model.Filter_Genres.Genres,
-                    model.Filter_Languages.Languages,
-                    model.Filter_Countries.Languages,
-                    new Range<int>(
-                        model.Filter_Runtimes.From,
-                        model.Filter_Runtimes.To
-                    ),
-                    new Range<int>(
-                        model.Filter_Ratings.From,
-                        model.Filter_Ratings.To
-                    )
-                ), new TraktExtendedInfo().SetMetadata(),
-                new TraktPagedParameters(page, limit)
-            );
+            uint? page = 0;
 
-
-            if (!result.IsSuccess) throw result.Exception;
-
-            foreach (var traktSearchResult in result.Value)
+            while (true)
             {
-                if(!list.Contains(traktSearchResult.Movie, new TraktMovieComparer()))
-                    list.Add(traktSearchResult.Movie);
-            }
+                var result = await _traktClient.Search.GetTextQueryResultsAsync(
+                    TraktSearchResultType.Movie,
+                    model.Query,
+                    model.Filter_SearchField,
+                    new TraktSearchFilter(
+                        model.Filter_Years.From,
+                        model.Filter_Years.To,
+                        model.Filter_Genres.Genres,
+                        model.Filter_Languages.Languages,
+                        model.Filter_Countries.Languages,
+                        new Range<int>(
+                            model.Filter_Runtimes.From,
+                            model.Filter_Runtimes.To
+                        ),
+                        new Range<int>(
+                            model.Filter_Ratings.From,
+                            model.Filter_Ratings.To
+                        )
+                    ), new TraktExtendedInfo().SetMetadata(),
+                    new TraktPagedParameters(page, fetchLimit)
+                );
 
-            if (result.PageCount > page)
-            {
-                //await Task.Delay(500); //Since we dont want to destroy the trakt.tv API
-                await MovieSearch(model, page + 1, limit, list);
+                if (!result.IsSuccess) throw result.Exception;
+
+                foreach (var traktSearchResult in result.Value)
+                {
+                    if (!list.Contains(traktSearchResult.Movie, new TraktMovieComparer()))
+                        list.Add(traktSearchResult.Movie);
+                }
+
+                if (result.PageCount == page) break;
+
+                page++;
             }
         }
 
         public async Task<TraktList> Update(TraktList model)
         {
-            await PrepareForAPIRequest();
+            await PrepareForApiRequest();
 
-            await traktClient.Users.UpdateCustomListAsync(
+            await _traktClient.Users.UpdateCustomListAsync(
                 "me",
                 model.Id.ToString(),
                 model.Name,
                 Constants.LIST_Description,
-                TraktAccessScope.Private,
+                TraktAccessScope.Public,
                 false,
                 false
             );
@@ -142,9 +153,9 @@ namespace Listrr.Repositories
         }
 
         
-        public async Task<List<ITraktMovie>> GetMovies(TraktList model)
+        public async Task<IList<ITraktMovie>> GetMovies(TraktList model)
         {
-            await PrepareForAPIRequest(model.Owner);
+            await PrepareForApiRequest(model.Owner);
 
             var result = new List<ITraktMovie>();
 
@@ -153,9 +164,9 @@ namespace Listrr.Repositories
             return result;
         }
 
-        private async Task GetMovies(TraktList model, uint? page, uint? limit, List<ITraktMovie> list)
+        private async Task GetMovies(TraktList model, uint? page, uint? limit, IList<ITraktMovie> list)
         {
-            var result = await traktClient.Users.GetCustomListItemsAsync(
+            var result = await _traktClient.Users.GetCustomListItemsAsync(
                 model.Owner.UserName,
                 model.Slug,
                 TraktListItemType.Movie,
@@ -182,15 +193,14 @@ namespace Listrr.Repositories
         }
 
 
-        public async Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list)
+        public async Task AddMovies(IList<ITraktMovie> movies, TraktList list)
         {
-            await PrepareForAPIRequest(list.Owner);
+            await PrepareForApiRequest(list.Owner);
             
-            var result = await traktClient.Users.AddCustomListItemsAsync(
+            var result = await _traktClient.Users.AddCustomListItemsAsync(
                 list.Owner.UserName,
                 list.Slug,
-                TraktUserCustomListItemsPost.Builder().AddMovies(movies).Build(),
-                TraktListItemType.Movie
+                TraktUserCustomListItemsPost.Builder().AddMovies(movies).Build()
             );
 
             if (!result.IsSuccess) throw result.Exception;
@@ -198,9 +208,9 @@ namespace Listrr.Repositories
 
         public async Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list)
         {
-            await PrepareForAPIRequest(list.Owner);
+            await PrepareForApiRequest(list.Owner);
 
-            var result = await traktClient.Users.RemoveCustomListItemsAsync(
+            var result = await _traktClient.Users.RemoveCustomListItemsAsync(
                 list.Owner.UserName,
                 list.Slug,
                 TraktUserCustomListItemsPost.Builder().AddMovies(movies).Build()
@@ -212,9 +222,9 @@ namespace Listrr.Repositories
 
         
 
-        public async Task<List<ITraktShow>> GetShows(TraktList model)
+        public async Task<IList<ITraktShow>> GetShows(TraktList model)
         {
-            await PrepareForAPIRequest(model.Owner);
+            await PrepareForApiRequest(model.Owner);
 
             var result = new List<ITraktShow>();
 
@@ -223,9 +233,9 @@ namespace Listrr.Repositories
             return result;
         }
 
-        private async Task GetShows(TraktList model, uint? page, uint? limit, List<ITraktShow> list)
+        private async Task GetShows(TraktList model, uint? page, uint? limit, IList<ITraktShow> list)
         {
-            var result = await traktClient.Users.GetCustomListItemsAsync(
+            var result = await _traktClient.Users.GetCustomListItemsAsync(
                 model.Owner.UserName,
                 model.Slug,
                 TraktListItemType.Show,
@@ -252,15 +262,14 @@ namespace Listrr.Repositories
         }
 
 
-        public async Task AddShows(IEnumerable<ITraktShow> shows, TraktList list)
+        public async Task AddShows(IList<ITraktShow> shows, TraktList list)
         {
-            await PrepareForAPIRequest(list.Owner);
+            await PrepareForApiRequest(list.Owner);
 
-            var result = await traktClient.Users.AddCustomListItemsAsync(
+            var result = await _traktClient.Users.AddCustomListItemsAsync(
                 list.Owner.UserName,
                 list.Slug,
-                TraktUserCustomListItemsPost.Builder().AddShows(shows).Build(),
-                TraktListItemType.Show
+                TraktUserCustomListItemsPost.Builder().AddShows(shows).Build()
             );
 
             if (!result.IsSuccess) throw result.Exception;
@@ -268,9 +277,9 @@ namespace Listrr.Repositories
 
         public async Task RemoveShows(IEnumerable<ITraktShow> shows, TraktList list)
         {
-            await PrepareForAPIRequest(list.Owner);
+            await PrepareForApiRequest(list.Owner);
 
-            var result = await traktClient.Users.RemoveCustomListItemsAsync(
+            var result = await _traktClient.Users.RemoveCustomListItemsAsync(
                 list.Owner.UserName,
                 list.Slug,
                 TraktUserCustomListItemsPost.Builder().AddShows(shows).Build()
@@ -280,67 +289,72 @@ namespace Listrr.Repositories
         }
 
 
-        public async Task<List<ITraktShow>> ShowSearch(TraktList model)
+        public async Task<IList<ITraktShow>> ShowSearch(TraktList model)
         {
             var list = new List<ITraktShow>();
 
-            await ShowSearch(model, 0, 100, list);
+            await ShowSearch(model, list);
 
             return list;
         }
 
-        private async Task ShowSearch(TraktList model, uint? page, uint? limit, List<ITraktShow> list)
+        private async Task ShowSearch(TraktList model, IList<ITraktShow> list)
         {
-            var result = await traktClient.Search.GetTextQueryResultsAsync(
-                TraktSearchResultType.Show,
-                model.Query,
-                model.Filter_SearchField,
-                new TraktSearchFilter(
-                    model.Filter_Years.From,
-                    model.Filter_Years.To,
-                    model.Filter_Genres.Genres,
-                    model.Filter_Languages.Languages,
-                    model.Filter_Countries.Languages,
-                    new Range<int>(
-                        model.Filter_Runtimes.From,
-                        model.Filter_Runtimes.To
-                    ),
-                    new Range<int>(
-                        model.Filter_Ratings.From,
-                        model.Filter_Ratings.To
-                    )
-                ), new TraktExtendedInfo().SetMetadata(),
-                new TraktPagedParameters(page, limit)
-            );
+            uint? page = 0;
 
-
-            if (!result.IsSuccess) throw result.Exception;
-
-            foreach (var traktSearchResult in result.Value)
+            while (true)
             {
-                if (!list.Contains(traktSearchResult.Show, new TraktShowComparer()))
-                    list.Add(traktSearchResult.Show);
-            }
+                var result = await _traktClient.Search.GetTextQueryResultsAsync(
+                    TraktSearchResultType.Show,
+                    model.Query,
+                    model.Filter_SearchField,
+                    new TraktSearchFilter(
+                        model.Filter_Years.From,
+                        model.Filter_Years.To,
+                        model.Filter_Genres.Genres,
+                        model.Filter_Languages.Languages,
+                        model.Filter_Countries.Languages,
+                        new Range<int>(
+                            model.Filter_Runtimes.From,
+                            model.Filter_Runtimes.To
+                        ),
+                        new Range<int>(
+                            model.Filter_Ratings.From,
+                            model.Filter_Ratings.To
+                        ),
+                        model.Filter_Certifications_Show.Certifications,
+                        model.Filter_Networks.Networks
+                    ), new TraktExtendedInfo().SetMetadata(),
+                    new TraktPagedParameters(page, fetchLimit)
+                );
 
-            if (result.PageCount > page)
-            {
-                await Task.Delay(500); //Since we dont want to destroy the trakt.tv API
-                await ShowSearch(model, page + 1, limit, list);
+
+                if (!result.IsSuccess) throw result.Exception;
+
+                foreach (var traktSearchResult in result.Value)
+                {
+                    if (!list.Contains(traktSearchResult.Show, new TraktShowComparer()))
+                        list.Add(traktSearchResult.Show);
+                }
+
+                if (result.PageCount == page) break;
+
+                page++;
             }
         }
 
 
 
-        private async Task PrepareForAPIRequest(IdentityUser user = null)
+        private async Task PrepareForApiRequest(IdentityUser user = null)
         {
             if (user == null)
             {
-                user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+                user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             }
 
-            var expiresAtToken = await userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt);
-            var access_token = await userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
-            var refresh_token = await userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
+            var expiresAtToken = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt);
+            var access_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
+            var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
 
             var expiresAt = DateTime.Parse(expiresAtToken);
 
@@ -349,7 +363,9 @@ namespace Listrr.Repositories
                 //Refresh the token
             }
 
-            traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
+            _traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
         }
+
+        
     }
 }

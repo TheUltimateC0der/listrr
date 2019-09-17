@@ -20,15 +20,15 @@ namespace Listrr.Controllers
     public class HomeController : Controller
     {
 
-        private readonly ITraktService traktService;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly AppDbContext appDbContext;
+        private readonly ITraktService _traktService;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly AppDbContext _appDbContext;
 
         public HomeController(ITraktService traktService, UserManager<IdentityUser> userManager, AppDbContext appDbContext)
         {
-            this.traktService = traktService;
-            this.userManager = userManager;
-            this.appDbContext = appDbContext;
+            _traktService = traktService;
+            _userManager = userManager;
+            _appDbContext = appDbContext;
         }
         
 
@@ -43,7 +43,7 @@ namespace Listrr.Controllers
         {
             ViewData["Message"] = "Overview of your lists";
 
-            return View(await traktService.Get(await userManager.GetUserAsync(User)));
+            return View(await _traktService.Get(await _userManager.GetUserAsync(User)));
         }
 
         [HttpGet]
@@ -52,10 +52,10 @@ namespace Listrr.Controllers
         {
             ViewData["Message"] = "Create a new list for movies";
 
-            var dbGenres = await appDbContext.TraktMovieGenres.ToListAsync();
-            var dbCertifications = await appDbContext.TraktMovieCertifications.ToListAsync();
-            var dbCountryCodes = await appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbLanguageCodes = await appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbGenres = await _appDbContext.TraktMovieGenres.ToListAsync();
+            var dbCertifications = await _appDbContext.TraktMovieCertifications.ToListAsync();
+            var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
             
             var model = new CreateMovieListViewModel()
             {
@@ -75,10 +75,10 @@ namespace Listrr.Controllers
         {
             ViewData["Message"] = "Create a new list for movies";
 
-            var dbGenres = await appDbContext.TraktMovieGenres.ToListAsync();
-            var dbCertifications = await appDbContext.TraktMovieCertifications.ToListAsync();
-            var dbCountryCodes = await appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbLanguageCodes = await appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbGenres = await _appDbContext.TraktMovieGenres.ToListAsync();
+            var dbCertifications = await _appDbContext.TraktMovieCertifications.ToListAsync();
+            var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
 
             model.Genres = new MultiSelectList(dbGenres, nameof(TraktMovieGenre.Slug), nameof(TraktMovieGenre.Slug));
             model.Certifications = new MultiSelectList(dbCertifications, nameof(TraktMovieCertification.Slug), nameof(TraktMovieCertification.Description));
@@ -99,8 +99,9 @@ namespace Listrr.Controllers
             if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
             if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
             if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
+
             
-            var result = await traktService.Create(new TraktList()
+            var result = await _traktService.Create(new TraktList()
             {
                 Name = model.Name,
                 Query = model.Query ?? "",
@@ -114,7 +115,7 @@ namespace Listrr.Controllers
                 Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
                 Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
                 Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
-                Owner = await userManager.GetUserAsync(User)
+                Owner = await _userManager.GetUserAsync(User)
             });
 
             Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(result.Id));
@@ -122,18 +123,19 @@ namespace Listrr.Controllers
             return RedirectToAction(nameof(MovieList));
         }
 
+
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ShowList()
         {
             ViewData["Message"] = "Create a new list for shows";
 
-            var dbGenres = await appDbContext.TraktShowGenres.ToListAsync();
-            var dbCertifications = await appDbContext.TraktShowCertifications.ToListAsync();
-            var dbCountryCodes = await appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbLanguageCodes = await appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbNetworks = await appDbContext.TraktShowNetworks.ToListAsync();
-            var dbStatus = await appDbContext.TraktShowStatuses.ToListAsync();
+            var dbGenres = await _appDbContext.TraktShowGenres.ToListAsync();
+            var dbCertifications = await _appDbContext.TraktShowCertifications.ToListAsync();
+            var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbNetworks = await _appDbContext.TraktShowNetworks.ToListAsync();
+            var dbStatus = await _appDbContext.TraktShowStatuses.ToListAsync();
 
             var model = new CreateShowListViewModel()
             {
@@ -155,12 +157,12 @@ namespace Listrr.Controllers
         {
             ViewData["Message"] = "Create a new list for shows";
 
-            var dbGenres = await appDbContext.TraktShowGenres.ToListAsync();
-            var dbCertifications = await appDbContext.TraktShowCertifications.ToListAsync();
-            var dbCountryCodes = await appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbLanguageCodes = await appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbNetworks = await appDbContext.TraktShowNetworks.ToListAsync();
-            var dbStatus = await appDbContext.TraktShowStatuses.ToListAsync();
+            var dbGenres = await _appDbContext.TraktShowGenres.ToListAsync();
+            var dbCertifications = await _appDbContext.TraktShowCertifications.ToListAsync();
+            var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
+            var dbNetworks = await _appDbContext.TraktShowNetworks.ToListAsync();
+            var dbStatus = await _appDbContext.TraktShowStatuses.ToListAsync();
 
             model.Genres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name));
             model.Certifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description));
@@ -183,7 +185,7 @@ namespace Listrr.Controllers
             if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
             if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
 
-            var result = await traktService.Create(new TraktList()
+            var result = await _traktService.Create(new TraktList()
             {
                 Name = model.Name,
                 Query = model.Query ?? "",
@@ -199,7 +201,7 @@ namespace Listrr.Controllers
                 Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
                 Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
                 Filter_Status = new StatusShowFilter(model.Filter_Status),
-                Owner = await userManager.GetUserAsync(User)
+                Owner = await _userManager.GetUserAsync(User)
             });
 
             Hangfire.BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(result.Id));

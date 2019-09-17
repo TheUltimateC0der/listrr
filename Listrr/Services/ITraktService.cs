@@ -12,18 +12,19 @@ namespace Listrr.Services
 
         Task<TraktList> Get(uint id, bool forceAPI = false);
         Task<List<TraktList>> Get(IdentityUser user);
+        Task Delete(TraktList model);
 
-        Task<List<ITraktMovie>> GetMovies(TraktList model);
-        Task<List<ITraktShow>> GetShows(TraktList model);
+        Task<IList<ITraktMovie>> GetMovies(TraktList model);
+        Task<IList<ITraktShow>> GetShows(TraktList model);
 
-        Task<List<TraktList>> GetProcessable();
+        Task<IList<TraktList>> GetProcessable();
 
 
-        Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list);
+        Task AddMovies(IList<ITraktMovie> movies, TraktList list);
         Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list);
 
 
-        Task AddShows(IEnumerable<ITraktShow> movies, TraktList list);
+        Task AddShows(IList<ITraktShow> movies, TraktList list);
         Task RemoveShows(IEnumerable<ITraktShow> movies, TraktList list);
 
 
@@ -31,8 +32,8 @@ namespace Listrr.Services
         Task<TraktList> Update(TraktList model);
 
 
-        Task<List<ITraktMovie>> MovieSearch(TraktList model);
-        Task<List<ITraktShow>> ShowSearch(TraktList model);
+        Task<IList<ITraktMovie>> MovieSearch(TraktList model);
+        Task<IList<ITraktShow>> ShowSearch(TraktList model);
 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Listrr.Comparer;
+using Listrr.Extensions;
 using Listrr.Services;
 using TraktNet.Objects.Get.Movies;
 
@@ -39,10 +40,22 @@ namespace Listrr.Jobs.BackgroundJobs
             }
 
             if (moviesToAdd.Any())
-                await traktService.AddMovies(moviesToAdd, list);
+            {
+                //Chunking to 100 items per list cause trakt api does not like 10000s of items
+                foreach (var moviesToAddChunk in moviesToAdd.ChunkBy(100))
+                {
+                    await traktService.AddMovies(moviesToAddChunk, list);
+                }
+            }
 
-            if(moviesToRemove.Any())
-                await traktService.RemoveMovies(moviesToRemove, list);
+            if (moviesToRemove.Any())
+            {
+                //Chunking to 100 items per list cause trakt api does not like 10000s of items
+                foreach (var moviesToRemoveChunk in moviesToRemove.ChunkBy(100))
+                {
+                    await traktService.RemoveMovies(moviesToRemoveChunk, list);
+                }
+            }
 
             list.Items = (existingMovies.Count + moviesToAdd.Count - moviesToRemove.Count);
             list.LastProcessed = DateTime.Now;

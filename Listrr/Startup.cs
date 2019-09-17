@@ -105,7 +105,10 @@ namespace Listrr
             GlobalConfiguration.Configuration
                 .UseActivator(new HangfireActivator(serviceProvider));
 
-            app.UseHangfireServer();
+            app.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                WorkerCount = 2
+            });
             if(env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
                 app.UseHangfireDashboard();
 
