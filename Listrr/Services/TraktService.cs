@@ -20,12 +20,12 @@ namespace Listrr.Services
             this.traktListApiRepository = traktListApiRepository;
         }
 
-        public async Task AddMovies(IEnumerable<ITraktMovie> movies, TraktList list)
+        public async Task AddMovies(IList<ITraktMovie> movies, TraktList list)
         {
             await traktListApiRepository.AddMovies(movies, list);
         }
 
-        public async Task AddShows(IEnumerable<ITraktShow> shows, TraktList list)
+        public async Task AddShows(IList<ITraktShow> shows, TraktList list)
         {
             await traktListApiRepository.AddShows(shows, list);
         }
@@ -36,6 +36,11 @@ namespace Listrr.Services
             model = await traktListDbRepository.Create(model);
 
             return model;
+        }
+
+        public async Task Delete(TraktList model)
+        {
+            await traktListApiRepository.Delete(model);
         }
 
         public async Task<TraktList> Get(uint id, bool forceAPI = false)
@@ -61,22 +66,22 @@ namespace Listrr.Services
             return traktListDbRepository.Get(user);
         }
 
-        public async Task<List<ITraktMovie>> GetMovies(TraktList model)
+        public async Task<IList<ITraktMovie>> GetMovies(TraktList model)
         {
             return await traktListApiRepository.GetMovies(model);
         }
 
-        public async Task<List<TraktList>> GetProcessable()
+        public async Task<IList<TraktList>> GetProcessable()
         {
             return await traktListDbRepository.GetProcessable();
         }
 
-        public async Task<List<ITraktShow>> GetShows(TraktList model)
+        public async Task<IList<ITraktShow>> GetShows(TraktList model)
         {
             return await traktListApiRepository.GetShows(model);
         }
 
-        public async Task<List<ITraktMovie>> MovieSearch(TraktList model)
+        public async Task<IList<ITraktMovie>> MovieSearch(TraktList model)
         {
             return await traktListApiRepository.MovieSearch(model);
         }
@@ -91,14 +96,17 @@ namespace Listrr.Services
             await traktListApiRepository.RemoveShows(shows, list);
         }
 
-        public async Task<List<ITraktShow>> ShowSearch(TraktList model)
+        public async Task<IList<ITraktShow>> ShowSearch(TraktList model)
         {
             return await traktListApiRepository.ShowSearch(model);
         }
 
         public async Task<TraktList> Update(TraktList model)
         {
+            await traktListApiRepository.Update(model);
+
             return await traktListDbRepository.Update(model);
+            
         }
     }
 }
