@@ -34,11 +34,11 @@ namespace Listrr.BackgroundJob
 
                 foreach (var traktNetwork in result.Value)
                 {
-                    if (currentNetworks.All(x => x.Name != traktNetwork.Network))
+                    if (currentNetworks.All(x => x.Name != traktNetwork.Name))
                     {
                         await appDbContext.TraktShowNetworks.AddAsync(new TraktShowNetwork()
                         {
-                            Name = traktNetwork.Network
+                            Name = traktNetwork.Name
                         });
                         await appDbContext.SaveChangesAsync();
                     }
