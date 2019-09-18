@@ -123,9 +123,9 @@ namespace Listrr
 
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = 2
+                WorkerCount = string.IsNullOrEmpty(Configuration["Hangfire:Workers"]) ? 2 : Convert.ToInt32(Configuration["Hangfire:Workers"])
             });
-            if(env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
+            if (env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
                 app.UseHangfireDashboard();
 
             RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
