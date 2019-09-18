@@ -15,6 +15,7 @@ using Listrr.BackgroundJob;
 using Listrr.Repositories;
 using Listrr.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Listrr
 {
@@ -76,6 +77,11 @@ namespace Listrr
 
             services.AddHttpContextAccessor();
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
@@ -85,6 +91,14 @@ namespace Listrr
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
+            app.UseForwardedHeaders();
+
+            app.Use((context, next) =>
+            {
+                context.Request.Scheme = "https";
+                return next();
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
