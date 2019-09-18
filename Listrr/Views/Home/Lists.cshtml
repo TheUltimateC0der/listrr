@@ -26,6 +26,7 @@
                     <td><b>Last processed</b></td>
                     <td><b>Type</b></td>
                     <td><b>Items</b></td>
+                    <td><b>Action</b></td>
                 </tr>
                 </thead>
                 @foreach (var list in Model)
@@ -35,6 +36,9 @@
                         <td>@list.LastProcessed</td>
                         <td>@list.Type</td>
                         <td>@list.Items</td>
+                        <td>
+                            <a asp-action="Delete" asp-route-Id="@list.Id" class="btn btn-danger btn-xs">Delete</a>
+                        </td>
                     </tr>
                 }
             </table>

@@ -15,6 +15,8 @@ namespace Listrr.Repositories
 
         Task<TraktList> Create(TraktList model);
         Task<TraktList> Update(TraktList model);
-        
+
+        Task Delete(TraktList model);
+
     }
 }

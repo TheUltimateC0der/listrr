@@ -53,5 +53,12 @@ namespace Listrr.Repositories
             // Just return couse we do sanatizing before
             return model;
         }
+
+        public async Task Delete(TraktList model)
+        {
+            appDbContext.TraktLists.Remove(model);
+
+            await appDbContext.SaveChangesAsync();
+        }
     }
 }
