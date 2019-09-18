@@ -155,6 +155,47 @@ namespace Listrr.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Delete(uint Id)
+        {
+            var list = await _traktService.Get(Id);
+
+            if (list == null) return RedirectToAction(nameof(Lists));
+
+            if (list.Owner.UserName == User.Identity.Name)
+            {
+                return View(new DeleteListViewModel
+                {
+                    Id = list.Id,
+                    Items = list.Items,
+                    Name = list.Name
+                });
+            }
+
+            return RedirectToAction(nameof(Lists));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Delete(DeleteListViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var list = await _traktService.Get(model.Id);
+
+            if (list == null) return RedirectToAction(nameof(Lists));
+
+            if (list.Owner.UserName == User.Identity.Name)
+            {
+                await _traktService.Delete(list);
+            }
+
+            return RedirectToAction(nameof(Lists));
+        }
+
+
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> ShowList(CreateShowListViewModel model)

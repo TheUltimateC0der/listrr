@@ -43,6 +43,7 @@ namespace Listrr.Services
 
         public async Task Delete(TraktList model)
         {
+            await traktListDbRepository.Delete(model);
             await traktListApiRepository.Delete(model);
         }
 
