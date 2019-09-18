@@ -19,7 +19,7 @@ namespace Listrr
                     config.SetBasePath(Directory.GetCurrentDirectory());
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                     config.AddCommandLine(args);
-                    config.AddEnvironmentVariables("listrr");
+                    config.AddEnvironmentVariables();
                 })
                 .UseStartup<Startup>();
     }
