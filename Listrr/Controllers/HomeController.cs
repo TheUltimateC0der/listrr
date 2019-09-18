@@ -135,7 +135,7 @@ namespace Listrr.Controllers
             ViewData["Message"] = "Create a new list for shows";
 
             var dbGenres = await _appDbContext.TraktShowGenres.ToListAsync();
-            var dbCertifications = await _appDbContext.TraktShowCertifications.OrderBy(x => x.Name).ToListAsync();
+            var dbCertifications = await _appDbContext.TraktShowCertifications.OrderBy(x => x.Description).ToListAsync();
             var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
             var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
             var dbNetworks = await _appDbContext.TraktShowNetworks.OrderBy(x => x.Name).ToListAsync();
