@@ -1,12 +1,15 @@
-﻿using Listrr.Comparer;
-using Listrr.Data.Trakt;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Listrr.Comparer;
+using Listrr.Data.Trakt;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+
 using TraktNet;
 using TraktNet.Enums;
 using TraktNet.Objects.Authentication;
@@ -137,7 +140,7 @@ namespace Listrr.Repositories
 
         public async Task<TraktList> Update(TraktList model)
         {
-            await PrepareForApiRequest();
+            await PrepareForApiRequest(model.Owner);
 
             await _traktClient.Users.UpdateCustomListAsync(
                 "me",
@@ -152,7 +155,27 @@ namespace Listrr.Repositories
             return model;
         }
 
-        
+        public async Task<bool> Exists(TraktList model)
+        {
+            await PrepareForApiRequest(model.Owner);
+
+            try
+            {
+                await _traktClient.Users.GetCustomListAsync(
+                    model.Owner.UserName,
+                    model.Slug
+                );
+            }
+            catch (TraktNet.Exceptions.TraktListNotFoundException)
+            {
+                return false;
+            }
+            
+
+            return true;
+        }
+
+
         public async Task<IList<ITraktMovie>> GetMovies(TraktList model)
         {
             await PrepareForApiRequest(model.Owner);
