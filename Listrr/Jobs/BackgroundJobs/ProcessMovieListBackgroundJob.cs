@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Listrr.Comparer;
 using Listrr.Extensions;
 using Listrr.Services;
+
 using TraktNet.Objects.Get.Movies;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
     public class ProcessMovieListBackgroundJob : IBackgroundJob<uint>
     {
-
         private readonly ITraktService traktService;
 
         public ProcessMovieListBackgroundJob(ITraktService traktService)
