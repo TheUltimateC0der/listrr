@@ -1,18 +1,22 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Listrr.API.Trakt.Models.Filters;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Jobs.BackgroundJobs;
-using Microsoft.AspNetCore.Mvc;
 using Listrr.Models;
 using Listrr.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using TraktNet.Enums;
+
 using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
 namespace Listrr.Controllers
@@ -131,11 +135,11 @@ namespace Listrr.Controllers
             ViewData["Message"] = "Create a new list for shows";
 
             var dbGenres = await _appDbContext.TraktShowGenres.ToListAsync();
-            var dbCertifications = await _appDbContext.TraktShowCertifications.ToListAsync();
+            var dbCertifications = await _appDbContext.TraktShowCertifications.OrderBy(x => x.Name).ToListAsync();
             var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
             var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
-            var dbNetworks = await _appDbContext.TraktShowNetworks.ToListAsync();
-            var dbStatus = await _appDbContext.TraktShowStatuses.ToListAsync();
+            var dbNetworks = await _appDbContext.TraktShowNetworks.OrderBy(x => x.Name).ToListAsync();
+            var dbStatus = await _appDbContext.TraktShowStatuses.OrderBy(x => x.Name).ToListAsync();
 
             var model = new CreateShowListViewModel()
             {
