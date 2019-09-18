@@ -35,6 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Home\Delete.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Home\Lists.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
