@@ -57,7 +57,7 @@ namespace Listrr.Controllers
             ViewData["Message"] = "Create a new list for movies";
 
             var dbGenres = await _appDbContext.TraktMovieGenres.ToListAsync();
-            var dbCertifications = await _appDbContext.TraktMovieCertifications.ToListAsync();
+            var dbCertifications = await _appDbContext.TraktMovieCertifications.OrderBy(x => x.Description).ToListAsync();
             var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
             var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Name).ToListAsync();
             
