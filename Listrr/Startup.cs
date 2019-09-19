@@ -44,7 +44,10 @@ namespace Listrr
                 options.UseSqlServer(connectionString)
             );
 
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<IdentityUser>(options =>
+                {
+                    options.User.AllowedUserNameCharacters = null;
+                })
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddHangfire(x =>
