@@ -14,24 +14,36 @@ namespace Listrr.Models
         [Display(Name = "Search query", Prompt = "Search query")]
         public string Query { get; set; }
 
-        [Display(Name = "Search by title", Prompt = "Search by title")]
-        public bool SearchByTitle { get; set; }
-        [Display(Name = "Search by tagline", Prompt = "Search by tagline")]
-        public bool SearchByTagline { get; set; }
-        [Display(Name = "Search by overview", Prompt = "Search by overview")]
-        public bool SearchByOverview { get; set; }
-        [Display(Name = "Search by people", Prompt = "Search by people")]
-        public bool SearchByPeople { get; set; }
-        [Display(Name = "Search by translations", Prompt = "Search by translations")]
-        public bool SearchByTranslations { get; set; }
         [Display(Name = "Search by alias", Prompt = "Search by alias")]
-        public bool SearchByAliases { get; set; }
-        [Display(Name = "Search by name", Prompt = "Search by name")]
-        public bool SearchByName { get; set; }
+        public bool SearchByAlias { get; set; }
+
         [Display(Name = "Search by biography", Prompt = "Search by biography")]
         public bool SearchByBiography { get; set; }
+
         [Display(Name = "Search by description", Prompt = "Search by description")]
         public bool SearchByDescription { get; set; }
+
+
+        [Display(Name = "Search by name", Prompt = "Search by name")]
+        public bool SearchByName { get; set; }
+
+        [Display(Name = "Search by overview", Prompt = "Search by overview")]
+        public bool SearchByOverview { get; set; }
+
+        [Display(Name = "Search by people", Prompt = "Search by people")]
+        public bool SearchByPeople { get; set; }
+
+
+        [Display(Name = "Search by tagline", Prompt = "Search by tagline")]
+        public bool SearchByTagline { get; set; }
+
+        [Display(Name = "Search by title", Prompt = "Search by title")]
+        public bool SearchByTitle { get; set; }
+        
+        [Display(Name = "Search by translations", Prompt = "Search by translations")]
+        public bool SearchByTranslations { get; set; }
+        
+        
 
         #region Basic Filter
 
