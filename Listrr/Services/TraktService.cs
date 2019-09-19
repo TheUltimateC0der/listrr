@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
+
 using Microsoft.AspNetCore.Identity;
+
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
 
@@ -40,6 +43,7 @@ namespace Listrr.Services
 
         public async Task Delete(TraktList model)
         {
+            await traktListDbRepository.Delete(model);
             await traktListApiRepository.Delete(model);
         }
 
@@ -69,6 +73,11 @@ namespace Listrr.Services
         public async Task<IList<ITraktMovie>> GetMovies(TraktList model)
         {
             return await traktListApiRepository.GetMovies(model);
+        }
+
+        public async Task<bool> Exists(TraktList model)
+        {
+            return await traktListApiRepository.Exists(model);
         }
 
         public async Task<IList<TraktList>> GetProcessable()

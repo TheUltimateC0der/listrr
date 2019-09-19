@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Listrr.Data.Trakt;
+
 using Microsoft.AspNetCore.Identity;
+
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
 
@@ -30,6 +33,8 @@ namespace Listrr.Services
 
         Task<TraktList> Create(TraktList model);
         Task<TraktList> Update(TraktList model);
+
+        Task<bool> Exists(TraktList model);
 
 
         Task<IList<ITraktMovie>> MovieSearch(TraktList model);

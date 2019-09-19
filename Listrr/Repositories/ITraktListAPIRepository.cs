@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Listrr.Data.Trakt;
+
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
 
@@ -17,7 +19,10 @@ namespace Listrr.Repositories
         Task<TraktList> Update(TraktList model);
         Task Delete(TraktList model);
 
-        
+        Task<bool> Exists(TraktList model);
+
+
+
         Task AddMovies(IList<ITraktMovie> movies, TraktList list);
 
         Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list);

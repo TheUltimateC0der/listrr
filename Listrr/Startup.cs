@@ -91,6 +91,8 @@ namespace Listrr
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
+            InitializeDatabase(app);
+
             app.UseForwardedHeaders();
 
             app.Use((context, next) =>
@@ -121,9 +123,9 @@ namespace Listrr
 
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = 2
+                WorkerCount = string.IsNullOrEmpty(Configuration["Hangfire:Workers"]) ? 2 : Convert.ToInt32(Configuration["Hangfire:Workers"])
             });
-            if(env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
+            if (env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
                 app.UseHangfireDashboard();
 
             RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
@@ -149,6 +151,15 @@ namespace Listrr
                     name: "default",
                     template: "{controller=Home}/{action=Lists}/{id?}");
             });
+        }
+
+
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+            }
         }
     }
 }

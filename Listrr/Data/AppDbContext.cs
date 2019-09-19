@@ -86,19 +86,6 @@ namespace Listrr.Data
 
             #endregion
 
-            #region TraktShowNetwork
-
-            builder
-                .Entity<TraktShowNetwork>()
-                .HasIndex(x => x.Name)
-                .IsUnique();
-
-            builder
-                .Entity<TraktShowNetwork>()
-                .HasKey(x => x.Name);
-
-            #endregion
-
             #region TraktShowStatus
 
             builder
