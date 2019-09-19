@@ -5,10 +5,12 @@ namespace Listrr.Data.Trakt
 {
     public class TraktShowNetwork
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
+        public string Id { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+
         [JsonProperty("name")]
         public string Name { get; set; }
-
     }
 }
