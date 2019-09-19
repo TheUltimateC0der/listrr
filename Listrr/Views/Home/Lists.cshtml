@@ -1,4 +1,5 @@
-﻿@model List<Listrr.Data.Trakt.TraktList>
+﻿@using Listrr.Data.Trakt
+@model List<Listrr.Data.Trakt.TraktList>
 @{
     ViewData["Title"] = "List";
 }
@@ -37,6 +38,20 @@
                         <td>@list.Type</td>
                         <td>@list.Items</td>
                         <td>
+                            <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-default btn-xs">Show</a>
+                            @switch (list.Type)
+                            {
+                                case ListType.Movie:
+                                    <a asp-action="EditMovieList" asp-route-Id="@list.Id" class="btn btn-primary btn-xs">Edit</a>
+
+                                    break;
+                                case ListType.Show:
+                                    <a asp-action="EditShowList" asp-route-Id="@list.Id" class="btn btn-primary btn-xs">Edit</a>
+
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
                             <a asp-action="Delete" asp-route-Id="@list.Id" class="btn btn-danger btn-xs">Delete</a>
                         </td>
                     </tr>

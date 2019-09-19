@@ -7,8 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Listrr.Models
 {
-    public class CreateMovieListViewModel
+    public class EditMovieListViewModel
     {
+        [Required]
+        public uint Id { get; set; }
+
         [Required]
         [Display(Name = "List Name", Prompt = "List Name")]
         public string Name { get; set; }
