@@ -67,7 +67,7 @@ namespace Listrr.Areas.Identity.Pages.Account
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
             if (signInResult.Succeeded)
             {
                 await UpdateTokens(
@@ -87,14 +87,14 @@ namespace Listrr.Areas.Identity.Pages.Account
             }
             else
             {
-                var user = new IdentityUser { UserName = info.Principal.Identity.Name };
+                var user = new IdentityUser { UserName = info.ProviderKey };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: true);
+                        await _signInManager.SignInAsync(user, false);
 
                         await UpdateTokens(
                             await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey),
