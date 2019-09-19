@@ -29,12 +29,12 @@ namespace Listrr.BackgroundJob
 
             foreach (var regionInfo in countries)
             {
-                if (!appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName))
+                if (!appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower()))
                 {
                     await appDbContext.CountryCodes.AddAsync(
                         new CountryCode()
                         {
-                            Code = regionInfo.TwoLetterISORegionName,
+                            Code = regionInfo.TwoLetterISORegionName.ToLower(),
                             Name = regionInfo.DisplayName
                         }
                     );
