@@ -1,6 +1,7 @@
-﻿@model CreateShowListViewModel
+﻿@model EditShowListViewModel
 @{
     ViewData["Title"] = "Show list";
+    ViewData["Message"] = "Edit a list for shows";
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -8,16 +9,19 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="ShowList" method="post">
+        <form asp-action="EditShowList" method="post">
+            
+            @Html.HiddenFor(x => x.Id)
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <input asp-for="Name" class="form-control" />
+                        <input asp-for="Name" class="form-control"/>
                         <small class="form-text text-muted">* Give your list a name that matches your filters to find it easier after creating.</small>
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <input asp-for="Query" class="form-control" />
+                        <input asp-for="Query" class="form-control"/>
                         <small class="form-text text-muted">Query e.g. <code>disney</code> for kids shows</small>
                         <span asp-validation-for="Query" class="text-danger"></span>
                     </div>
@@ -25,12 +29,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>
-                                    <input asp-for="SearchByAlias" /> @Html.DisplayNameFor(m => m.SearchByAlias)
+                                    <input asp-for="SearchByAlias"/> @Html.DisplayNameFor(m => m.SearchByAlias)
                                 </label>
                             </div>
                             <div class="col-md-6">
                                 <label>
-                                    <input asp-for="SearchByBiography" /> @Html.DisplayNameFor(m => m.SearchByBiography)
+                                    <input asp-for="SearchByBiography"/> @Html.DisplayNameFor(m => m.SearchByBiography)
                                 </label>
                             </div>
 
@@ -40,26 +44,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>
-                                    <input asp-for="SearchByDescription" /> @Html.DisplayNameFor(m => m.SearchByDescription)
+                                    <input asp-for="SearchByDescription"/> @Html.DisplayNameFor(m => m.SearchByDescription)
                                 </label>
                             </div>
                             <div class="col-md-6">
                                 <label>
-                                    <input asp-for="SearchByName" /> @Html.DisplayNameFor(m => m.SearchByName)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="checkbox">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>
-                                    <input asp-for="SearchByOverview" /> @Html.DisplayNameFor(m => m.SearchByOverview)
-                                </label>
-                            </div>
-                            <div class="col-md-6">
-                                <label>
-                                    <input asp-for="SearchByPeople" /> @Html.DisplayNameFor(m => m.SearchByPeople)
+                                    <input asp-for="SearchByName"/> @Html.DisplayNameFor(m => m.SearchByName)
                                 </label>
                             </div>
                         </div>
@@ -68,12 +58,26 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>
-                                    <input asp-for="SearchByTitle" /> @Html.DisplayNameFor(m => m.SearchByTitle)
+                                    <input asp-for="SearchByOverview"/> @Html.DisplayNameFor(m => m.SearchByOverview)
                                 </label>
                             </div>
                             <div class="col-md-6">
                                 <label>
-                                    <input asp-for="SearchByTranslations" /> @Html.DisplayNameFor(m => m.SearchByTranslations)
+                                    <input asp-for="SearchByPeople"/> @Html.DisplayNameFor(m => m.SearchByPeople)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkbox">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>
+                                    <input asp-for="SearchByTitle"/> @Html.DisplayNameFor(m => m.SearchByTitle)
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label>
+                                    <input asp-for="SearchByTranslations"/> @Html.DisplayNameFor(m => m.SearchByTranslations)
                                 </label>
                             </div>
                         </div>
@@ -98,9 +102,9 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-addon">Between</span>
-                            <input asp-for="Filter_Years.From" value="1910" class="form-control" />
+                            <input asp-for="Filter_Years.From" class="form-control"/>
                             <span class="input-group-addon" style="border-left: 0; border-right: 0;">and</span>
-                            <input asp-for="Filter_Years.To" value="@DateTime.Now.Year" class="form-control" />
+                            <input asp-for="Filter_Years.To" class="form-control"/>
                         </div>
                         <small class="form-text text-muted">Years filter e.g. <code>2000-2010</code></small>
                         <span asp-validation-for="Filter_Years.From" class="text-danger"></span>
@@ -109,9 +113,9 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-addon">Between</span>
-                            <input asp-for="Filter_Runtimes.From" value="30" class="form-control" />
+                            <input asp-for="Filter_Runtimes.From" class="form-control"/>
                             <span class="input-group-addon" style="border-left: 0; border-right: 0;">and</span>
-                            <input asp-for="Filter_Runtimes.To" value="250" class="form-control" />
+                            <input asp-for="Filter_Runtimes.To" class="form-control"/>
                         </div>
                         <small class="form-text text-muted">Runtime filter e.g. <code>30-200</code> for shows with a runtime min. 30 and max. 200 minutes</small>
                         <span asp-validation-for="Filter_Runtimes.From" class="text-danger"></span>
@@ -120,9 +124,9 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-addon">Between</span>
-                            <input asp-for="Filter_Ratings.From" value="75" class="form-control" />
+                            <input asp-for="Filter_Ratings.From" class="form-control"/>
                             <span class="input-group-addon" style="border-left: 0; border-right: 0;">and</span>
-                            <input asp-for="Filter_Ratings.To" value="100" class="form-control" />
+                            <input asp-for="Filter_Ratings.To" class="form-control"/>
                         </div>
                         <small class="form-text text-muted">Ratings filter e.g. <code>75-100</code> for a rating between 75-100</small>
                         <span asp-validation-for="Filter_Ratings.From" class="text-danger"></span>

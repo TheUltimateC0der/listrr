@@ -38,7 +38,15 @@ namespace Listrr.Data.Trakt
 
         public string Query { get; set; }
 
-        public TraktSearchField Filter_SearchField { get; set; }
+        public bool SearchByAlias { get; set; }
+        public bool SearchByBiography { get; set; }
+        public bool SearchByDescription { get; set; }
+        public bool SearchByName { get; set; }
+        public bool SearchByOverview { get; set; }
+        public bool SearchByPeople { get; set; }
+        public bool SearchByTitle { get; set; }
+        public bool SearchByTranslations { get; set; }
+        public bool SearchByTagline { get; set; }
 
         public TranslationsBasicFilter Filter_Translations { get; set; }
 
