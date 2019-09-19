@@ -132,7 +132,7 @@ namespace Listrr
 
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = string.IsNullOrEmpty(Configuration["Hangfire:Workers"]) ? 2 : Convert.ToInt32(Configuration["Hangfire:Workers"])
+                WorkerCount = hangFireConfiguration.Workers
             });
 
             app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions
