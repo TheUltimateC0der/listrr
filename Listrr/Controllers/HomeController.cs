@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Listrr.API.Trakt.Models.Filters;
@@ -16,8 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
-using TraktNet.Enums;
 
 using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
@@ -316,7 +312,7 @@ namespace Listrr.Controllers
                 var dbNetworks = await _appDbContext.TraktShowNetworks.OrderBy(x => x.Name).ToListAsync();
                 var dbStatus = await _appDbContext.TraktShowStatuses.OrderBy(x => x.Name).ToListAsync();
 
-                var model = new EditShowListViewModel
+                return View(new EditShowListViewModel
                 {
                     Id = list.Id,
                     Genres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
@@ -346,9 +342,7 @@ namespace Listrr.Controllers
                     Filter_Countries = list.Filter_Countries.Languages,
                     Filter_Certifications = list.Filter_Certifications_Show.Certifications,
                     Filter_Status = list.Filter_Status.Status,
-                };
-
-                return View(model);
+                });
             }
 
             return RedirectToAction(nameof(Lists));
@@ -401,7 +395,6 @@ namespace Listrr.Controllers
         public async Task<IActionResult> Delete(uint Id)
         {
             var list = await _traktService.Get(Id);
-
             if (list == null) return RedirectToAction(nameof(Lists));
 
             if (list.Owner.UserName == User.Identity.Name)
