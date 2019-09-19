@@ -194,14 +194,6 @@ namespace Listrr.Data
                     x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
                 );
 
-            builder
-                .Entity<TraktList>()
-                .Property(x => x.Filter_SearchField)
-                .HasConversion(
-                    x => JsonConvert.SerializeObject(x),
-                    x => JsonConvert.DeserializeObject<TraktSearchField>(x)
-                );
-
             #endregion
 
             #region CountryCode
