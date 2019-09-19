@@ -11,7 +11,9 @@ using Listrr.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Hangfire;
+using HangfireBasicAuthenticationFilter;
 using Listrr.BackgroundJob;
+using Listrr.Configuration;
 using Listrr.Repositories;
 using Listrr.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -85,6 +87,10 @@ namespace Listrr
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
+            var hangfireConfiguration = new HangFireConfiguration();
+            Configuration.Bind("Hangfire", hangfireConfiguration);
+            services.AddSingleton(hangfireConfiguration);
+
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
@@ -92,7 +98,7 @@ namespace Listrr
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
         {
             InitializeDatabase(app);
 
@@ -128,8 +134,11 @@ namespace Listrr
             {
                 WorkerCount = string.IsNullOrEmpty(Configuration["Hangfire:Workers"]) ? 2 : Convert.ToInt32(Configuration["Hangfire:Workers"])
             });
-            if (env.IsDevelopment()) //Check this, couse reverseproxy could fuckup the "IsLocalhost" request
-                app.UseHangfireDashboard();
+
+            app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireCustomBasicAuthenticationFilter { User = hangFireConfiguration.Username ?? "Admin", Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123" } }
+            });
 
             RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
