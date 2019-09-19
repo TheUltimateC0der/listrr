@@ -12,5 +12,7 @@ namespace Listrr.Configuration
         public string Password { get; set; }
 
         public string DashboardPath { get; set; }
+
+        public int Workers { get; set; }
     }
 }
