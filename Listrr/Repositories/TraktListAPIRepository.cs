@@ -100,12 +100,25 @@ namespace Listrr.Repositories
         {
             uint? page = 0;
 
+            TraktSearchField searchFields = new TraktSearchField();
+
+            if (model.SearchByAlias) searchFields = searchFields | TraktSearchField.Aliases;
+            if (model.SearchByBiography) searchFields = searchFields | TraktSearchField.Biography;
+            if (model.SearchByDescription) searchFields = searchFields | TraktSearchField.Description;
+            if (model.SearchByName) searchFields = searchFields | TraktSearchField.Name;
+            if (model.SearchByOverview) searchFields = searchFields | TraktSearchField.Overview;
+            if (model.SearchByPeople) searchFields = searchFields | TraktSearchField.People;
+            if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
+            if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
+            if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
+            if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
+
             while (true)
             {
                 var result = await _traktClient.Search.GetTextQueryResultsAsync(
                     TraktSearchResultType.Movie,
                     model.Query,
-                    model.Filter_SearchField,
+                    searchFields,
                     new TraktSearchFilter(
                         model.Filter_Years.From,
                         model.Filter_Years.To,
@@ -325,12 +338,24 @@ namespace Listrr.Repositories
         {
             uint? page = 0;
 
+            TraktSearchField searchFields = new TraktSearchField();
+
+            if (model.SearchByAlias) searchFields = searchFields | TraktSearchField.Aliases;
+            if (model.SearchByBiography) searchFields = searchFields | TraktSearchField.Biography;
+            if (model.SearchByDescription) searchFields = searchFields | TraktSearchField.Description;
+            if (model.SearchByName) searchFields = searchFields | TraktSearchField.Name;
+            if (model.SearchByOverview) searchFields = searchFields | TraktSearchField.Overview;
+            if (model.SearchByPeople) searchFields = searchFields | TraktSearchField.People;
+            if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
+            if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
+            if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
+
             while (true)
             {
                 var result = await _traktClient.Search.GetTextQueryResultsAsync(
                     TraktSearchResultType.Show,
                     model.Query,
-                    model.Filter_SearchField,
+                    searchFields,
                     new TraktSearchFilter(
                         model.Filter_Years.From,
                         model.Filter_Years.To,
