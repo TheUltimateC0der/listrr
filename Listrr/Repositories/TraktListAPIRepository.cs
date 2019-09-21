@@ -71,9 +71,9 @@ namespace Listrr.Repositories
             await _traktClient.Users.DeleteCustomListAsync(model.Owner.UserName, model.Slug);
         }
 
-        public async Task<TraktList> Get(uint id)
+        public async Task<TraktList> Get(uint id, IdentityUser user = null)
         {
-            await PrepareForApiRequest();
+            await PrepareForApiRequest(user);
 
             var response = await _traktClient.Users.GetCustomListAsync("me", id.ToString());
 
@@ -83,7 +83,9 @@ namespace Listrr.Repositories
             {
                 Id = response.Value.Ids.Trakt,
                 Slug = response.Value.Ids.Slug,
-                Name = response.Value.Name
+                Name = response.Value.Name,
+                Items = response.Value.ItemCount,
+                Likes = response.Value.Likes
             };
         }
 
@@ -395,23 +397,26 @@ namespace Listrr.Repositories
 
         private async Task PrepareForApiRequest(IdentityUser user = null)
         {
-            if (user == null)
+            if (user == null && _httpContextAccessor.HttpContext != null)
             {
                 user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             }
 
-            var expiresAtToken = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt);
-            var access_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
-            var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
-
-            var expiresAt = DateTime.Parse(expiresAtToken);
-
-            if (expiresAt < DateTime.Now)
+            if (user != null)
             {
-                //Refresh the token
-            }
+                var expiresAtToken = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt);
+                var access_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
+                var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
 
-            _traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
+                var expiresAt = DateTime.Parse(expiresAtToken);
+
+                if (expiresAt < DateTime.Now)
+                {
+                    //Refresh the token
+                }
+
+                _traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
+            }
         }
 
         

@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Hangfire;
 using Listrr.API.Trakt.Models.Filters;
+using Listrr.BackgroundJob;
+using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Jobs.BackgroundJobs;
@@ -25,18 +27,22 @@ namespace Listrr.Controllers
         private readonly ITraktService _traktService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AppDbContext _appDbContext;
+        private readonly ToplistConfiguration _toplistConfiguration;
 
-        public HomeController(ITraktService traktService, UserManager<IdentityUser> userManager, AppDbContext appDbContext)
+        public HomeController(ITraktService traktService, UserManager<IdentityUser> userManager, AppDbContext appDbContext, ToplistConfiguration toplistConfiguration)
         {
             _traktService = traktService;
             _userManager = userManager;
             _appDbContext = appDbContext;
+            _toplistConfiguration = toplistConfiguration;
         }
         
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var lists = await _traktService.Top(_toplistConfiguration.Count, _toplistConfiguration.Threshold);
+
+            return View(lists);
         }
 
         [HttpGet]
