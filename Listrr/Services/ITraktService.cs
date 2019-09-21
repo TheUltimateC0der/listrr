@@ -13,6 +13,7 @@ namespace Listrr.Services
     public interface ITraktService
     {
 
+        Task<IList<TraktList>> Top(int count, int threshold);
         Task<TraktList> Get(uint id, bool forceAPI = false);
         Task<List<TraktList>> Get(IdentityUser user);
         Task Delete(TraktList model);

@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Listrr.Configuration
+@inject ToplistConfiguration ToplistConfiguration
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -30,9 +33,6 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    @*<li>
-                        <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>*@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li>
@@ -44,13 +44,10 @@
                         <li>
                             <a asp-area="" asp-controller="Home" asp-action="ShowList">Create show list</a>
                         </li>
+                        <li>
+                            <a asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count lists</a>
+                        </li>
                     }
-                    @*<li>
-                        <a asp-area="" asp-controller="Home" asp-action="About">About</a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
-                    </li>*@
                 </ul>
                 <partial name="_LoginPartial" />
             </div>
@@ -60,15 +57,12 @@
     <partial name="_CookieConsentPartial" />
 
     <div class="container">
-        @*<div class="page-header">
-            <h1>Sticky footer with fixed navbar</h1>
-        </div>*@
         @RenderBody()
     </div>
 
     <footer class="footer">
         <div class="container">
-            <p class="text-muted">&copy; 2018 - <a href="https://listrr.pro">listrr.pro</a></p>
+            <p class="text-muted">&copy; 2018 - @DateTime.Now.Year | <a href="https://listrr.pro">listrr.pro</a></p>
         </div>
     </footer>
 

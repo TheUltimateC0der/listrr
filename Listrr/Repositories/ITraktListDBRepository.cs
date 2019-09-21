@@ -8,6 +8,7 @@ namespace Listrr.Repositories
     public interface ITraktListDBRepository
     {
 
+        Task<IList<TraktList>> Top(int count, int threshold);
         Task<TraktList> Get(uint id);
         Task<List<TraktList>> Get(IdentityUser user);
 
