@@ -21,14 +21,14 @@ namespace Listrr.Jobs.BackgroundJobs
 
         public async Task Execute(uint param)
         {
-            var list = await traktService.Get(param);
+            var list = await traktService.Get(param, true);
             var found = await traktService.ShowSearch(list);
             var existing = await traktService.GetShows(list);
 
             List<ITraktShow> toRemove = new List<ITraktShow>();
             foreach (var existingShow in existing)
             {
-                if(!found.Contains(existingShow, new TraktShowComparer()))
+                if (!found.Contains(existingShow, new TraktShowComparer()))
                     toRemove.Add(existingShow);
             }
 
@@ -57,7 +57,8 @@ namespace Listrr.Jobs.BackgroundJobs
                 }
             }
 
-            list.Items = (existing.Count + toAdd.Count - toRemove.Count);
+            list = await traktService.Get(list.Id, true);
+
             list.LastProcessed = DateTime.Now;
 
             await traktService.Update(list);
