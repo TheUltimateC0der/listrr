@@ -29,9 +29,19 @@ namespace Listrr.Repositories
             return model;
         }
 
+        public async Task<IList<TraktList>> Top(int count, int threshold)
+        {
+            return await appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .OrderByDescending(x => x.Likes)
+                .Take(count)
+                .Where(x => x.Likes > threshold)
+                .ToListAsync();
+        }
+
         public async Task<TraktList> Get(uint id)
         {
-            return await appDbContext.TraktLists.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.TraktLists.AsNoTracking().Include(x => x.Owner).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<TraktList>> Get(IdentityUser user)
