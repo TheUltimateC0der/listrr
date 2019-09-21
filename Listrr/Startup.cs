@@ -91,6 +91,10 @@ namespace Listrr
             Configuration.Bind("Hangfire", hangfireConfiguration);
             services.AddSingleton(hangfireConfiguration);
 
+            var toplistConfiguration = new ToplistConfiguration();
+            Configuration.Bind("Toplist", toplistConfiguration);
+            services.AddSingleton(toplistConfiguration);
+
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
@@ -161,7 +165,7 @@ namespace Listrr
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Lists}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
 

@@ -27,7 +27,9 @@ namespace Listrr.Data.Trakt
 
         public bool Process { get; set; }
 
-        public int Items { get; set; }
+        public int? Items { get; set; }
+
+        public int? Likes { get; set; }
 
         public DateTime LastProcessed { get; set; }
 
