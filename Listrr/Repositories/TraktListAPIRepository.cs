@@ -351,6 +351,14 @@ namespace Listrr.Repositories
             if (model.SearchByTagline) searchFields |= TraktSearchField.Tagline;
             if (model.SearchByTitle) searchFields |= TraktSearchField.Title;
             if (model.SearchByTranslations) searchFields |= TraktSearchField.Translations;
+
+
+            var traktShowStatus = new List<TraktNet.Enums.TraktShowStatus>();
+
+            if(model.Filter_Status.Status?.Contains("canceled") == true) traktShowStatus.Add(TraktNet.Enums.TraktShowStatus.Canceled);
+            if(model.Filter_Status.Status?.Contains("ended") == true) traktShowStatus.Add(TraktNet.Enums.TraktShowStatus.Ended);
+            if(model.Filter_Status.Status?.Contains("in production") == true) traktShowStatus.Add(TraktNet.Enums.TraktShowStatus.InProduction);
+            if(model.Filter_Status.Status?.Contains("returning series") == true) traktShowStatus.Add(TraktNet.Enums.TraktShowStatus.ReturningSeries);
             
             while (true)
             {
@@ -373,7 +381,8 @@ namespace Listrr.Repositories
                             model.Filter_Ratings.To
                         ),
                         model.Filter_Certifications_Show.Certifications,
-                        model.Filter_Networks.Networks
+                        model.Filter_Networks.Networks, 
+                        traktShowStatus.Count != 0 ? traktShowStatus.ToArray() : null
                     ), new TraktExtendedInfo().SetMetadata(),
                     new TraktPagedParameters(page, fetchLimit)
                 );
