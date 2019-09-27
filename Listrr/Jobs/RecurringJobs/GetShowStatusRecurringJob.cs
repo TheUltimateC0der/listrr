@@ -20,7 +20,13 @@ namespace Listrr.BackgroundJob
 
         public async Task Execute()
         {
-            var result = new List<string> {"returning series", "in production", "planned", "canceled", "ended"};
+            var result = new List<string>
+            {
+                TraktNet.Enums.TraktShowStatus.Ended.ObjectName,
+                TraktNet.Enums.TraktShowStatus.InProduction.ObjectName,
+                TraktNet.Enums.TraktShowStatus.ReturningSeries.ObjectName,
+                TraktNet.Enums.TraktShowStatus.Canceled.ObjectName
+            };
 
             var currentStatus = await appDbContext.TraktShowStatuses.ToListAsync();
 
