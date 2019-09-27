@@ -7,5 +7,7 @@
 
         public string Code { get; set; }
 
+        public string Description => $"{Code} ({Name})";
+
     }
 }
