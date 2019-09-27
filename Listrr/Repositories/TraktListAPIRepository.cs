@@ -342,16 +342,16 @@ namespace Listrr.Repositories
 
             TraktSearchField searchFields = new TraktSearchField();
 
-            if (model.SearchByAlias) searchFields = searchFields | TraktSearchField.Aliases;
-            if (model.SearchByBiography) searchFields = searchFields | TraktSearchField.Biography;
-            if (model.SearchByDescription) searchFields = searchFields | TraktSearchField.Description;
-            if (model.SearchByName) searchFields = searchFields | TraktSearchField.Name;
-            if (model.SearchByOverview) searchFields = searchFields | TraktSearchField.Overview;
-            if (model.SearchByPeople) searchFields = searchFields | TraktSearchField.People;
-            if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
-            if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
-            if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
-
+            if (model.SearchByAlias) searchFields |= TraktSearchField.Aliases;
+            if (model.SearchByBiography) searchFields |= TraktSearchField.Biography;
+            if (model.SearchByDescription) searchFields |= TraktSearchField.Description;
+            if (model.SearchByName) searchFields |= TraktSearchField.Name;
+            if (model.SearchByOverview) searchFields |= TraktSearchField.Overview;
+            if (model.SearchByPeople) searchFields |= TraktSearchField.People;
+            if (model.SearchByTagline) searchFields |= TraktSearchField.Tagline;
+            if (model.SearchByTitle) searchFields |= TraktSearchField.Title;
+            if (model.SearchByTranslations) searchFields |= TraktSearchField.Translations;
+            
             while (true)
             {
                 var result = await _traktClient.Search.GetTextQueryResultsAsync(
@@ -419,6 +419,5 @@ namespace Listrr.Repositories
             }
         }
 
-        
     }
 }
