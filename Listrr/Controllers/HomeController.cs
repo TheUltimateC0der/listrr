@@ -24,9 +24,9 @@ namespace Listrr.Controllers
     public class HomeController : Controller
     {
 
+        private readonly AppDbContext _appDbContext;
         private readonly ITraktService _traktService;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly AppDbContext _appDbContext;
         private readonly ToplistConfiguration _toplistConfiguration;
 
         public HomeController(ITraktService traktService, UserManager<IdentityUser> userManager, AppDbContext appDbContext, ToplistConfiguration toplistConfiguration)
@@ -428,7 +428,7 @@ namespace Listrr.Controllers
 
             if (list.Owner.UserName == User.Identity.Name)
             {
-                await _traktService.Delete(list);
+                await _traktService.Delete(list, false);
             }
 
             return RedirectToAction(nameof(Lists));
