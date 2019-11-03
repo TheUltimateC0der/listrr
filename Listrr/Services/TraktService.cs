@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using Listrr.Data.Trakt;
+﻿using Listrr.Data.Trakt;
 using Listrr.Repositories;
 
 using Microsoft.AspNetCore.Identity;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
