@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Listrr.Comparer;
+using Listrr.Extensions;
+using Listrr.Services;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Listrr.Comparer;
-using Listrr.Extensions;
-using Listrr.Services;
 using TraktNet.Exceptions;
 using TraktNet.Objects.Get.Movies;
 

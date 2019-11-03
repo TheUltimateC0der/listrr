@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
-using Listrr.API.Trakt.Models.Filters;
-using Listrr.BackgroundJob;
+﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
@@ -16,6 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
