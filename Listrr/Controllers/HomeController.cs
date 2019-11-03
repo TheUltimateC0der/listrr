@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
-using Listrr.API.Trakt.Models.Filters;
-using Listrr.BackgroundJob;
+﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
@@ -17,6 +12,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
 using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
 namespace Listrr.Controllers
@@ -24,9 +23,9 @@ namespace Listrr.Controllers
     public class HomeController : Controller
     {
 
+        private readonly AppDbContext _appDbContext;
         private readonly ITraktService _traktService;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly AppDbContext _appDbContext;
         private readonly ToplistConfiguration _toplistConfiguration;
 
         public HomeController(ITraktService traktService, UserManager<IdentityUser> userManager, AppDbContext appDbContext, ToplistConfiguration toplistConfiguration)
@@ -428,7 +427,7 @@ namespace Listrr.Controllers
 
             if (list.Owner.UserName == User.Identity.Name)
             {
-                await _traktService.Delete(list);
+                await _traktService.Delete(list, false);
             }
 
             return RedirectToAction(nameof(Lists));
