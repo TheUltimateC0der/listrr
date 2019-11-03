@@ -41,10 +41,12 @@ namespace Listrr.Services
             return model;
         }
 
-        public async Task Delete(TraktList model)
+        public async Task Delete(TraktList model, bool onlyLocal = true)
         {
             await _traktListDbRepository.Delete(model);
-            await _traktListApiRepository.Delete(model);
+
+            if(!onlyLocal)
+                await _traktListApiRepository.Delete(model);
         }
 
         public async Task<TraktList> Get(uint id, bool forceAPI = false)
