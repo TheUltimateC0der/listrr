@@ -24,10 +24,10 @@ namespace Listrr.Jobs.BackgroundJobs
 
         public async Task Execute(uint param)
         {
-            var list = await traktService.Get(param, true);
-
             try
             {
+                var list = await traktService.Get(param, true);
+
                 var found = await traktService.ShowSearch(list);
                 var existing = await traktService.GetShows(list);
 
@@ -69,9 +69,9 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 await traktService.Update(list);
             }
-            catch (TraktListNotFoundException traktListNotFoundException)
+            catch (TraktListNotFoundException)
             {
-                await traktService.Delete(list);
+                await traktService.Delete(await traktService.Get(param));
             }
         }
     }
