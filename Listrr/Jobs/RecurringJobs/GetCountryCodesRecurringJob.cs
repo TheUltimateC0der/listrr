@@ -29,20 +29,18 @@ namespace Listrr.BackgroundJob
 
             foreach (var regionInfo in countries)
             {
-                if (!appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower()))
-                {
-                    if(regionInfo.TwoLetterISORegionName.Length != 2) continue;
+                if (appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower())) continue;
+                if(regionInfo.TwoLetterISORegionName.Length != 2) continue;
 
-                    await appDbContext.CountryCodes.AddAsync(
-                        new CountryCode()
-                        {
-                            Code = regionInfo.TwoLetterISORegionName.ToLower(),
-                            Name = regionInfo.DisplayName
-                        }
-                    );
+                await appDbContext.CountryCodes.AddAsync(
+                    new CountryCode()
+                    {
+                        Code = regionInfo.TwoLetterISORegionName.ToLower(),
+                        Name = regionInfo.DisplayName
+                    }
+                );
 
-                    await appDbContext.SaveChangesAsync();
-                }
+                await appDbContext.SaveChangesAsync();
             }
 
 
