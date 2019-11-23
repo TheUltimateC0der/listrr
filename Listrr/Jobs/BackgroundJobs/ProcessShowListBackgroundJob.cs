@@ -31,14 +31,14 @@ namespace Listrr.Jobs.BackgroundJobs
                 var found = await traktService.ShowSearch(list);
                 var existing = await traktService.GetShows(list);
 
-                List<ITraktShow> toRemove = new List<ITraktShow>();
+                var toRemove = new List<ITraktShow>();
                 foreach (var existingShow in existing)
                 {
                     if (!found.Contains(existingShow, new TraktShowComparer()))
                         toRemove.Add(existingShow);
                 }
 
-                List<ITraktShow> toAdd = new List<ITraktShow>();
+                var toAdd = new List<ITraktShow>();
                 foreach (var foundShow in found)
                 {
                     if (!existing.Contains(foundShow, new TraktShowComparer()))
