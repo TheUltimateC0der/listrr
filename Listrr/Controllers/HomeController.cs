@@ -103,11 +103,6 @@ namespace Listrr.Controllers
                 Filter_Years = model.Filter_Years,
                 Filter_Ratings = model.Filter_Ratings,
                 Filter_Runtimes = model.Filter_Runtimes,
-                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
-                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
-                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
-                Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
-                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
                 SearchByAlias = model.SearchByAlias,
                 SearchByBiography = model.SearchByBiography,
                 SearchByDescription = model.SearchByDescription,
@@ -117,6 +112,11 @@ namespace Listrr.Controllers
                 SearchByTitle = model.SearchByTitle,
                 SearchByTranslations = model.SearchByTranslations,
                 SearchByTagline = model.SearchByTagline,
+                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
+                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
                 Owner = await _userManager.GetUserAsync(User)
             });
 
@@ -187,7 +187,7 @@ namespace Listrr.Controllers
             if (list.Owner.UserName == User.Identity.Name)
             {
                 list.Name = model.Name;
-                list.Query = model.Query;
+                list.Query = model.Query ?? "";
                 list.SearchByAlias = model.SearchByAlias;
                 list.SearchByBiography = model.SearchByBiography;
                 list.SearchByDescription = model.SearchByDescription;
@@ -275,13 +275,6 @@ namespace Listrr.Controllers
                 Filter_Years = model.Filter_Years,
                 Filter_Ratings = model.Filter_Ratings,
                 Filter_Runtimes = model.Filter_Runtimes,
-                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
-                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
-                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
-                Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
-                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
-                Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
-                Filter_Status = new StatusShowFilter(model.Filter_Status),
                 SearchByAlias = model.SearchByAlias,
                 SearchByBiography = model.SearchByBiography,
                 SearchByDescription = model.SearchByDescription,
@@ -290,6 +283,13 @@ namespace Listrr.Controllers
                 SearchByPeople = model.SearchByPeople,
                 SearchByTitle = model.SearchByTitle,
                 SearchByTranslations = model.SearchByTranslations,
+                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
+                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
+                Filter_Status = new StatusShowFilter(model.Filter_Status),
                 Owner = await _userManager.GetUserAsync(User)
             });
 
@@ -366,7 +366,7 @@ namespace Listrr.Controllers
             if (list.Owner.UserName == User.Identity.Name)
             {
                 list.Name = model.Name;
-                list.Query = model.Query;
+                list.Query = model.Query ?? "";
                 list.SearchByAlias = model.SearchByAlias;
                 list.SearchByBiography = model.SearchByBiography;
                 list.SearchByDescription = model.SearchByDescription;
