@@ -19,10 +19,10 @@ namespace Listrr.BackgroundJob
 
         public async Task Execute()
         {
-            List<RegionInfo> countries = new List<RegionInfo>();
-            foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.SpecificCultures))
+            var countries = new List<RegionInfo>();
+            foreach (var culture in CultureInfo.GetCultures(CultureTypes.SpecificCultures))
             {
-                RegionInfo country = new RegionInfo(culture.LCID);
+                var country = new RegionInfo(culture.LCID);
                 if (countries.All(p => p.Name != country.Name))
                     countries.Add(country);
             }
