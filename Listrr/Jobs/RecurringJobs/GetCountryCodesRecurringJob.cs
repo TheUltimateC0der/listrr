@@ -31,6 +31,8 @@ namespace Listrr.BackgroundJob
             {
                 if (!appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower()))
                 {
+                    if(regionInfo.TwoLetterISORegionName.Length != 2) continue;
+
                     await appDbContext.CountryCodes.AddAsync(
                         new CountryCode()
                         {
