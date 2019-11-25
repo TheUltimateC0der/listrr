@@ -70,7 +70,12 @@ namespace Listrr.Controllers
                 Certifications = new MultiSelectList(dbCertifications, nameof(TraktMovieCertification.Slug), nameof(TraktMovieCertification.Description)),
                 Countries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
                 Languages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
-                Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description))
+                Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                ReverseGenres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
+                ReverseCertifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description)),
+                ReverseCountries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
+                ReverseLanguages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description))
             };
 
             return View(model);
@@ -92,6 +97,11 @@ namespace Listrr.Controllers
             model.Countries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name));
             model.Languages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
             model.Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
+            model.ReverseGenres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name));
+            model.ReverseCertifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description));
+            model.ReverseCountries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name));
+            model.ReverseLanguages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
+            model.ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
 
             if (!ModelState.IsValid) return View(model);
             
@@ -115,8 +125,13 @@ namespace Listrr.Controllers
                 Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
                 Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
                 Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
-                Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
+                Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
                 Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                ReverseFilter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                ReverseFilter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                ReverseFilter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
+                ReverseFilter_Countries = new CountriesCommonFilter(model.Filter_Countries),
                 Owner = await _userManager.GetUserAsync(User)
             });
 
@@ -127,9 +142,9 @@ namespace Listrr.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> EditMovieList(uint Id)
+        public async Task<IActionResult> EditMovieList(uint id)
         {
-            var list = await _traktService.Get(Id);
+            var list = await _traktService.Get(id);
 
             if (list == null) return RedirectToAction(nameof(Lists));
             if (list.Type != ListType.Movie) return RedirectToAction(nameof(Lists));
@@ -149,6 +164,11 @@ namespace Listrr.Controllers
                     Countries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
                     Languages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
                     Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                    ReverseGenres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
+                    ReverseCertifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description)),
+                    ReverseCountries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
+                    ReverseLanguages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                    ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
                     Name = list.Name,
                     Query = list.Query,
                     SearchByAlias = list.SearchByAlias,
@@ -160,14 +180,19 @@ namespace Listrr.Controllers
                     SearchByTitle = list.SearchByTitle,
                     SearchByTranslations = list.SearchByTranslations,
                     SearchByTagline = list.SearchByTagline,
-                    Filter_Translations = list.Filter_Translations.Translations,
-                    Filter_Genres = list.Filter_Genres.Genres,
                     Filter_Years = list.Filter_Years,
                     Filter_Runtimes = list.Filter_Runtimes,
                     Filter_Ratings = list.Filter_Ratings,
-                    Filter_Languages = list.Filter_Languages.Languages,
+                    Filter_Genres = list.Filter_Genres.Genres,
+                    Filter_Certifications = list.Filter_Certifications_Show.Certifications,
                     Filter_Countries = list.Filter_Countries.Languages,
-                    Filter_Certifications = list.Filter_Certifications_Movie.Certifications,
+                    Filter_Languages = list.Filter_Languages.Languages,
+                    Filter_Translations = list.Filter_Translations.Translations,
+                    ReverseFilter_Genres = list.ReverseFilter_Genres.Genres,
+                    ReverseFilter_Certifications = list.ReverseFilter_Certifications_Show.Certifications,
+                    ReverseFilter_Countries = list.ReverseFilter_Countries.Languages,
+                    ReverseFilter_Languages = list.ReverseFilter_Languages.Languages,
+                    ReverseFilter_Translations = list.ReverseFilter_Translations.Translations
                 });
             }
 
@@ -203,8 +228,13 @@ namespace Listrr.Controllers
                 list.Filter_Genres = new GenresCommonFilter(model.Filter_Genres);
                 list.Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages);
                 list.Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations);
-                list.Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications);
+                list.Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications);
                 list.Filter_Countries = new CountriesCommonFilter(model.Filter_Countries);
+                list.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
+                list.ReverseFilter_Languages = new LanguagesCommonFilter(model.ReverseFilter_Languages);
+                list.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
+                list.ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.ReverseFilter_Certifications);
+                list.ReverseFilter_Countries = new CountriesCommonFilter(model.ReverseFilter_Countries);
 
                 await _traktService.Update(list);
 
@@ -239,6 +269,13 @@ namespace Listrr.Controllers
                 Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
                 Networks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name)),
                 Status = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name)),
+                ReverseGenres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
+                ReverseCertifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description)),
+                ReverseCountries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
+                ReverseLanguages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                ReverseNetworks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name)),
+                ReverseStatus = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name)),
             };
 
             return View(model);
@@ -264,6 +301,13 @@ namespace Listrr.Controllers
             model.Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
             model.Networks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name));
             model.Status = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name));
+            model.ReverseGenres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name));
+            model.ReverseCertifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description));
+            model.ReverseCountries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name));
+            model.ReverseLanguages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
+            model.ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
+            model.ReverseNetworks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name));
+            model.ReverseStatus = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name));
 
             if (!ModelState.IsValid) return View(model);
 
@@ -290,6 +334,13 @@ namespace Listrr.Controllers
                 Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
                 Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
                 Filter_Status = new StatusShowFilter(model.Filter_Status),
+                ReverseFilter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                ReverseFilter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                ReverseFilter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
+                ReverseFilter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                ReverseFilter_Networks = new NetworksShowFilter(model.Filter_Networks),
+                ReverseFilter_Status = new StatusShowFilter(model.Filter_Status),
                 Owner = await _userManager.GetUserAsync(User)
             });
 
@@ -300,11 +351,11 @@ namespace Listrr.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> EditShowList(uint Id)
+        public async Task<IActionResult> EditShowList(uint id)
         {
             ViewData["Message"] = "Create a new list for shows";
 
-            var list = await _traktService.Get(Id);
+            var list = await _traktService.Get(id);
             if (list == null) return RedirectToAction(nameof(Lists));
             if (list.Type != ListType.Show) return RedirectToAction(nameof(Lists));
 
@@ -327,6 +378,13 @@ namespace Listrr.Controllers
                     Translations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
                     Networks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name)),
                     Status = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name)),
+                    ReverseGenres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
+                    ReverseCertifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description)),
+                    ReverseCountries = new MultiSelectList(dbCountryCodes, nameof(CountryCode.Code), nameof(CountryCode.Name)),
+                    ReverseLanguages = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                    ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description)),
+                    ReverseNetworks = new MultiSelectList(dbNetworks, nameof(TraktShowNetwork.Name), nameof(TraktShowNetwork.Name)),
+                    ReverseStatus = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name)),
                     Name = list.Name,
                     Query = list.Query,
                     SearchByAlias = list.SearchByAlias,
@@ -337,16 +395,23 @@ namespace Listrr.Controllers
                     SearchByPeople = list.SearchByPeople,
                     SearchByTitle = list.SearchByTitle,
                     SearchByTranslations = list.SearchByTranslations,
-                    Filter_Translations = list.Filter_Translations.Translations,
-                    Filter_Genres = list.Filter_Genres.Genres,
-                    Filter_Networks = list.Filter_Networks.Networks,
                     Filter_Years = list.Filter_Years,
                     Filter_Runtimes = list.Filter_Runtimes,
                     Filter_Ratings = list.Filter_Ratings,
-                    Filter_Languages = list.Filter_Languages.Languages,
-                    Filter_Countries = list.Filter_Countries.Languages,
+                    Filter_Genres = list.Filter_Genres.Genres,
                     Filter_Certifications = list.Filter_Certifications_Show.Certifications,
+                    Filter_Countries = list.Filter_Countries.Languages,
+                    Filter_Languages = list.Filter_Languages.Languages,
+                    Filter_Translations = list.Filter_Translations.Translations,
+                    Filter_Networks = list.Filter_Networks.Networks,
                     Filter_Status = list.Filter_Status.Status,
+                    ReverseFilter_Genres = list.ReverseFilter_Genres.Genres,
+                    ReverseFilter_Certifications = list.ReverseFilter_Certifications_Show.Certifications,
+                    ReverseFilter_Countries = list.ReverseFilter_Countries.Languages,
+                    ReverseFilter_Languages = list.ReverseFilter_Languages.Languages,
+                    ReverseFilter_Translations = list.ReverseFilter_Translations.Translations,
+                    ReverseFilter_Networks = list.ReverseFilter_Networks.Networks,
+                    ReverseFilter_Status = list.ReverseFilter_Status.Status
                 });
             }
 
@@ -385,6 +450,13 @@ namespace Listrr.Controllers
                 list.Filter_Countries = new CountriesCommonFilter(model.Filter_Countries);
                 list.Filter_Networks = new NetworksShowFilter(model.Filter_Networks);
                 list.Filter_Status = new StatusShowFilter(model.Filter_Status);
+                list.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
+                list.ReverseFilter_Languages = new LanguagesCommonFilter(model.ReverseFilter_Languages);
+                list.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
+                list.ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.ReverseFilter_Certifications);
+                list.ReverseFilter_Countries = new CountriesCommonFilter(model.ReverseFilter_Countries);
+                list.ReverseFilter_Networks = new NetworksShowFilter(model.ReverseFilter_Networks);
+                list.ReverseFilter_Status = new StatusShowFilter(model.ReverseFilter_Status);
 
                 await _traktService.Update(list);
 
@@ -397,9 +469,9 @@ namespace Listrr.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Delete(uint Id)
+        public async Task<IActionResult> Delete(uint id)
         {
-            var list = await _traktService.Get(Id);
+            var list = await _traktService.Get(id);
             if (list == null) return RedirectToAction(nameof(Lists));
 
             if (list.Owner.UserName == User.Identity.Name)
