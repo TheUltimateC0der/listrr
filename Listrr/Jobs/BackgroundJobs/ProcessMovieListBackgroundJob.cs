@@ -23,21 +23,21 @@ namespace Listrr.Jobs.BackgroundJobs
 
         public async Task Execute(uint param)
         {
-            var list = await traktService.Get(param, true);
-
             try
             {
+                var list = await traktService.Get(param, true);
+
                 var foundMovies = await traktService.MovieSearch(list);
                 var existingMovies = await traktService.GetMovies(list);
 
-                List<ITraktMovie> moviesToRemove = new List<ITraktMovie>();
+                var moviesToRemove = new List<ITraktMovie>();
                 foreach (var existingMovie in existingMovies)
                 {
                     if (!foundMovies.Contains(existingMovie, new TraktMovieComparer()))
                         moviesToRemove.Add(existingMovie);
                 }
 
-                List<ITraktMovie> moviesToAdd = new List<ITraktMovie>();
+                var moviesToAdd = new List<ITraktMovie>();
                 foreach (var foundMovie in foundMovies)
                 {
                     if (!existingMovies.Contains(foundMovie, new TraktMovieComparer()))
@@ -68,9 +68,9 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 await traktService.Update(list);
             }
-            catch (TraktListNotFoundException traktListNotFoundException)
+            catch (TraktListNotFoundException)
             {
-                await traktService.Delete(list);
+                await traktService.Delete(await traktService.Get(param));
             }
         }
     }

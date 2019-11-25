@@ -143,6 +143,26 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
+                    if (model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
+                        if (model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Movie.Certification))
+                            continue;
+
+                    if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
+                        if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
+                            continue;
+
+                    if (model.ReverseFilter_Genres.Genres != null && traktSearchResult.Movie.Genres != null)
+                        if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
+                            continue;
+
+                    if (model.ReverseFilter_Languages.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
+                        if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
+                            continue;
+
+                    if (model.ReverseFilter_Translations.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
+                        if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
+                            continue;
+
                     if (!list.Contains(traktSearchResult.Movie, new TraktMovieComparer()))
                         list.Add(traktSearchResult.Movie);
                 }
@@ -383,7 +403,7 @@ namespace Listrr.Repositories
                         model.Filter_Certifications_Show.Certifications,
                         model.Filter_Networks.Networks, 
                         traktShowStatus.Count != 0 ? traktShowStatus.ToArray() : null
-                    ), new TraktExtendedInfo().SetMetadata(),
+                    ), new TraktExtendedInfo().SetFull(),
                     new TraktPagedParameters(page, fetchLimit)
                 );
 
@@ -392,6 +412,35 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
+                    if(model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
+                        if(model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
+                            continue;
+
+                    if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
+                        if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
+                            continue;
+
+                    if (model.ReverseFilter_Genres.Genres != null && traktSearchResult.Show.Genres != null)
+                        if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
+                            continue;
+
+                    if (model.ReverseFilter_Languages.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
+                        if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
+                            continue;
+
+                    if (model.ReverseFilter_Networks.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
+                        if (model.ReverseFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
+                            continue;
+
+                    if (model.ReverseFilter_Status.Status != null && traktSearchResult.Show.Status != null)
+                        if (model.ReverseFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
+                            continue;
+
+                    if (model.ReverseFilter_Translations.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
+                        if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
+                            continue;
+
+
                     if (!list.Contains(traktSearchResult.Show, new TraktShowComparer()))
                         list.Add(traktSearchResult.Show);
                 }
