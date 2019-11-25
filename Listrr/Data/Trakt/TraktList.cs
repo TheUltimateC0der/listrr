@@ -1,8 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.API.Trakt.Models.Filters;
+
 using Microsoft.AspNetCore.Identity;
-using TraktNet.Enums;
+
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Listrr.Data.Trakt
 {
@@ -49,9 +50,7 @@ namespace Listrr.Data.Trakt
         public bool SearchByTitle { get; set; }
         public bool SearchByTranslations { get; set; }
         public bool SearchByTagline { get; set; }
-
-        public TranslationsBasicFilter Filter_Translations { get; set; }
-
+        
         #endregion
 
         #region Common Filter
@@ -68,13 +67,35 @@ namespace Listrr.Data.Trakt
 
         public CountriesCommonFilter Filter_Countries { get; set; }
 
+        public TranslationsBasicFilter Filter_Translations { get; set; }
+
         #endregion
+
+        #region Reverse Common Filter
+
+        public LanguagesCommonFilter ReverseFilter_Languages { get; set; }
+
+        public GenresCommonFilter ReverseFilter_Genres { get; set; }
+
+        public CountriesCommonFilter ReverseFilter_Countries { get; set; }
+
+        public TranslationsBasicFilter ReverseFilter_Translations { get; set; }
+
+        #endregion
+
 
         #region Movie Filter
 
         public CertificationsMovieFilter Filter_Certifications_Movie { get; set; }
 
         #endregion
+
+        #region Reverse Movie Filter
+
+        public CertificationsMovieFilter ReverseFilter_Certifications_Movie { get; set; }
+
+        #endregion
+
 
         #region Show Filter
 
@@ -83,6 +104,16 @@ namespace Listrr.Data.Trakt
         public NetworksShowFilter Filter_Networks { get; set; }
 
         public StatusShowFilter Filter_Status { get; set; }
+
+        #endregion
+
+        #region Revsere Show Filter
+
+        public CertificationsShowFilter ReverseFilter_Certifications_Show { get; set; }
+
+        public NetworksShowFilter ReverseFilter_Networks { get; set; }
+
+        public StatusShowFilter ReverseFilter_Status { get; set; }
 
         #endregion
 
