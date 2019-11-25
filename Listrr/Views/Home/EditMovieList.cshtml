@@ -161,29 +161,29 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <select asp-for="ReverseFilter_Translations" asp-items="Model.ReverseLanguages" class="form-control select2" multiple data-placeholder="Select a translation"></select>
-                                <small class="form-text text-muted">Select the languages that a show has to have translatins for</small>
+                                <small class="form-text text-muted">Select the languages that you want to exclude</small>
                                 <span asp-validation-for="ReverseFilter_Translations" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <select asp-for="ReverseFilter_Genres" asp-items="Model.ReverseGenres" class="form-control select2" multiple data-placeholder="Select a genre"></select>
-                                <small class="form-text text-muted">Select the genres a show should have</small>
+                                <small class="form-text text-muted">Select the genres that you want to exclude</small>
                                 <span asp-validation-for="ReverseFilter_Genres" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <select asp-for="ReverseFilter_Languages" asp-items="Model.ReverseLanguages" class="form-control select2" multiple data-placeholder="Select a language"></select>
-                                <small class="form-text text-muted">Languages filter e.g. <code>en,de</code> for shows that are available in english and german</small>
+                                <small class="form-text text-muted">Select the languages that you want to exclude</small>
                                 <span asp-validation-for="ReverseFilter_Languages" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <select asp-for="ReverseFilter_Countries" asp-items="Model.ReverseCountries" class="form-control select2" multiple data-placeholder="Select a country"></select>
-                                <small class="form-text text-muted">Countries filter e.g. <code>us,de</code> for shows that are available in the US and germany</small>
+                                <small class="form-text text-muted">Select the countries that you want to exclude</small>
                                 <span asp-validation-for="ReverseFilter_Countries" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <select asp-for="ReverseFilter_Certifications" asp-items="Model.ReverseCertifications" class="form-control select2" multiple data-placeholder="Select a certification"></select>
-                                <small class="form-text text-muted">Certifications filter e.g. <code>g,pg</code> for kids shows.</small>
+                                <small class="form-text text-muted">Select the certifications that you want to exclude</small>
                                 <span asp-validation-for="ReverseFilter_Certifications" class="text-danger"></span>
                             </div>
                         </div>
