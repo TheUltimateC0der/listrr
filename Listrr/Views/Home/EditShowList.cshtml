@@ -164,16 +164,9 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Exclusion filters</div>
                 <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="alert alert-info" role="alert">
-                                These filters are used to exclude the chosen values from the list.
-                            </div>
-                            @*<div class="alert alert-info" role="alert">
-                            <b>Example:</b> You did not choose anything for the status filter above, and select all items in here. This will result in
-                        </div>*@
-                        </div>
-                    </div>
+
+                    @await Html.PartialAsync("_ReverseFiltersExplanationPartial")
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
