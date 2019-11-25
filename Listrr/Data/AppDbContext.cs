@@ -193,7 +193,71 @@ namespace Listrr.Data
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
                 );
+            // Reverse filters
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Certifications_Movie)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
+                );
 
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Certifications_Show)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Countries)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CountriesCommonFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Genres)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<GenresCommonFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Languages)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<LanguagesCommonFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Networks)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Status)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
+                );
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ReverseFilter_Translations)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
+                );
+            
             #endregion
 
             #region CountryCode
