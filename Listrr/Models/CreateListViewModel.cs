@@ -45,6 +45,9 @@ namespace Listrr.Models
         [Display(Name = "Search by translations", Prompt = "Search by translations")]
         public bool SearchByTranslations { get; set; }
 
+        [Display(Name = "Minimum amount of votes", Prompt = "Minimum amount of votes")]
+        public int MinVotes { get; set; }
+
         #region Common Filter
 
         [Display(Name = "Movie translation", Prompt = "de,en,ru")]
