@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 
 using TraktNet;
 using TraktNet.Enums;
+using TraktNet.Exceptions;
 using TraktNet.Objects.Authentication;
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
@@ -143,8 +144,12 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
-                        if (model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Movie.Certification))
+                    if (traktSearchResult.Movie.Votes != null && model.Filter_Ratings.Votes > 0)
+                        if (!(traktSearchResult.Movie.Votes >= model.Filter_Ratings.Votes))
+                            continue;
+
+                    if (model.ReverseFilter_Certifications_Movie.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
+                        if (model.ReverseFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
                             continue;
 
                     if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
@@ -412,7 +417,11 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if(model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
+                    if (traktSearchResult.Show.Votes != null && model.Filter_Ratings.Votes > 0)
+                        if (!(traktSearchResult.Show.Votes >= model.Filter_Ratings.Votes))
+                            continue;
+
+                    if (model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
                         if(model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
                             continue;
 
