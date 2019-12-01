@@ -136,7 +136,7 @@ namespace Listrr.Repositories
                             model.Filter_Ratings.From,
                             model.Filter_Ratings.To
                         )
-                    ), new TraktExtendedInfo().SetMetadata(),
+                    ), new TraktExtendedInfo().SetFull(),
                     new TraktPagedParameters(page, fetchLimit)
                 );
 
