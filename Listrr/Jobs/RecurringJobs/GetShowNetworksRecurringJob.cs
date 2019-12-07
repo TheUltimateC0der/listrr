@@ -1,46 +1,49 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+
+using System.Linq;
+using System.Threading.Tasks;
+
 using TraktNet;
 
-namespace Listrr.BackgroundJob
+namespace Listrr.Jobs.RecurringJobs
 {
     public class GetShowNetworksRecurringJob : IRecurringJob
     {
 
-        private readonly TraktClient traktClient;
-        private readonly IConfiguration configuration;
-        private readonly AppDbContext appDbContext;
+        private readonly TraktClient _traktClient;
+        private readonly AppDbContext _appDbContext;
+        private readonly TraktAPIConfiguration _traktApiConfiguration;
 
-        public GetShowNetworksRecurringJob(AppDbContext appDbContext, IConfiguration configuration)
+        public GetShowNetworksRecurringJob(AppDbContext appDbContext, TraktAPIConfiguration traktApiConfiguration)
         {
-            this.configuration = configuration;
-            this.appDbContext = appDbContext;
+            _appDbContext = appDbContext;
+            _traktApiConfiguration = traktApiConfiguration;
 
-            traktClient = new TraktClient(configuration["Trakt:ClientID"], configuration["Trakt:ClientSecret"]);
+            _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
         }
 
 
         public async Task Execute()
         {
-            var result = await traktClient.Networks.GetNetworksAsync();
+            var result = await _traktClient.Networks.GetNetworksAsync();
 
             if (result.IsSuccess)
             {
-                var currentNetworks = await appDbContext.TraktShowNetworks.ToListAsync();
+                var currentNetworks = await _appDbContext.TraktShowNetworks.ToListAsync();
 
                 foreach (var traktNetwork in result.Value)
                 {
                     if (currentNetworks.All(x => x.Name != traktNetwork.Name))
                     {
-                        await appDbContext.TraktShowNetworks.AddAsync(new TraktShowNetwork()
+                        await _appDbContext.TraktShowNetworks.AddAsync(new TraktShowNetwork()
                         {
                             Name = traktNetwork.Name
                         });
-                        await appDbContext.SaveChangesAsync();
+                        await _appDbContext.SaveChangesAsync();
                     }
                 }
             }
