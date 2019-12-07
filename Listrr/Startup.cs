@@ -1,23 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Listrr.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Hangfire;
+﻿using Hangfire;
+
 using HangfireBasicAuthenticationFilter;
-using Listrr.BackgroundJob;
 using Listrr.Configuration;
+using Listrr.Data;
 using Listrr.Repositories;
 using Listrr.Services;
+
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Listrr.Jobs.RecurringJobs;
 
 namespace Listrr
 {
@@ -35,6 +39,36 @@ namespace Listrr
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
+            // Config
+            var hangfireConfiguration = new HangFireConfiguration();
+            Configuration.Bind("Hangfire", hangfireConfiguration);
+            services.AddSingleton(hangfireConfiguration);
+
+            var toplistConfiguration = new ToplistConfiguration();
+            Configuration.Bind("Toplist", toplistConfiguration);
+            services.AddSingleton(toplistConfiguration);
+
+            var traktApiConfiguration = new TraktAPIConfiguration();
+            Configuration.Bind("Trakt", traktApiConfiguration);
+            services.AddSingleton(traktApiConfiguration);
+
+            // Multi Instance LB
+            services.AddDbContext<DataProtectionDbContext>(options =>
+                options.UseSqlServer(connectionString)
+            );
+
+            services.AddDataProtection()
+                .PersistKeysToDbContext<DataProtectionDbContext>()
+                .SetApplicationName("Listrr");
+
+            services.AddDistributedSqlServerCache(options =>
+            {
+                options.ConnectionString = connectionString;
+                options.SchemaName = "dbo";
+                options.TableName = "Cache";
+            });
+
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -49,8 +83,7 @@ namespace Listrr
             services.AddDefaultIdentity<IdentityUser>(options =>
                 {
                     options.User.AllowedUserNameCharacters = null;
-                })
-                .AddEntityFrameworkStores<AppDbContext>();
+                }).AddEntityFrameworkStores<AppDbContext>();
 
             services.AddHangfire(x =>
                 x.UseSqlServerStorage(connectionString));
@@ -58,8 +91,8 @@ namespace Listrr
             services.AddAuthentication()
                 .AddTrakt(options =>
                 {
-                    options.ClientId = Configuration["Trakt:ClientID"];
-                    options.ClientSecret = Configuration["Trakt:ClientSecret"];
+                    options.ClientId = traktApiConfiguration.ClientId;
+                    options.ClientSecret = traktApiConfiguration.ClientSecret;
                     options.SaveTokens = true;
                     options.Events.OnCreatingTicket = ctx =>
                     {
@@ -74,11 +107,20 @@ namespace Listrr
                     };
                 });
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.Name = "Listrr";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);
+
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            services.AddDbContext<AppDbContext>(options => 
-                options.UseSqlServer(connectionString));
 
             services.AddHttpContextAccessor();
 
@@ -86,15 +128,7 @@ namespace Listrr
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-
-            var hangfireConfiguration = new HangFireConfiguration();
-            Configuration.Bind("Hangfire", hangfireConfiguration);
-            services.AddSingleton(hangfireConfiguration);
-
-            var toplistConfiguration = new ToplistConfiguration();
-            Configuration.Bind("Toplist", toplistConfiguration);
-            services.AddSingleton(toplistConfiguration);
-
+            
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
@@ -175,6 +209,7 @@ namespace Listrr
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+                serviceScope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.Migrate();
             }
         }
     }

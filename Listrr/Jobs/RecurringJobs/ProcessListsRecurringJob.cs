@@ -1,28 +1,26 @@
-﻿using System;
-using System.Threading.Tasks;
-using Listrr.Data.Trakt;
+﻿using Listrr.Data.Trakt;
 using Listrr.Jobs.BackgroundJobs;
 using Listrr.Services;
-using Microsoft.AspNetCore.Identity;
 
-namespace Listrr.BackgroundJob
+using System;
+using System.Threading.Tasks;
+
+namespace Listrr.Jobs.RecurringJobs
 {
     public class ProcessListsRecurringJob : IRecurringJob
     {
 
-        private readonly ITraktService traktService;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly ITraktService _traktService;
 
-        public ProcessListsRecurringJob(ITraktService traktService, UserManager<IdentityUser> userManager)
+        public ProcessListsRecurringJob(ITraktService traktService)
         {
-            this.traktService = traktService;
-            this.userManager = userManager;
+            _traktService = traktService;
         }
 
 
         public async Task Execute()
         {
-            var lists = await traktService.GetProcessable();
+            var lists = await _traktService.GetProcessable();
 
             foreach (var traktList in lists)
             {

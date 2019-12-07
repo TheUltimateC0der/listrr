@@ -1,18 +1,19 @@
-﻿using System.Globalization;
+﻿using Listrr.Data;
+
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Listrr.Data;
 
-namespace Listrr.BackgroundJob
+namespace Listrr.Jobs.RecurringJobs
 {
     public class GetLanguageCodesRecurringJob : IRecurringJob
     {
 
-        private readonly AppDbContext appDbContext;
+        private readonly AppDbContext _appDbContext;
 
         public GetLanguageCodesRecurringJob(AppDbContext appDbContext)
         {
-            this.appDbContext = appDbContext;
+            _appDbContext = appDbContext;
         }
 
 
@@ -20,9 +21,9 @@ namespace Listrr.BackgroundJob
         {
             foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
             {
-                if (!appDbContext.LanguageCodes.Any(x => x.Code == culture.TwoLetterISOLanguageName && x.Name == culture.NativeName))
+                if (!_appDbContext.LanguageCodes.Any(x => x.Code == culture.TwoLetterISOLanguageName && x.Name == culture.NativeName))
                 {
-                    await appDbContext.LanguageCodes.AddAsync(
+                    await _appDbContext.LanguageCodes.AddAsync(
                         new LanguageCode()
                         {
                             Code = culture.TwoLetterISOLanguageName,
@@ -30,7 +31,7 @@ namespace Listrr.BackgroundJob
                         }
                     );
 
-                    await appDbContext.SaveChangesAsync();
+                    await _appDbContext.SaveChangesAsync();
                 }
             }
         }
