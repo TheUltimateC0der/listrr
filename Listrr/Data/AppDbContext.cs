@@ -1,10 +1,11 @@
 ﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Data.Trakt;
+
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
 using Newtonsoft.Json;
-using TraktNet.Enums;
-using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
 
 namespace Listrr.Data
 {
@@ -25,7 +26,7 @@ namespace Listrr.Data
 
         public DbSet<CountryCode> CountryCodes { get; set; }
         public DbSet<LanguageCode> LanguageCodes { get; set; }
-
+        
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }

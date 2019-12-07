@@ -1,47 +1,50 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+
+using System.Linq;
+using System.Threading.Tasks;
+
 using TraktNet;
 
-namespace Listrr.BackgroundJob
+namespace Listrr.Jobs.RecurringJobs
 {
     public class GetShowGenresRecurringJob : IRecurringJob
     {
 
-        private readonly TraktClient traktClient;
-        private readonly IConfiguration configuration;
-        private readonly AppDbContext appDbContext;
+        private readonly TraktClient _traktClient;
+        private readonly AppDbContext _appDbContext;
+        private readonly TraktAPIConfiguration _traktApiConfiguration;
 
-        public GetShowGenresRecurringJob(AppDbContext appDbContext, IConfiguration configuration)
+        public GetShowGenresRecurringJob(AppDbContext appDbContext, TraktAPIConfiguration traktApiConfiguration)
         {
-            this.configuration = configuration;
-            this.appDbContext = appDbContext;
+            _appDbContext = appDbContext;
+            _traktApiConfiguration = traktApiConfiguration;
 
-            traktClient = new TraktClient(configuration["Trakt:ClientID"], configuration["Trakt:ClientSecret"]);
+            _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
         }
 
 
         public async Task Execute()
         {
-            var result = await traktClient.Genres.GetShowGenresAsync();
+            var result = await _traktClient.Genres.GetShowGenresAsync();
 
             if (result.IsSuccess)
             {
-                var currentGenres = await appDbContext.TraktShowGenres.ToListAsync();
+                var currentGenres = await _appDbContext.TraktShowGenres.ToListAsync();
 
                 foreach (var traktGenre in result.Value)
                 {
                     if (currentGenres.All(x => x.Slug != traktGenre.Slug))
                     {
-                        await appDbContext.TraktShowGenres.AddAsync(new TraktShowGenre()
+                        await _appDbContext.TraktShowGenres.AddAsync(new TraktShowGenre()
                         {
                             Name = traktGenre.Name,
                             Slug = traktGenre.Slug
                         });
-                        await appDbContext.SaveChangesAsync();
+                        await _appDbContext.SaveChangesAsync();
                     }
                 }
             }

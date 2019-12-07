@@ -1,20 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Listrr.Data;
+﻿using Listrr.Data;
 using Listrr.Data.Trakt;
+
 using Microsoft.EntityFrameworkCore;
 
-namespace Listrr.BackgroundJob
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Listrr.Jobs.RecurringJobs
 {
     public class GetShowStatusRecurringJob : IRecurringJob
     {
 
-        private readonly AppDbContext appDbContext;
+        private readonly AppDbContext _appDbContext;
 
         public GetShowStatusRecurringJob(AppDbContext appDbContext)
         {
-            this.appDbContext = appDbContext;
+            _appDbContext = appDbContext;
         }
 
 
@@ -28,17 +30,17 @@ namespace Listrr.BackgroundJob
                 TraktNet.Enums.TraktShowStatus.Canceled.ObjectName
             };
 
-            var currentStatus = await appDbContext.TraktShowStatuses.ToListAsync();
+            var currentStatus = await _appDbContext.TraktShowStatuses.ToListAsync();
 
             foreach (var traktStatus in result)
             {
                 if (currentStatus.All(x => x.Name != traktStatus))
                 {
-                    await appDbContext.TraktShowStatuses.AddAsync(new TraktShowStatus()
+                    await _appDbContext.TraktShowStatuses.AddAsync(new TraktShowStatus()
                     {
                         Name = traktStatus
                     });
-                    await appDbContext.SaveChangesAsync();
+                    await _appDbContext.SaveChangesAsync();
                 }
             }
         }

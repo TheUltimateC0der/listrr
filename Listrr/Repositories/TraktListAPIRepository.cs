@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Listrr.Comparer;
+﻿using Listrr.Comparer;
+using Listrr.Configuration;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktNet;
 using TraktNet.Enums;
-using TraktNet.Exceptions;
 using TraktNet.Objects.Authentication;
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
@@ -27,18 +26,17 @@ namespace Listrr.Repositories
 
         private readonly TraktClient _traktClient;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly TraktAPIConfiguration _traktApiConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IConfiguration _configuration;
+        
 
-        private readonly uint? fetchLimit = 100;
-
-        public TraktListAPIRepository(UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public TraktListAPIRepository(UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
         {
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
-            _configuration = configuration;
+            _traktApiConfiguration = traktApiConfiguration;
 
-            _traktClient = new TraktClient(configuration["Trakt:ClientID"], configuration["Trakt:ClientSecret"]);
+            _traktClient = new TraktClient(_traktApiConfiguration.ClientId, traktApiConfiguration.ClientSecret);
         }
 
 
@@ -136,8 +134,8 @@ namespace Listrr.Repositories
                             model.Filter_Ratings.From,
                             model.Filter_Ratings.To
                         )
-                    ), new TraktExtendedInfo().SetMetadata(),
-                    new TraktPagedParameters(page, fetchLimit)
+                    ), new TraktExtendedInfo().SetFull(),
+                    new TraktPagedParameters(page, _traktApiConfiguration.FetchLimitSearch)
                 );
 
                 if (!result.IsSuccess) throw result.Exception;
@@ -173,8 +171,10 @@ namespace Listrr.Repositories
                 }
 
                 if (result.PageCount == page) break;
-
+                
                 page++;
+
+                await Task.Delay(_traktApiConfiguration.DelaySearch);
             }
         }
 
@@ -222,12 +222,12 @@ namespace Listrr.Repositories
 
             var result = new List<ITraktMovie>();
 
-            await GetMovies(model, null, null, result);
+            await GetMovies(model, result);
 
             return result;
         }
 
-        private async Task GetMovies(TraktList model, uint? page, uint? limit, IList<ITraktMovie> list)
+        private async Task GetMovies(TraktList model, IList<ITraktMovie> list, uint? page = 0)
         {
             var result = await _traktClient.Users.GetCustomListItemsAsync(
                 model.Owner.UserName,
@@ -236,7 +236,7 @@ namespace Listrr.Repositories
                 new TraktExtendedInfo().SetMetadata(),
                 new TraktPagedParameters(
                     page,
-                    limit
+                    _traktApiConfiguration.FetchLimitList
                 )
             );
 
@@ -249,8 +249,8 @@ namespace Listrr.Repositories
 
             if (result.PageCount > page)
             {
-                await Task.Delay(500);
-                await GetMovies(model, page + 1, limit, list);
+                await Task.Delay(_traktApiConfiguration.DelayList);
+                await GetMovies(model, list, page + 1);
             }
 
         }
@@ -291,12 +291,12 @@ namespace Listrr.Repositories
 
             var result = new List<ITraktShow>();
 
-            await GetShows(model, null, null, result);
+            await GetShows(model, result);
 
             return result;
         }
 
-        private async Task GetShows(TraktList model, uint? page, uint? limit, IList<ITraktShow> list)
+        private async Task GetShows(TraktList model, IList<ITraktShow> list, uint? page = 0)
         {
             var result = await _traktClient.Users.GetCustomListItemsAsync(
                 model.Owner.UserName,
@@ -305,7 +305,7 @@ namespace Listrr.Repositories
                 new TraktExtendedInfo().SetMetadata(),
                 new TraktPagedParameters(
                     page,
-                    limit
+                    _traktApiConfiguration.FetchLimitList
                 )
             );
 
@@ -318,8 +318,8 @@ namespace Listrr.Repositories
 
             if (result.PageCount > page)
             {
-                await Task.Delay(500);
-                await GetShows(model, page + 1, limit, list);
+                await Task.Delay(_traktApiConfiguration.DelayList);
+                await GetShows(model, list, page + 1);
             }
 
         }
@@ -409,7 +409,7 @@ namespace Listrr.Repositories
                         model.Filter_Networks.Networks, 
                         traktShowStatus.Count != 0 ? traktShowStatus.ToArray() : null
                     ), new TraktExtendedInfo().SetFull(),
-                    new TraktPagedParameters(page, fetchLimit)
+                    new TraktPagedParameters(page, _traktApiConfiguration.FetchLimitSearch)
                 );
 
 
@@ -457,6 +457,8 @@ namespace Listrr.Repositories
                 if (result.PageCount == page) break;
 
                 page++;
+
+                await Task.Delay(_traktApiConfiguration.DelaySearch);
             }
         }
 

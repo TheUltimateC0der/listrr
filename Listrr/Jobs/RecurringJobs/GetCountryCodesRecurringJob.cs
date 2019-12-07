@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Listrr.Data;
+
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Listrr.Data;
 
-namespace Listrr.BackgroundJob
+namespace Listrr.Jobs.RecurringJobs
 {
     public class GetCountryCodesRecurringJob : IRecurringJob
     {
 
-        private readonly AppDbContext appDbContext;
+        private readonly AppDbContext _appDbContext;
 
         public GetCountryCodesRecurringJob(AppDbContext appDbContext)
         {
-            this.appDbContext = appDbContext;
+            _appDbContext = appDbContext;
         }
 
 
@@ -29,10 +30,10 @@ namespace Listrr.BackgroundJob
 
             foreach (var regionInfo in countries)
             {
-                if (appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower())) continue;
+                if (_appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower())) continue;
                 if (regionInfo.TwoLetterISORegionName.Length != 2) continue;
 
-                await appDbContext.CountryCodes.AddAsync(
+                await _appDbContext.CountryCodes.AddAsync(
                     new CountryCode()
                     {
                         Code = regionInfo.TwoLetterISORegionName.ToLower(),
@@ -40,7 +41,7 @@ namespace Listrr.BackgroundJob
                     }
                 );
 
-                await appDbContext.SaveChangesAsync();
+                await _appDbContext.SaveChangesAsync();
             }
 
 

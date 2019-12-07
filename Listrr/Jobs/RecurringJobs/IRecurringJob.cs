@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Listrr.BackgroundJob
+namespace Listrr.Jobs.RecurringJobs
 {
     public interface IRecurringJob
     {
