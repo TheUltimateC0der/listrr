@@ -145,10 +145,16 @@
                                 <span asp-validation-for="Filter_Countries" class="text-danger"></span>
                             </div>
                             <div class="form-group">
+                                <p class="form-control-static">Due to the fact that this has not been implemented into the lib we are using for communicating with the Trakt API, we disabled this feature.</p>
+                                <small class="form-text text-muted">Certifications filter e.g. <code>g,pg</code> for kids shows.</small>
+                            </div>
+                            @*
+                            <div class="form-group">
                                 <select asp-for="Filter_Certifications" asp-items="Model.Certifications" class="form-control select2" multiple data-placeholder="Select a certification"></select>
                                 <small class="form-text text-muted">Certifications filter e.g. <code>g,pg</code> for kids shows.</small>
                                 <span asp-validation-for="Filter_Certifications" class="text-danger"></span>
                             </div>
+                            *@
                         </div>
                     </div>
                 </div>

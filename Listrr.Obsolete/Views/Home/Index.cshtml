@@ -1,0 +1,65 @@
+﻿@using Listrr.Configuration
+@using Listrr.Data.Trakt
+@using Microsoft.Extensions.Configuration
+@model IList<Listrr.Data.Trakt.TraktList>
+@inject ToplistConfiguration ToplistConfiguration
+
+@{
+    ViewData["Title"] = $"Top {ToplistConfiguration.Count} that have more votes than {ToplistConfiguration.Threshold}";
+    ViewData["Message"] = $"User created lists";
+}
+
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+
+<div class="row">
+    @if (Model.Count == 0)
+    {
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert">
+                #FeelsBadMan There are no lists currently :(
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>
+                            <b>Name</b>
+                        </td>
+                        <td>
+                            <b>Type</b>
+                        </td>
+                        <td>
+                            <b>Items</b>
+                        </td>
+                        <td>
+                            <b>Likes</b>
+                        </td>
+                        <td>
+                            <b>Action</b>
+                        </td>
+                    </tr>
+                </thead>
+                @foreach (var list in Model)
+                {
+                    <tr>
+                        <td>
+                            @list.Name
+                        </td>
+                        <td>@list.Type</td>
+                        <td>@list.Items</td>
+                        <td>@list.Likes</td>
+                        <td>
+                            <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-primary btn-xs">Open on Trakt</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>

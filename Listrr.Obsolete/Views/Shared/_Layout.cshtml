@@ -1,0 +1,77 @@
+﻿@using Listrr.Configuration
+@inject ToplistConfiguration ToplistConfiguration
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - listrr.pro</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/select2.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">listrr.pro</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Home" asp-action="Lists">Your Lists</a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Home" asp-action="MovieList">Create movie list</a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Home" asp-action="ShowList">Create show list</a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count lists</a>
+                        </li>
+                    }
+                </ul>
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
+    </nav>
+
+    <partial name="_CookieConsentPartial" />
+
+    <div class="container">
+        @RenderBody()
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted">&copy; 2018 - @DateTime.Now.Year | <a href="https://listrr.pro">listrr.pro</a> | <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a> | <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a></p>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/js/select2.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>

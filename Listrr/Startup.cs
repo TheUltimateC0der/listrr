@@ -1,11 +1,13 @@
-﻿using Hangfire;
-
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Hangfire;
 using HangfireBasicAuthenticationFilter;
 using Listrr.Configuration;
 using Listrr.Data;
+using Listrr.Jobs.RecurringJobs;
 using Listrr.Repositories;
 using Listrr.Services;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -13,15 +15,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Listrr.Jobs.RecurringJobs;
+using Microsoft.Extensions.Hosting;
 
 namespace Listrr
 {
@@ -56,18 +53,15 @@ namespace Listrr
             services.AddDbContext<DataProtectionDbContext>(options =>
                 options.UseSqlServer(connectionString)
             );
-
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionDbContext>()
                 .SetApplicationName("Listrr");
-
             services.AddDistributedSqlServerCache(options =>
             {
                 options.ConnectionString = connectionString;
                 options.SchemaName = "dbo";
                 options.TableName = "Cache";
             });
-
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -76,15 +70,14 @@ namespace Listrr
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString)
             );
-
             services.AddDefaultIdentity<IdentityUser>(options =>
-                {
-                    options.User.AllowedUserNameCharacters = null;
-                }).AddEntityFrameworkStores<AppDbContext>();
-
+            {
+                options.User.AllowedUserNameCharacters = null;
+            }).AddEntityFrameworkStores<AppDbContext>();
             services.AddHangfire(x =>
                 x.UseSqlServerStorage(connectionString));
 
@@ -119,29 +112,29 @@ namespace Listrr
                 options.SlidingExpiration = true;
             });
 
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
             services.AddHttpContextAccessor();
 
+            //ReverseProxy Fix
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-            
+
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
 
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
         {
             InitializeDatabase(app);
 
+            //ReverseProxy Fix
             app.UseForwardedHeaders();
-
             app.Use((context, next) =>
             {
                 context.Request.Scheme = "https";
@@ -163,8 +156,35 @@ namespace Listrr
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseAuthentication();
+            app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            InitializeHangfire(app, serviceProvider, hangFireConfiguration);
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+            });
+        }
+
+
+
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+                serviceScope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.Migrate();
+            }
+        }
+
+        private void InitializeHangfire(IApplicationBuilder app, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
+        {
             GlobalConfiguration.Configuration
                 .UseActivator(new HangfireActivator(serviceProvider));
 
@@ -188,29 +208,8 @@ namespace Listrr
             RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>((x) => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>((x) => x.Execute(), Cron.Daily);
 
-
-            ////Starting all jobs here for initial db fill
-            //foreach (var recurringJob in JobStorage.Current.GetConnection().GetRecurringJobs())
-            //{
-            //    RecurringJob.Trigger(recurringJob.Id);
-            //}
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
         }
 
 
-        private void InitializeDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-                serviceScope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.Migrate();
-            }
-        }
     }
 }

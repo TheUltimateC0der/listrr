@@ -16,8 +16,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-using TraktShowStatus = Listrr.Data.Trakt.TraktShowStatus;
-
 namespace Listrr.Controllers
 {
     public class HomeController : Controller
@@ -35,7 +33,7 @@ namespace Listrr.Controllers
             _appDbContext = appDbContext;
             _toplistConfiguration = toplistConfiguration;
         }
-        
+
 
         public async Task<IActionResult> Index()
         {
@@ -63,7 +61,7 @@ namespace Listrr.Controllers
             var dbCertifications = await _appDbContext.TraktMovieCertifications.OrderBy(x => x.Description).ToListAsync();
             var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
             var dbLanguageCodes = await _appDbContext.LanguageCodes.OrderBy(x => x.Code).ToListAsync();
-            
+
             var model = new CreateMovieListViewModel()
             {
                 Genres = new MultiSelectList(dbGenres, nameof(TraktMovieGenre.Slug), nameof(TraktMovieGenre.Slug)),
@@ -104,7 +102,7 @@ namespace Listrr.Controllers
             model.ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
 
             if (!ModelState.IsValid) return View(model);
-            
+
             var result = await _traktService.Create(new TraktList()
             {
                 Name = model.Name,
@@ -460,7 +458,7 @@ namespace Listrr.Controllers
 
                 await _traktService.Update(list);
 
-                return RedirectToAction(nameof(EditShowList), new {list.Id});
+                return RedirectToAction(nameof(EditShowList), new { list.Id });
             }
 
             return RedirectToAction(nameof(Lists));
@@ -505,11 +503,11 @@ namespace Listrr.Controllers
             return RedirectToAction(nameof(Lists));
         }
 
-        
 
 
 
-        
+
+
 
         public IActionResult About()
         {
