@@ -112,11 +112,11 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Between</span>
                                     </div>
-                                    <input asp-for="Filter_Years.From" value="1910" class="form-control" />
+                                    <input asp-for="Filter_Years.From" class="form-control" />
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="border-left: 0; border-right: 0;">and</span>
                                     </div>
-                                    <input asp-for="Filter_Years.To" value="@DateTime.Now.Year" class="form-control" />
+                                    <input asp-for="Filter_Years.To" class="form-control" />
                                 </div>
                                 <small class="form-text text-muted">Years filter e.g. <code>2000-2010</code></small>
                                 <span asp-validation-for="Filter_Years.From" class="text-danger"></span>
@@ -128,11 +128,11 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Between</span>
                                     </div>
-                                    <input asp-for="Filter_Runtimes.From" value="30" class="form-control" />
+                                    <input asp-for="Filter_Runtimes.From" class="form-control" />
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="border-left: 0; border-right: 0;">and</span>
                                     </div>
-                                    <input asp-for="Filter_Runtimes.To" value="250" class="form-control" />
+                                    <input asp-for="Filter_Runtimes.To" class="form-control" />
                                     <div class="input-group-append">
                                         <span class="input-group-text" style="border-left: 0;">minutes</span>
                                     </div>
@@ -147,15 +147,15 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Between</span>
                                     </div>
-                                    <input asp-for="Filter_Ratings.From" value="75" class="form-control" />
+                                    <input asp-for="Filter_Ratings.From" class="form-control" />
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="border-left: 0; border-right: 0;">and</span>
                                     </div>
-                                    <input asp-for="Filter_Ratings.To" value="100" class="form-control" />
+                                    <input asp-for="Filter_Ratings.To" class="form-control" />
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="border-left: 0; border-right: 0;">with at least</span>
                                     </div>
-                                    <input asp-for="Filter_Ratings.Votes" value="10" class="form-control" />
+                                    <input asp-for="Filter_Ratings.Votes" class="form-control" />
                                     <div class="input-group-append">
                                         <span class="input-group-text" style="border-left: 0;">votes</span>
                                     </div>
