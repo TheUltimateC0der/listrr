@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Listrr.Data;
 using Listrr.Data.Trakt;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,13 +27,14 @@ namespace Listrr.Repositories
             await appDbContext.SaveChangesAsync();
 
 
-            // Just return couse we get the id from trakt
+            // Just return cause we get the id from trakt
             return model;
         }
 
         public async Task<IList<TraktList>> Top(int count, int threshold)
         {
             return await appDbContext.TraktLists
+                .AsNoTracking()
                 .Include(x => x.Owner)
                 .OrderByDescending(x => x.Likes)
                 .Take(count)
@@ -41,12 +44,12 @@ namespace Listrr.Repositories
 
         public async Task<TraktList> Get(uint id)
         {
-            return await appDbContext.TraktLists.AsNoTracking().Include(x => x.Owner).FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.TraktLists.Include(x => x.Owner).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<TraktList>> Get(IdentityUser user)
         {
-            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Owner.Id == user.Id).ToListAsync();
+            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Owner.Id == user.Id).AsNoTracking().ToListAsync();
         }
 
         public async Task<List<TraktList>> GetProcessable()

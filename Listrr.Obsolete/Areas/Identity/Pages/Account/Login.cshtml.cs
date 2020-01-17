@@ -29,7 +29,7 @@ namespace Listrr.Areas.Identity.Pages.Account
 
             var externalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            return RedirectToPage("ExternalLogin", new {provider = externalLogins.First().Name, returnUrl = returnUrl});
+            return RedirectToPage("ExternalLogin", new {provider = externalLogins.FirstOrDefault(x => x.Name == "Trakt"), returnUrl = returnUrl});
         }
     }
 }

@@ -116,12 +116,12 @@ namespace Listrr.Services
             return await _traktListApiRepository.ShowSearch(model);
         }
 
-        public async Task<TraktList> Update(TraktList model)
+        public async Task<TraktList> Update(TraktList model, bool api = false)
         {
-            await _traktListApiRepository.Update(model);
+            if(api)
+                await _traktListApiRepository.Update(model);
 
             return await _traktListDbRepository.Update(model);
-            
         }
     }
 }

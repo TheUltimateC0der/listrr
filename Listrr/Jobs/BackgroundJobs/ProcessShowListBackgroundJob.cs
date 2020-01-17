@@ -1,11 +1,12 @@
-﻿using Listrr.Comparer;
-using Listrr.Extensions;
-using Listrr.Services;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Listrr.Comparer;
+using Listrr.Data.Trakt;
+using Listrr.Extensions;
+using Listrr.Services;
 
 using TraktNet.Exceptions;
 using TraktNet.Objects.Get.Shows;
@@ -14,22 +15,25 @@ namespace Listrr.Jobs.BackgroundJobs
 {
     public class ProcessShowListBackgroundJob : IBackgroundJob<uint>
     {
-
-        private readonly ITraktService traktService;
+        private readonly ITraktService _traktService;
+        private TraktList traktList;
 
         public ProcessShowListBackgroundJob(ITraktService traktService)
         {
-            this.traktService = traktService;
+            _traktService = traktService;
         }
 
         public async Task Execute(uint param)
         {
             try
             {
-                var list = await traktService.Get(param, true);
+                traktList = await _traktService.Get(param, true);
+                traktList.ScanState = ScanState.Updating;
 
-                var found = await traktService.ShowSearch(list);
-                var existing = await traktService.GetShows(list);
+                await _traktService.Update(traktList);
+
+                var found = await _traktService.ShowSearch(traktList);
+                var existing = await _traktService.GetShows(traktList);
 
                 var toRemove = new List<ITraktShow>();
                 foreach (var existingShow in existing)
@@ -50,7 +54,7 @@ namespace Listrr.Jobs.BackgroundJobs
                     //Chunking to 100 items per list cause trakt api does not like 10000s of items
                     foreach (var toAddChunk in toAdd.ChunkBy(100))
                     {
-                        await traktService.AddShows(toAddChunk, list);
+                        await _traktService.AddShows(toAddChunk, traktList);
                     }
                 }
 
@@ -59,19 +63,21 @@ namespace Listrr.Jobs.BackgroundJobs
                     //Chunking to 100 items per list cause trakt api does not like 10000s of items
                     foreach (var toRemoveChunk in toRemove.ChunkBy(100))
                     {
-                        await traktService.RemoveShows(toRemoveChunk, list);
+                        await _traktService.RemoveShows(toRemoveChunk, traktList);
                     }
                 }
-
-                list = await traktService.Get(list.Id, true);
-
-                list.LastProcessed = DateTime.Now;
-
-                await traktService.Update(list);
+                
+                traktList.LastProcessed = DateTime.Now;
             }
             catch (TraktListNotFoundException)
             {
-                await traktService.Delete(await traktService.Get(param));
+                await _traktService.Delete(await _traktService.Get(param));
+            }
+            finally
+            {
+                traktList.ScanState = ScanState.None;
+
+                await _traktService.Update(traktList);
             }
         }
     }

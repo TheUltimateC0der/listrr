@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Hangfire;
+using Hangfire.Storage;
 using HangfireBasicAuthenticationFilter;
+
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Jobs.RecurringJobs;
 using Listrr.Repositories;
 using Listrr.Services;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -49,6 +53,15 @@ namespace Listrr
             Configuration.Bind("Trakt", traktApiConfiguration);
             services.AddSingleton(traktApiConfiguration);
 
+            var githubApiConfiguration = new GithubAPIConfiguration();
+            Configuration.Bind("GitHub", githubApiConfiguration);
+            services.AddSingleton(githubApiConfiguration);
+
+            var donorConfiguration = new DonorConfiguration();
+            Configuration.Bind("Donor", donorConfiguration);
+            services.AddSingleton(donorConfiguration);
+
+
             // Multi Instance LB
             services.AddDbContext<DataProtectionDbContext>(options =>
                 options.UseSqlServer(connectionString)
@@ -74,7 +87,7 @@ namespace Listrr
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString)
             );
-            services.AddDefaultIdentity<IdentityUser>(options =>
+            services.AddDefaultIdentity<User>(options =>
             {
                 options.User.AllowedUserNameCharacters = null;
             }).AddEntityFrameworkStores<AppDbContext>();
@@ -86,6 +99,23 @@ namespace Listrr
                 {
                     options.ClientId = traktApiConfiguration.ClientId;
                     options.ClientSecret = traktApiConfiguration.ClientSecret;
+                    options.SaveTokens = true;
+                    options.Events.OnCreatingTicket = ctx =>
+                    {
+                        List<AuthenticationToken> tokens = ctx.Properties.GetTokens() as List<AuthenticationToken>;
+                        tokens.Add(new AuthenticationToken()
+                        {
+                            Name = "TicketCreated",
+                            Value = DateTime.Now.ToString()
+                        });
+                        ctx.Properties.StoreTokens(tokens);
+                        return Task.CompletedTask;
+                    };
+                })
+                .AddGitHub(options =>
+                {
+                    options.ClientId = githubApiConfiguration.ClientId;
+                    options.ClientSecret = githubApiConfiguration.ClientSecret;
                     options.SaveTokens = true;
                     options.Events.OnCreatingTicket = ctx =>
                     {
@@ -169,6 +199,17 @@ namespace Listrr
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHangfireDashboard(new DashboardOptions
+                {
+                    Authorization = new[]
+                    {
+                        new HangfireCustomBasicAuthenticationFilter
+                        {
+                            User = hangFireConfiguration.Username ?? "Admin",
+                            Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123"
+                        }
+                    }
+                });
             });
         }
 
@@ -198,16 +239,21 @@ namespace Listrr
                 Authorization = new[] { new HangfireCustomBasicAuthenticationFilter { User = hangFireConfiguration.Username ?? "Admin", Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123" } }
             });
 
-            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<ProcessListsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>((x) => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<ProcessListsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>(x => x.Execute(), Cron.Daily);
 
+            ////Starting all jobs here for initial db fill
+            //foreach (var recurringJob in JobStorage.Current.GetConnection().GetRecurringJobs())
+            //{
+            //    RecurringJob.Trigger(recurringJob.Id);
+            //}
         }
 
 

@@ -1,11 +1,12 @@
-﻿using Listrr.Comparer;
-using Listrr.Extensions;
-using Listrr.Services;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Listrr.Comparer;
+using Listrr.Data.Trakt;
+using Listrr.Extensions;
+using Listrr.Services;
 
 using TraktNet.Exceptions;
 using TraktNet.Objects.Get.Movies;
@@ -14,21 +15,25 @@ namespace Listrr.Jobs.BackgroundJobs
 {
     public class ProcessMovieListBackgroundJob : IBackgroundJob<uint>
     {
-        private readonly ITraktService traktService;
-
+        private readonly ITraktService _traktService;
+        private TraktList traktList;
+        
         public ProcessMovieListBackgroundJob(ITraktService traktService)
         {
-            this.traktService = traktService;
+            _traktService = traktService;
         }
 
         public async Task Execute(uint param)
         {
             try
             {
-                var list = await traktService.Get(param, true);
+                traktList = await _traktService.Get(param, true);
+                traktList.ScanState = ScanState.Updating;
 
-                var foundMovies = await traktService.MovieSearch(list);
-                var existingMovies = await traktService.GetMovies(list);
+                await _traktService.Update(traktList);
+
+                var foundMovies = await _traktService.MovieSearch(traktList);
+                var existingMovies = await _traktService.GetMovies(traktList);
 
                 var moviesToRemove = new List<ITraktMovie>();
                 foreach (var existingMovie in existingMovies)
@@ -47,30 +52,32 @@ namespace Listrr.Jobs.BackgroundJobs
                 if (moviesToAdd.Any())
                 {
                     //Chunking to 100 items per list cause trakt api does not like 10000s of items
-                    foreach (var moviesToAddChunk in moviesToAdd.ChunkBy(100))
+                    foreach (var moviesToAddChunk in moviesToAdd.ChunkBy(500))
                     {
-                        await traktService.AddMovies(moviesToAddChunk, list);
+                        await _traktService.AddMovies(moviesToAddChunk, traktList);
                     }
                 }
 
                 if (moviesToRemove.Any())
                 {
                     //Chunking to 100 items per list cause trakt api does not like 10000s of items
-                    foreach (var moviesToRemoveChunk in moviesToRemove.ChunkBy(100))
+                    foreach (var moviesToRemoveChunk in moviesToRemove.ChunkBy(500))
                     {
-                        await traktService.RemoveMovies(moviesToRemoveChunk, list);
+                        await _traktService.RemoveMovies(moviesToRemoveChunk, traktList);
                     }
                 }
 
-                list = await traktService.Get(list.Id, true);
-
-                list.LastProcessed = DateTime.Now;
-
-                await traktService.Update(list);
+                traktList.LastProcessed = DateTime.Now;
             }
             catch (TraktListNotFoundException)
             {
-                await traktService.Delete(await traktService.Get(param));
+                await _traktService.Delete(await _traktService.Get(param));
+            }
+            finally
+            {
+                traktList.ScanState = ScanState.None;
+
+                await _traktService.Update(traktList);
             }
         }
     }

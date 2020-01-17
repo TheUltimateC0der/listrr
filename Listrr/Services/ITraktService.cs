@@ -33,7 +33,7 @@ namespace Listrr.Services
 
 
         Task<TraktList> Create(TraktList model);
-        Task<TraktList> Update(TraktList model);
+        Task<TraktList> Update(TraktList model, bool api = false);
 
         Task<bool> Exists(TraktList model);
 
