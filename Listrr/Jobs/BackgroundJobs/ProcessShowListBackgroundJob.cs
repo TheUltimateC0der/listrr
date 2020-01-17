@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +8,6 @@ using Listrr.Extensions;
 using Listrr.Services;
 
 using TraktNet.Exceptions;
-using TraktNet.Objects.Get.Shows;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
@@ -35,43 +33,30 @@ namespace Listrr.Jobs.BackgroundJobs
                 var found = await _traktService.ShowSearch(traktList);
                 var existing = await _traktService.GetShows(traktList);
 
-                var toRemove = new List<ITraktShow>();
-                foreach (var existingShow in existing)
-                {
-                    if (!found.Contains(existingShow, new TraktShowComparer()))
-                        toRemove.Add(existingShow);
-                }
+                var remove = existing.Except(found, new TraktShowComparer()).ToList();
+                var add = found.Except(existing, new TraktShowComparer()).ToList();
 
-                var toAdd = new List<ITraktShow>();
-                foreach (var foundShow in found)
+                if (add.Any())
                 {
-                    if (!existing.Contains(foundShow, new TraktShowComparer()))
-                        toAdd.Add(foundShow);
-                }
-
-                if (toAdd.Any())
-                {
-                    //Chunking to 100 items per list cause trakt api does not like 10000s of items
-                    foreach (var toAddChunk in toAdd.ChunkBy(100))
+                    foreach (var toAddChunk in add.ChunkBy(500))
                     {
                         await _traktService.AddShows(toAddChunk, traktList);
                     }
                 }
 
-                if (toRemove.Any())
+                if (remove.Any())
                 {
-                    //Chunking to 100 items per list cause trakt api does not like 10000s of items
-                    foreach (var toRemoveChunk in toRemove.ChunkBy(100))
+                    foreach (var toRemoveChunk in remove.ChunkBy(500))
                     {
                         await _traktService.RemoveShows(toRemoveChunk, traktList);
                     }
                 }
-                
+
                 traktList.LastProcessed = DateTime.Now;
             }
             catch (TraktListNotFoundException)
             {
-                await _traktService.Delete(await _traktService.Get(param));
+                await _traktService.Delete(new TraktList { Id = param });
             }
             finally
             {
