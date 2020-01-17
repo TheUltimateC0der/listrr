@@ -58,7 +58,7 @@ namespace Listrr
             services.AddSingleton(githubApiConfiguration);
 
             var donorConfiguration = new DonorConfiguration();
-            Configuration.Bind("Donor", donorConfiguration);
+            Configuration.Bind("donor", donorConfiguration);
             services.AddSingleton(donorConfiguration);
 
 
@@ -231,7 +231,8 @@ namespace Listrr
 
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = hangFireConfiguration.Workers
+                WorkerCount = hangFireConfiguration.Workers,
+                Queues = new []{ "system", "donor", "DEFAULT"}
             });
 
             app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions

@@ -52,9 +52,9 @@ namespace Listrr.Repositories
             return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Owner.Id == user.Id).AsNoTracking().ToListAsync();
         }
 
-        public async Task<List<TraktList>> GetProcessable()
+        public async Task<List<TraktList>> GetLists(User.UserLevel userLevel)
         {
-            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Process).ToListAsync();
+            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Process && x.Owner.Level == userLevel).ToListAsync();
         }
 
         public async Task<TraktList> Update(TraktList model)

@@ -289,6 +289,14 @@ namespace Listrr.Data
 
             #endregion
 
+            #region User
+
+            builder.Entity<User>()
+                .Property(x => x.Level)
+                .HasDefaultValue(User.UserLevel.User);
+
+            #endregion
+
             base.OnModelCreating(builder);
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +21,7 @@ namespace Listrr.Services
         Task<IList<ITraktMovie>> GetMovies(TraktList model);
         Task<IList<ITraktShow>> GetShows(TraktList model);
 
-        Task<IList<TraktList>> GetProcessable();
+        Task<IList<TraktList>> GetLists(User.UserLevel userClass);
 
 
         Task AddMovies(IList<ITraktMovie> movies, TraktList list);

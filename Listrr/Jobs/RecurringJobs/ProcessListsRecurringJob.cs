@@ -1,12 +1,16 @@
-﻿using Listrr.Data.Trakt;
+﻿using System;
+using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.States;
+using Listrr.Data;
+using Listrr.Data.Trakt;
 using Listrr.Jobs.BackgroundJobs;
 using Listrr.Services;
 
-using System;
-using System.Threading.Tasks;
-
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("System")]
     public class ProcessListsRecurringJob : IRecurringJob
     {
 
@@ -20,9 +24,30 @@ namespace Listrr.Jobs.RecurringJobs
 
         public async Task Execute()
         {
-            var lists = await _traktService.GetProcessable();
+            var normalLists = await _traktService.GetLists(User.UserLevel.User);
+            var donorLists = await _traktService.GetLists(User.UserLevel.Donor);
 
-            foreach (var traktList in lists)
+            IBackgroundJobClient donorQueueClient = new BackgroundJobClient();
+            var donorEnqueuedState = new EnqueuedState { Queue = "Donor" };
+
+            foreach (var traktList in donorLists)
+            {
+                switch (traktList.Type)
+                {
+                    case ListType.Movie:
+                        donorQueueClient.Create<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id), donorEnqueuedState);
+
+                        break;
+                    case ListType.Show:
+                        donorQueueClient.Create<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id), donorEnqueuedState);
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            foreach (var traktList in normalLists)
             {
                 switch (traktList.Type)
                 {
@@ -37,7 +62,6 @@ namespace Listrr.Jobs.RecurringJobs
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                
             }
 
         }

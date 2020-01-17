@@ -1,16 +1,20 @@
-﻿using Listrr.Configuration;
+﻿using System.Linq;
+using System.Threading.Tasks;
+
+using Hangfire;
+
+using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.EntityFrameworkCore;
 
-using System.Linq;
-using System.Threading.Tasks;
-
 using TraktNet;
 
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("System")]
     public class GetMovieCertificationsRecurringJob : IRecurringJob
     {
 
@@ -25,7 +29,6 @@ namespace Listrr.Jobs.RecurringJobs
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
         }
-
 
         public async Task Execute()
         {

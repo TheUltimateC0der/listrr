@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Listrr.Data;
 using Listrr.Data.Trakt;
 using Microsoft.AspNetCore.Identity;
 
@@ -12,7 +13,7 @@ namespace Listrr.Repositories
         Task<TraktList> Get(uint id);
         Task<List<TraktList>> Get(IdentityUser user);
 
-        Task<List<TraktList>> GetProcessable();
+        Task<List<TraktList>> GetLists(User.UserLevel userClass);
 
         Task<TraktList> Create(TraktList model);
         Task<TraktList> Update(TraktList model);

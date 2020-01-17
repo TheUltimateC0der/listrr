@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Listrr.Data;
@@ -485,14 +486,20 @@ namespace Listrr.Repositories
                 var access_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
                 var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
 
+                _traktClient.Authorization = TraktAuthorization.CreateWith(access_token, refresh_token);
+
                 var expiresAt = DateTime.Parse(expiresAtToken);
 
-                if (expiresAt < DateTime.Now)
+                if (expiresAt < DateTime.Now.AddDays(-5))
                 {
-                    //Refresh the token
+                    var tokenResponse = await _traktClient.Authentication.RefreshAuthorizationAsync();
+                    if (tokenResponse.IsSuccess)
+                    {
+                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt, tokenResponse.Value.CreatedAt.AddSeconds(Convert.ToInt32(tokenResponse.Value.ExpiresInSeconds)).ToString(CultureInfo.InvariantCulture));
+                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken, tokenResponse.Value.AccessToken);
+                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken, tokenResponse.Value.RefreshToken);
+                    }
                 }
-
-                _traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
             }
         }
 

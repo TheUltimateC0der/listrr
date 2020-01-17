@@ -1,11 +1,15 @@
-﻿using Listrr.Data;
-
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Hangfire;
+
+using Listrr.Data;
+
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("System")]
     public class GetLanguageCodesRecurringJob : IRecurringJob
     {
 
