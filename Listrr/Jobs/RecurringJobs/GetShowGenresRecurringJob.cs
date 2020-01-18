@@ -12,7 +12,7 @@ using TraktNet;
 namespace Listrr.Jobs.RecurringJobs
 {
 
-    [Queue("System")]
+    [Queue("system")]
     public class GetShowGenresRecurringJob : IRecurringJob
     {
 

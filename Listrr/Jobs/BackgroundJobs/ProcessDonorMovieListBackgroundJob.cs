@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 
+using Hangfire;
+
 using Listrr.Comparer;
 using Listrr.Data.Trakt;
 using Listrr.Extensions;
@@ -11,12 +13,14 @@ using TraktNet.Exceptions;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
-    public class ProcessMovieListBackgroundJob : IBackgroundJob<uint>
+
+    [Queue("donor")]
+    public class ProcessDonorMovieListBackgroundJob : IBackgroundJob<uint>
     {
         private readonly ITraktService _traktService;
         private TraktList traktList;
         
-        public ProcessMovieListBackgroundJob(ITraktService traktService)
+        public ProcessDonorMovieListBackgroundJob(ITraktService traktService)
         {
             _traktService = traktService;
         }

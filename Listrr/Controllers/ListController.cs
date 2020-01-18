@@ -52,7 +52,7 @@ namespace Listrr.Controllers
                 list.ScanState = ScanState.Scheduled;
                 await _traktService.Update(list);
 
-                Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(list.Id));
+                Hangfire.BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(list.Id));
             }
 
             return RedirectToAction(nameof(My));
@@ -146,7 +146,14 @@ namespace Listrr.Controllers
                 result.ReverseFilter_Certifications_Movie = new CertificationsMovieFilter(model.ReverseFilter_Certifications);
             }
 
-            Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(result.Id));
+            if (user.IsDonor)
+            {
+                Hangfire.BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(result.Id));
+            }
+            else
+            {
+                Hangfire.BackgroundJob.Enqueue<ProcessUserMovieListBackgroundJob>(x => x.Execute(result.Id));
+            }
 
             return RedirectToAction(nameof(MovieList));
         }
@@ -253,8 +260,16 @@ namespace Listrr.Controllers
 
                 await _traktService.Update(list, true);
 
-                if (list.Owner.IsDonor && list.ScanState == ScanState.None)
-                    Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(list.Id));
+                if (list.ScanState == ScanState.None)
+                    if (list.Owner.IsDonor)
+                    {
+                        Hangfire.BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(list.Id));
+                    }
+                    else
+                    {
+                        Hangfire.BackgroundJob.Enqueue<ProcessUserMovieListBackgroundJob>(x => x.Execute(list.Id));
+                    }
+                    
 
                 return RedirectToAction(nameof(EditMovieList), new { list.Id });
             }
@@ -366,7 +381,14 @@ namespace Listrr.Controllers
                 result.ReverseFilter_Status = new StatusShowFilter(model.ReverseFilter_Status);
             }
 
-            Hangfire.BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(result.Id));
+            if (user.IsDonor)
+            {
+                Hangfire.BackgroundJob.Enqueue<ProcessDonorShowListBackgroundJob>(x => x.Execute(result.Id));
+            }
+            else
+            {
+                Hangfire.BackgroundJob.Enqueue<ProcessUserShowListBackgroundJob>(x => x.Execute(result.Id));
+            }
 
             return RedirectToAction(nameof(ShowList));
         }
@@ -486,8 +508,15 @@ namespace Listrr.Controllers
 
                 await _traktService.Update(list, true);
 
-                if (list.Owner.IsDonor && list.ScanState == ScanState.None)
-                    Hangfire.BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(list.Id));
+                if (list.ScanState == ScanState.None)
+                    if (list.Owner.IsDonor)
+                    {
+                        Hangfire.BackgroundJob.Enqueue<ProcessDonorShowListBackgroundJob>(x => x.Execute(list.Id));
+                    }
+                    else
+                    {
+                        Hangfire.BackgroundJob.Enqueue<ProcessUserShowListBackgroundJob>(x => x.Execute(list.Id));
+                    }
                 
                 return RedirectToAction(nameof(EditShowList), new { list.Id });
             }

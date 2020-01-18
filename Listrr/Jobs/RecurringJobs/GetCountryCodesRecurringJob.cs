@@ -10,7 +10,7 @@ using Listrr.Data;
 namespace Listrr.Jobs.RecurringJobs
 {
 
-    [Queue("System")]
+    [Queue("system")]
     public class GetCountryCodesRecurringJob : IRecurringJob
     {
 

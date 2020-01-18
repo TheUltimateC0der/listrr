@@ -11,12 +11,12 @@ using TraktNet.Exceptions;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
-    public class ProcessShowListBackgroundJob : IBackgroundJob<uint>
+    public class ProcessUserShowListBackgroundJob : IBackgroundJob<uint>
     {
         private readonly ITraktService _traktService;
         private TraktList traktList;
 
-        public ProcessShowListBackgroundJob(ITraktService traktService)
+        public ProcessUserShowListBackgroundJob(ITraktService traktService)
         {
             _traktService = traktService;
         }

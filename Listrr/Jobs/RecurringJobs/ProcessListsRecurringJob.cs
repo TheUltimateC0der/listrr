@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Hangfire;
-using Hangfire.States;
+
 using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Jobs.BackgroundJobs;
@@ -10,7 +11,7 @@ using Listrr.Services;
 namespace Listrr.Jobs.RecurringJobs
 {
 
-    [Queue("System")]
+    [Queue("system")]
     public class ProcessListsRecurringJob : IRecurringJob
     {
 
@@ -26,20 +27,17 @@ namespace Listrr.Jobs.RecurringJobs
         {
             var normalLists = await _traktService.GetLists(User.UserLevel.User);
             var donorLists = await _traktService.GetLists(User.UserLevel.Donor);
-
-            IBackgroundJobClient donorQueueClient = new BackgroundJobClient();
-            var donorEnqueuedState = new EnqueuedState { Queue = "Donor" };
-
+            
             foreach (var traktList in donorLists)
             {
                 switch (traktList.Type)
                 {
                     case ListType.Movie:
-                        donorQueueClient.Create<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id), donorEnqueuedState);
+                        BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(traktList.Id));
 
                         break;
                     case ListType.Show:
-                        donorQueueClient.Create<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id), donorEnqueuedState);
+                        BackgroundJob.Enqueue<ProcessDonorShowListBackgroundJob>(x => x.Execute(traktList.Id));
 
                         break;
                     default:
@@ -52,11 +50,11 @@ namespace Listrr.Jobs.RecurringJobs
                 switch (traktList.Type)
                 {
                     case ListType.Movie:
-                        Hangfire.BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id));
+                        BackgroundJob.Enqueue<ProcessUserMovieListBackgroundJob>(x => x.Execute(traktList.Id));
 
                         break;
                     case ListType.Show:
-                        Hangfire.BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id));
+                        BackgroundJob.Enqueue<ProcessUserShowListBackgroundJob>(x => x.Execute(traktList.Id));
 
                         break;
                     default:

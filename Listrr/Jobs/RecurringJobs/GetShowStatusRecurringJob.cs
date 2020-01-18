@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Listrr.Jobs.RecurringJobs
 {
 
-    [Queue("System")]
+    [Queue("system")]
     public class GetShowStatusRecurringJob : IRecurringJob
     {
 
