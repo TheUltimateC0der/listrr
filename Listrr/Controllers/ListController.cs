@@ -1,13 +1,10 @@
 ﻿using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 using Listrr.API.Trakt.Models.Filters;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
-using Listrr.Extensions;
-using Listrr.Jobs.BackgroundJobs;
 using Listrr.Models;
 using Listrr.Services;
 

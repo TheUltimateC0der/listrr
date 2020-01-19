@@ -1,10 +1,9 @@
-﻿@using Listrr.Configuration
-@model IList<Listrr.Data.Trakt.TraktList>
+﻿@model IList<Listrr.Data.Trakt.TraktList>
 @inject ToplistConfiguration ToplistConfiguration
 
 @{
-    ViewData["Title"] = $"Top {ToplistConfiguration.Count} that have more votes than {ToplistConfiguration.Threshold}";
-    ViewData["Message"] = $"User created lists";
+    ViewData["Title"] = $"Top {ToplistConfiguration.Count}";
+    ViewData["Message"] = $"Lists that have more votes than {ToplistConfiguration.Threshold}";
 }
 
 <div class="row">
