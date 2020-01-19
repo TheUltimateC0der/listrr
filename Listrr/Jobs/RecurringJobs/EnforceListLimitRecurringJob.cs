@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 
+using Hangfire;
+
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Services;
@@ -9,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Listrr.Jobs.RecurringJobs
 {
+    [Queue("system")]
     public class EnforceListLimitRecurringJob : IRecurringJob
     {
         private readonly AppDbContext _appDbContext;
