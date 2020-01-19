@@ -66,8 +66,11 @@
             </div>
 
             <hr />
-
-            @await Html.PartialAsync("_LimitNotification")
+            
+            @if (User.Identity.IsAuthenticated)
+            {
+                @await Html.PartialAsync("_LimitNotification")
+            }
 
             @RenderBody()
         </main>

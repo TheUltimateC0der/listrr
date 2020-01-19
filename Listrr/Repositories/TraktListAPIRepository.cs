@@ -438,7 +438,7 @@ namespace Listrr.Repositories
                         if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
                             continue;
 
-                    if (model.ReverseFilter_Genres.Genres != null && traktSearchResult.Show.Genres != null)
+                    if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Show.Genres != null)
                         if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
                             continue;
 

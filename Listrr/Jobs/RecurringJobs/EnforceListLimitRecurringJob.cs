@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Listrr.API.Trakt.Models.Filters;
+
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Services;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Listrr.Jobs.RecurringJobs
@@ -15,10 +15,11 @@ namespace Listrr.Jobs.RecurringJobs
         private readonly ITraktService _traktService;
         private readonly LimitConfigurationList _limitConfigurationList;
 
-        public EnforceListLimitRecurringJob(AppDbContext appDbContext, LimitConfigurationList limitConfigurationList)
+        public EnforceListLimitRecurringJob(AppDbContext appDbContext, LimitConfigurationList limitConfigurationList, ITraktService traktService)
         {
             _appDbContext = appDbContext;
             _limitConfigurationList = limitConfigurationList;
+            _traktService = traktService;
         }
 
 
