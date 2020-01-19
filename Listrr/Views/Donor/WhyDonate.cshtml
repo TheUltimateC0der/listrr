@@ -1,0 +1,30 @@
+﻿@model WhyDonateViewModel
+@{
+    ViewData["Title"] = "Why donate?";
+    ViewData["Message"] = "Donate to the listrr.pro project";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <p>The public available instance of listrr.pro relies on donations to keep it up and running. We currently have @Model.Users users which created @Model.Lists lists that get updated every 24 hours.</p>
+        <h5>Donations are appreciated in the form of money or time.</h5>
+        <p>When donating your time, you could help fix existing bugs, or help implement new features which are listed on our GitHub at <a href="https://github.com/TheUltimateC0der/Listrr/issues">https://github.com/TheUltimateC0der/Listrr/issues</a>.</p>
+        <p>When donating your money, you support the public available infrastructure where listrr.pro is running. The money will be used to buy new servers to run listrr on, or coffee to fix bugs or implement new features.</p>
+        <hr/>
+        <h5>Any donor perks?</h5>
+        <p>Yes! We currently offer perks for our donors, and will add new perks in the future as listrr.pro evolves!</p>
+        <p>Current perks are:</p>
+        <ul>
+            <li>More than @Model.UserListLimit lists</li>
+            <li>Usage of exclusion filters</li>
+            <li>Higher priority list updating queue</li>
+            <li>Trigger list update on edit</li>
+            <li>Trigger list update manual</li>
+            <li>More to come as listrr evolves ...</li>
+        </ul>
+        <p>If you want to donate to listrr, you can do this via GitHub sponsors by following the link here: <a href="https://github.com/sponsors/TheUltimateC0der">https://github.com/sponsors/TheUltimateC0der</a></p>
+        <hr/>
+        <h5>How do I get my perks?</h5>
+        <p>Please connect your GitHub account to the listrr app so that I can check your GitHub username. Everything is completely automated, and you should get your perks within 5 minutes after the information is available through the GitHub graph API.</p>
+    </div>
+</div>

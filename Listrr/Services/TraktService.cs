@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Listrr.Data;
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
 
@@ -66,7 +66,7 @@ namespace Listrr.Services
             return await _traktListDbRepository.Get(id);
         }
 
-        public Task<List<TraktList>> Get(IdentityUser user)
+        public Task<IList<TraktList>> Get(IdentityUser user)
         {
             return _traktListDbRepository.Get(user);
         }
@@ -86,9 +86,14 @@ namespace Listrr.Services
             return await _traktListApiRepository.Exists(model);
         }
 
-        public async Task<IList<TraktList>> GetProcessable()
+        public async Task<IList<TraktList>> GetLists(UserLevel userLevel)
         {
-            return await _traktListDbRepository.GetProcessable();
+            return await _traktListDbRepository.Get(userLevel);
+        }
+
+        public async Task<IList<TraktList>> GetLists(UserLevel userLevel, int take)
+        {
+            return await _traktListDbRepository.Get(userLevel, take);
         }
 
         public async Task<IList<ITraktShow>> GetShows(TraktList model)
@@ -116,12 +121,12 @@ namespace Listrr.Services
             return await _traktListApiRepository.ShowSearch(model);
         }
 
-        public async Task<TraktList> Update(TraktList model)
+        public async Task<TraktList> Update(TraktList model, bool api = false)
         {
-            await _traktListApiRepository.Update(model);
+            if(api)
+                await _traktListApiRepository.Update(model);
 
             return await _traktListDbRepository.Update(model);
-            
         }
     }
 }

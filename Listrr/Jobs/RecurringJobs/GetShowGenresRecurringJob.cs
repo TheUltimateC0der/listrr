@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 using System.Linq;
 using System.Threading.Tasks;
-
+using Hangfire;
 using TraktNet;
 
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("system")]
     public class GetShowGenresRecurringJob : IRecurringJob
     {
 

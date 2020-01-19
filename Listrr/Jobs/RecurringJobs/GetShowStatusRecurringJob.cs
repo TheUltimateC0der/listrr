@@ -1,14 +1,18 @@
-﻿using Listrr.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Hangfire;
+
+using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.EntityFrameworkCore;
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("system")]
     public class GetShowStatusRecurringJob : IRecurringJob
     {
 

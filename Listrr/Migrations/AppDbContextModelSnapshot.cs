@@ -15,15 +15,17 @@ namespace Listrr.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Listrr.Data.CountryCode", b =>
                 {
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Code");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Name", "Code");
 
@@ -34,9 +36,11 @@ namespace Listrr.Migrations
 
             modelBuilder.Entity("Listrr.Data.LanguageCode", b =>
                 {
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Code");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Name", "Code");
 
@@ -47,81 +51,124 @@ namespace Listrr.Migrations
 
             modelBuilder.Entity("Listrr.Data.Trakt.TraktList", b =>
                 {
-                    b.Property<long>("Id");
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Filter_Certifications_Movie");
+                    b.Property<string>("Filter_Certifications_Movie")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Certifications_Show");
+                    b.Property<string>("Filter_Certifications_Show")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Countries");
+                    b.Property<string>("Filter_Countries")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Genres");
+                    b.Property<string>("Filter_Genres")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Languages");
+                    b.Property<string>("Filter_Languages")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Networks");
+                    b.Property<string>("Filter_Networks")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Ratings");
+                    b.Property<string>("Filter_Ratings")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Runtimes");
+                    b.Property<string>("Filter_Runtimes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Status");
+                    b.Property<string>("Filter_Status")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Translations");
+                    b.Property<string>("Filter_Translations")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Years");
+                    b.Property<string>("Filter_Years")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Items");
+                    b.Property<int?>("Items")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("LastProcessed");
+                    b.Property<DateTime>("LastProcessed")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("Likes");
+                    b.Property<int?>("Likes")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("OwnerId");
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Process");
+                    b.Property<bool>("Process")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Query");
+                    b.Property<string>("Query")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Certifications_Movie");
+                    b.Property<string>("ReverseFilter_Certifications_Movie")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Certifications_Show");
+                    b.Property<string>("ReverseFilter_Certifications_Show")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Countries");
+                    b.Property<string>("ReverseFilter_Countries")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Genres");
+                    b.Property<string>("ReverseFilter_Genres")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Languages");
+                    b.Property<string>("ReverseFilter_Languages")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Networks");
+                    b.Property<string>("ReverseFilter_Networks")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Status");
+                    b.Property<string>("ReverseFilter_Status")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReverseFilter_Translations");
+                    b.Property<string>("ReverseFilter_Translations")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SearchByAlias");
+                    b.Property<int>("ScanState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(2);
 
-                    b.Property<bool>("SearchByBiography");
+                    b.Property<bool>("SearchByAlias")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByDescription");
+                    b.Property<bool>("SearchByBiography")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByName");
+                    b.Property<bool>("SearchByDescription")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByOverview");
+                    b.Property<bool>("SearchByName")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByPeople");
+                    b.Property<bool>("SearchByOverview")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByTagline");
+                    b.Property<bool>("SearchByPeople")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByTitle");
+                    b.Property<bool>("SearchByTagline")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("SearchByTranslations");
+                    b.Property<bool>("SearchByTitle")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Slug");
+                    b.Property<bool>("SearchByTranslations")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("Type");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -137,11 +184,13 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Listrr.Data.Trakt.TraktMovieCertification", b =>
                 {
                     b.Property<string>("Slug")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Slug");
 
@@ -154,9 +203,10 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Listrr.Data.Trakt.TraktMovieGenre", b =>
                 {
                     b.Property<string>("Slug")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Slug");
 
@@ -169,11 +219,13 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Listrr.Data.Trakt.TraktShowCertification", b =>
                 {
                     b.Property<string>("Slug")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Slug");
 
@@ -186,9 +238,10 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Listrr.Data.Trakt.TraktShowGenre", b =>
                 {
                     b.Property<string>("Slug")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Slug");
 
@@ -201,9 +254,11 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Listrr.Data.Trakt.TraktShowNetwork", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -212,7 +267,8 @@ namespace Listrr.Migrations
 
             modelBuilder.Entity("Listrr.Data.Trakt.TraktShowStatus", b =>
                 {
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Name");
 
@@ -222,18 +278,91 @@ namespace Listrr.Migrations
                     b.ToTable("TraktShowStatuses");
                 });
 
+            modelBuilder.Entity("Listrr.Data.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Level")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -250,14 +379,18 @@ namespace Listrr.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -266,69 +399,22 @@ namespace Listrr.Migrations
                     b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AccessFailedCount");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256);
-
-                    b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -340,15 +426,19 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
-                    b.Property<string>("ProviderDisplayName");
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -359,9 +449,11 @@ namespace Listrr.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("RoleId");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -372,15 +464,19 @@ namespace Listrr.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -389,54 +485,60 @@ namespace Listrr.Migrations
 
             modelBuilder.Entity("Listrr.Data.Trakt.TraktList", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Owner")
+                    b.HasOne("Listrr.Data.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Listrr.Data.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Listrr.Data.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Listrr.Data.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Listrr.Data.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

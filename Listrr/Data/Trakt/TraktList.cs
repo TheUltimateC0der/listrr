@@ -14,6 +14,13 @@ namespace Listrr.Data.Trakt
         Show
     }
 
+    public enum ScanState
+    {
+        Scheduled,
+        Updating,
+        None
+    }
+
     public class TraktList
     {
 
@@ -26,6 +33,8 @@ namespace Listrr.Data.Trakt
 
         public string Slug { get; set; }
 
+        public ScanState ScanState { get; set; }
+
         public bool Process { get; set; }
 
         public int? Items { get; set; }
@@ -34,7 +43,7 @@ namespace Listrr.Data.Trakt
 
         public DateTime LastProcessed { get; set; }
 
-        public IdentityUser Owner { get; set; }
+        public User Owner { get; set; }
 
 
         #region Basic Filter

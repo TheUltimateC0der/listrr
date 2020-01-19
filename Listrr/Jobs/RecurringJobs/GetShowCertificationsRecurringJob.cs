@@ -1,16 +1,20 @@
-﻿using Listrr.Configuration;
+﻿using System.Linq;
+using System.Threading.Tasks;
+
+using Hangfire;
+
+using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.EntityFrameworkCore;
 
-using System.Linq;
-using System.Threading.Tasks;
-
 using TraktNet;
 
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("system")]
     public class GetShowCertificationsRecurringJob : IRecurringJob
     {
 

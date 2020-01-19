@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+
 using TraktNet.Objects.Get.Movies;
 
 namespace Listrr.Comparer
@@ -12,7 +14,7 @@ namespace Listrr.Comparer
 
         public int GetHashCode(ITraktMovie obj)
         {
-            return obj.GetHashCode();
+            return Convert.ToInt32(obj.Ids.Trakt);
         }
     }
 }

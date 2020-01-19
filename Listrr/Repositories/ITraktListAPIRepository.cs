@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Listrr.Data;
 using Listrr.Data.Trakt;
-using Microsoft.AspNetCore.Identity;
+
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
 
@@ -11,7 +12,7 @@ namespace Listrr.Repositories
     public interface ITraktListAPIRepository
     {
 
-        Task<TraktList> Get(uint id, IdentityUser user = null);
+        Task<TraktList> Get(uint id, User user = null);
         Task<IList<ITraktMovie>> GetMovies(TraktList model);
         Task<IList<ITraktShow>> GetShows(TraktList model);
         

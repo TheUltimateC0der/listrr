@@ -1,12 +1,16 @@
-﻿using Listrr.Data;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Hangfire;
+
+using Listrr.Data;
+
 namespace Listrr.Jobs.RecurringJobs
 {
+
+    [Queue("system")]
     public class GetCountryCodesRecurringJob : IRecurringJob
     {
 

@@ -1,7 +1,6 @@
 ﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Data.Trakt;
 
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Listrr.Data
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
 
         public DbSet<TraktList> TraktLists { get; set; }
@@ -106,6 +105,11 @@ namespace Listrr.Data
                 .Entity<TraktList>()
                 .HasIndex(x => new { x.Slug, x.Name })
                 .IsUnique();
+
+            builder
+                .Entity<TraktList>()
+                .Property(x => x.ScanState)
+                .HasDefaultValue(ScanState.None);
 
             builder
                 .Entity<TraktList>()
@@ -282,6 +286,14 @@ namespace Listrr.Data
             builder
                 .Entity<LanguageCode>()
                 .HasKey(x => new { x.Name, x.Code });
+
+            #endregion
+
+            #region User
+
+            builder.Entity<User>()
+                .Property(x => x.Level)
+                .HasDefaultValue(UserLevel.User);
 
             #endregion
 

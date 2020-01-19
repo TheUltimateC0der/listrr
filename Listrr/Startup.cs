@@ -1,8 +1,14 @@
-﻿using Hangfire;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Hangfire;
 
 using HangfireBasicAuthenticationFilter;
+
 using Listrr.Configuration;
 using Listrr.Data;
+using Listrr.Jobs.RecurringJobs;
 using Listrr.Repositories;
 using Listrr.Services;
 
@@ -12,16 +18,10 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Listrr.Jobs.RecurringJobs;
+using Microsoft.Extensions.Hosting;
 
 namespace Listrr
 {
@@ -52,22 +52,28 @@ namespace Listrr
             Configuration.Bind("Trakt", traktApiConfiguration);
             services.AddSingleton(traktApiConfiguration);
 
+            var githubApiConfiguration = new GithubAPIConfiguration();
+            Configuration.Bind("GitHub", githubApiConfiguration);
+            services.AddSingleton(githubApiConfiguration);
+
+            var limitConfigurationList = new LimitConfigurationList();
+            Configuration.Bind("LimitConfig", limitConfigurationList);
+            services.AddSingleton(limitConfigurationList);
+
+
             // Multi Instance LB
             services.AddDbContext<DataProtectionDbContext>(options =>
                 options.UseSqlServer(connectionString)
             );
-
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionDbContext>()
                 .SetApplicationName("Listrr");
-
             services.AddDistributedSqlServerCache(options =>
             {
                 options.ConnectionString = connectionString;
                 options.SchemaName = "dbo";
                 options.TableName = "Cache";
             });
-
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -76,15 +82,14 @@ namespace Listrr
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString)
             );
-
-            services.AddDefaultIdentity<IdentityUser>(options =>
-                {
-                    options.User.AllowedUserNameCharacters = null;
-                }).AddEntityFrameworkStores<AppDbContext>();
-
+            services.AddDefaultIdentity<User>(options =>
+            {
+                options.User.AllowedUserNameCharacters = null;
+            }).AddEntityFrameworkStores<AppDbContext>();
             services.AddHangfire(x =>
                 x.UseSqlServerStorage(connectionString));
 
@@ -93,6 +98,23 @@ namespace Listrr
                 {
                     options.ClientId = traktApiConfiguration.ClientId;
                     options.ClientSecret = traktApiConfiguration.ClientSecret;
+                    options.SaveTokens = true;
+                    options.Events.OnCreatingTicket = ctx =>
+                    {
+                        List<AuthenticationToken> tokens = ctx.Properties.GetTokens() as List<AuthenticationToken>;
+                        tokens.Add(new AuthenticationToken()
+                        {
+                            Name = "TicketCreated",
+                            Value = DateTime.Now.ToString()
+                        });
+                        ctx.Properties.StoreTokens(tokens);
+                        return Task.CompletedTask;
+                    };
+                })
+                .AddGitHub(options =>
+                {
+                    options.ClientId = githubApiConfiguration.ClientId;
+                    options.ClientSecret = githubApiConfiguration.ClientSecret;
                     options.SaveTokens = true;
                     options.Events.OnCreatingTicket = ctx =>
                     {
@@ -119,29 +141,31 @@ namespace Listrr
                 options.SlidingExpiration = true;
             });
 
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
             services.AddHttpContextAccessor();
 
+            //ReverseProxy Fix
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
-            
+
+            services.AddScoped<IGitHubGraphService, GitHubGraphService>();
+            services.AddScoped<IBackgroundJobQueueService, BackgroundJobQueueService>();
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
 
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration, LimitConfigurationList limitConfigurationList)
         {
             InitializeDatabase(app);
 
+            //ReverseProxy Fix
             app.UseForwardedHeaders();
-
             app.Use((context, next) =>
             {
                 context.Request.Scheme = "https";
@@ -163,45 +187,33 @@ namespace Listrr
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseRouting();
+
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            GlobalConfiguration.Configuration
-                .UseActivator(new HangfireActivator(serviceProvider));
+            InitializeHangfire(app, serviceProvider, hangFireConfiguration, limitConfigurationList);
 
-            app.UseHangfireServer(new BackgroundJobServerOptions
+            app.UseEndpoints(endpoints =>
             {
-                WorkerCount = hangFireConfiguration.Workers
-            });
-
-            app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions
-            {
-                Authorization = new[] { new HangfireCustomBasicAuthenticationFilter { User = hangFireConfiguration.Username ?? "Admin", Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123" } }
-            });
-
-            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<ProcessListsRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>((x) => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>((x) => x.Execute(), Cron.Daily);
-
-
-            ////Starting all jobs here for initial db fill
-            //foreach (var recurringJob in JobStorage.Current.GetConnection().GetRecurringJobs())
-            //{
-            //    RecurringJob.Trigger(recurringJob.Id);
-            //}
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+                endpoints.MapHangfireDashboard(new DashboardOptions
+                {
+                    Authorization = new[]
+                    {
+                        new HangfireCustomBasicAuthenticationFilter
+                        {
+                            User = hangFireConfiguration.Username ?? "Admin",
+                            Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123"
+                        }
+                    }
+                });
             });
         }
+
 
 
         private void InitializeDatabase(IApplicationBuilder app)
@@ -212,5 +224,52 @@ namespace Listrr
                 serviceScope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.Migrate();
             }
         }
+
+        private void InitializeHangfire(IApplicationBuilder app, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration, LimitConfigurationList limitConfigurationList)
+        {
+            GlobalConfiguration.Configuration
+                .UseActivator(new HangfireActivator(serviceProvider));
+
+            var queues = new List<string>();
+            queues.Add("system");
+
+            foreach (var limitConfiguration in limitConfigurationList.LimitConfigurations)
+            {
+                queues.Add(limitConfiguration.QueueName);
+            }
+
+            app.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                WorkerCount = hangFireConfiguration.Workers,
+                Queues = queues.ToArray()
+            });
+
+            app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireCustomBasicAuthenticationFilter { User = hangFireConfiguration.Username ?? "Admin", Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123" } }
+            });
+
+            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>(x => x.Execute(), Cron.Daily);
+
+            RecurringJob.AddOrUpdate<ProcessDonorListsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<ProcessUserListsRecurringJob>(x => x.Execute(), "*/30 * * * *");
+            
+            RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(), "*/5 * * * *");
+
+            ////Starting all jobs here for initial db fill
+            //foreach (var recurringJob in JobStorage.Current.GetConnection().GetRecurringJobs())
+            //{
+            //    RecurringJob.Trigger(recurringJob.Id);
+            //}
+        }
+
+
     }
 }

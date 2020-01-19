@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 *.pubxml
+
+appsettings.Development.json

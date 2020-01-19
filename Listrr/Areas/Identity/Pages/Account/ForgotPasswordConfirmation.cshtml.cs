@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Listrr.Areas.Identity.Pages.Account
@@ -7,6 +9,8 @@ namespace Listrr.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ForgotPasswordConfirmation : PageModel
     {
-        public IActionResult OnGet() => RedirectToPage("/Account/Login");
+        public void OnGet()
+        {
+        }
     }
 }

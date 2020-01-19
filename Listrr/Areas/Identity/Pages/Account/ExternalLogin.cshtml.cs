@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Listrr.Data;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +15,13 @@ namespace Listrr.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
+            SignInManager<User> signInManager,
+            UserManager<User> userManager,
             ILogger<ExternalLoginModel> logger)
         {
             _signInManager = signInManager;
@@ -57,7 +60,7 @@ namespace Listrr.Areas.Identity.Pages.Account
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
@@ -87,7 +90,7 @@ namespace Listrr.Areas.Identity.Pages.Account
             }
             else
             {
-                var user = new IdentityUser { UserName = info.ProviderKey };
+                var user = new User { UserName = info.ProviderKey };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -117,7 +120,8 @@ namespace Listrr.Areas.Identity.Pages.Account
             }
         }
 
-        private async Task UpdateTokens(IdentityUser user, string loginProvider, string access_token, string refresh_token, string expires_at)
+
+        private async Task UpdateTokens(User user, string loginProvider, string access_token, string refresh_token, string expires_at)
         {
             await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_AccessToken, access_token);
             await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_RefreshToken, refresh_token);
