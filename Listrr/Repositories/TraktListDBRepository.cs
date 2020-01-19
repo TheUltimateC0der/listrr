@@ -12,7 +12,6 @@ namespace Listrr.Repositories
 {
     public class TraktListDBRepository : ITraktListDBRepository
     {
-
         private readonly AppDbContext appDbContext;
 
         public TraktListDBRepository(AppDbContext appDbContext)
@@ -26,15 +25,12 @@ namespace Listrr.Repositories
             appDbContext.TraktLists.Add(model);
             await appDbContext.SaveChangesAsync();
 
-
-            // Just return cause we get the id from trakt
             return model;
         }
 
         public async Task<IList<TraktList>> Top(int count, int threshold)
         {
             return await appDbContext.TraktLists
-                .AsNoTracking()
                 .Include(x => x.Owner)
                 .OrderByDescending(x => x.Likes)
                 .Take(count)
@@ -44,17 +40,37 @@ namespace Listrr.Repositories
 
         public async Task<TraktList> Get(uint id)
         {
-            return await appDbContext.TraktLists.Include(x => x.Owner).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            return await appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<List<TraktList>> Get(IdentityUser user)
+        public async Task<IList<TraktList>> Get(IdentityUser user)
         {
-            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Owner.Id == user.Id).AsNoTracking().ToListAsync();
+            return await appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .Where(x => x.Owner.Id == user.Id)
+                .OrderBy(x => x.LastProcessed)
+                .ToListAsync();
         }
 
-        public async Task<List<TraktList>> GetLists(User.UserLevel userLevel)
+        public async Task<IList<TraktList>> Get(UserLevel userLevel)
         {
-            return await appDbContext.TraktLists.Include(x => x.Owner).Where(x => x.Process && x.Owner.Level == userLevel).ToListAsync();
+            return await appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .Where(x => x.Process && x.Owner.Level == userLevel)
+                .OrderBy(x => x.LastProcessed)
+                .ToListAsync();
+        }
+
+        public async Task<IList<TraktList>> Get(UserLevel userLevel, int take)
+        {
+            return await appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .Where(x => x.Process && x.Owner.Level == userLevel)
+                .OrderBy(x => x.LastProcessed)
+                .Take(take)
+                .ToListAsync();
         }
 
         public async Task<TraktList> Update(TraktList model)
@@ -62,8 +78,6 @@ namespace Listrr.Repositories
             appDbContext.TraktLists.Update(model);
             await appDbContext.SaveChangesAsync();
 
-
-            // Just return couse we do sanatizing before
             return model;
         }
 

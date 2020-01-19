@@ -66,7 +66,7 @@ namespace Listrr.Services
             return await _traktListDbRepository.Get(id);
         }
 
-        public Task<List<TraktList>> Get(IdentityUser user)
+        public Task<IList<TraktList>> Get(IdentityUser user)
         {
             return _traktListDbRepository.Get(user);
         }
@@ -86,9 +86,14 @@ namespace Listrr.Services
             return await _traktListApiRepository.Exists(model);
         }
 
-        public async Task<IList<TraktList>> GetLists(User.UserLevel userLevel)
+        public async Task<IList<TraktList>> GetLists(UserLevel userLevel)
         {
-            return await _traktListDbRepository.GetLists(userLevel);
+            return await _traktListDbRepository.Get(userLevel);
+        }
+
+        public async Task<IList<TraktList>> GetLists(UserLevel userLevel, int take)
+        {
+            return await _traktListDbRepository.Get(userLevel, take);
         }
 
         public async Task<IList<ITraktShow>> GetShows(TraktList model)

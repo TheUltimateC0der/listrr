@@ -4,14 +4,17 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Listrr.Data
 {
+
+    public enum UserLevel
+    {
+        User,
+        Donor,
+    }
+
     public class User : IdentityUser
     {
 
-        public enum UserLevel
-        {
-            User,
-            Donor,
-        }
+        
 
         [NotMapped]
         public bool IsDonor => Level != UserLevel.User;

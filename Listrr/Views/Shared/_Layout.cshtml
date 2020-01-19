@@ -44,14 +44,14 @@
                                     <a class="dropdown-item" asp-area="" asp-controller="donor" asp-action="WhyDonate">Why donate?</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a>
-                                    <a class="dropdown-item" asp-area="Identity" asp-controller="Account" asp-action="">Link GitHub account</a>
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login" asp-route-handler="LinkLogin" asp-route-provider="GitHub">Link GitHub account</a>
                                 </div>
                             </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count</a>
-                            </li>
                         }
+
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count</a>
+                        </li>
                     </ul>
 
                 </div>

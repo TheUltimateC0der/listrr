@@ -11,5 +11,7 @@ namespace Listrr.Jobs.BackgroundJobs
     public interface IBackgroundJob<T>
     {
         Task Execute(T param);
+
+        Task ExecutePriorized(T param);
     }
 }

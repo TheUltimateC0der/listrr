@@ -293,7 +293,7 @@ namespace Listrr.Data
 
             builder.Entity<User>()
                 .Property(x => x.Level)
-                .HasDefaultValue(User.UserLevel.User);
+                .HasDefaultValue(UserLevel.User);
 
             #endregion
 

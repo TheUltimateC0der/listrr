@@ -12,9 +12,9 @@ namespace Listrr.Controllers
     public class DonorController : Controller
     {
         private readonly AppDbContext _appDbContext;
-        private readonly DonorConfiguration _donorConfiguration;
+        private readonly LimitConfiguration _donorConfiguration;
 
-        public DonorController(AppDbContext appDbContext, DonorConfiguration donorConfiguration)
+        public DonorController(AppDbContext appDbContext, LimitConfiguration donorConfiguration)
         {
             _appDbContext = appDbContext;
             _donorConfiguration = donorConfiguration;

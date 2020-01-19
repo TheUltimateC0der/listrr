@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Hangfire;
-using Hangfire.Storage;
+
 using HangfireBasicAuthenticationFilter;
 
 using Listrr.Configuration;
@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,9 +56,9 @@ namespace Listrr
             Configuration.Bind("GitHub", githubApiConfiguration);
             services.AddSingleton(githubApiConfiguration);
 
-            var donorConfiguration = new DonorConfiguration();
-            Configuration.Bind("donor", donorConfiguration);
-            services.AddSingleton(donorConfiguration);
+            var limitConfigurationList = new LimitConfigurationList();
+            Configuration.Bind("LimitConfig", limitConfigurationList);
+            services.AddSingleton(limitConfigurationList);
 
 
             // Multi Instance LB
@@ -150,6 +149,8 @@ namespace Listrr
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
+            services.AddScoped<IGitHubGraphService, GitHubGraphService>();
+            services.AddScoped<IBackgroundJobQueueService, BackgroundJobQueueService>();
             services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
             services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
             services.AddScoped<ITraktService, TraktService>();
@@ -159,7 +160,7 @@ namespace Listrr
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration, LimitConfigurationList limitConfigurationList)
         {
             InitializeDatabase(app);
 
@@ -191,7 +192,7 @@ namespace Listrr
             app.UseAuthentication();
             app.UseAuthorization();
 
-            InitializeHangfire(app, serviceProvider, hangFireConfiguration);
+            InitializeHangfire(app, serviceProvider, hangFireConfiguration, limitConfigurationList);
 
             app.UseEndpoints(endpoints =>
             {
@@ -224,15 +225,23 @@ namespace Listrr
             }
         }
 
-        private void InitializeHangfire(IApplicationBuilder app, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration)
+        private void InitializeHangfire(IApplicationBuilder app, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration, LimitConfigurationList limitConfigurationList)
         {
             GlobalConfiguration.Configuration
                 .UseActivator(new HangfireActivator(serviceProvider));
 
+            var queues = new List<string>();
+            queues.Add("system");
+
+            foreach (var limitConfiguration in limitConfigurationList.LimitConfigurations)
+            {
+                queues.Add(limitConfiguration.QueueName);
+            }
+
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
                 WorkerCount = hangFireConfiguration.Workers,
-                Queues = new []{ "system", "donor", "DEFAULT"}
+                Queues = queues.ToArray()
             });
 
             app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions
@@ -246,9 +255,13 @@ namespace Listrr
             RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>(x => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>(x => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<ProcessListsRecurringJob>(x => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>(x => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>(x => x.Execute(), Cron.Daily);
+
+            RecurringJob.AddOrUpdate<ProcessDonorListsRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<ProcessUserListsRecurringJob>(x => x.Execute(), "*/30 * * * *");
+            
+            RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(), Cron.Daily);
 
             ////Starting all jobs here for initial db fill
             //foreach (var recurringJob in JobStorage.Current.GetConnection().GetRecurringJobs())

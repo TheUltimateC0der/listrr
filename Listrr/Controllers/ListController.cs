@@ -3,8 +3,10 @@ using System.Net;
 using System.Threading.Tasks;
 
 using Listrr.API.Trakt.Models.Filters;
+using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
+using Listrr.Extensions;
 using Listrr.Jobs.BackgroundJobs;
 using Listrr.Models;
 using Listrr.Services;
@@ -22,12 +24,14 @@ namespace Listrr.Controllers
         private readonly AppDbContext _appDbContext;
         private readonly ITraktService _traktService;
         private readonly UserManager<User> _userManager;
+        private readonly IBackgroundJobQueueService _backgroundJobQueueService;
 
-        public ListController(AppDbContext appDbContext, ITraktService traktService, UserManager<User> userManager)
+        public ListController(AppDbContext appDbContext, ITraktService traktService, UserManager<User> userManager, IBackgroundJobQueueService backgroundJobQueueService)
         {
             _appDbContext = appDbContext;
             _traktService = traktService;
             _userManager = userManager;
+            _backgroundJobQueueService = backgroundJobQueueService;
         }
 
 
@@ -52,7 +56,7 @@ namespace Listrr.Controllers
                 list.ScanState = ScanState.Scheduled;
                 await _traktService.Update(list);
 
-                Hangfire.BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(list.Id));
+                _backgroundJobQueueService.Queue(list);
             }
 
             return RedirectToAction(nameof(My));
@@ -146,14 +150,7 @@ namespace Listrr.Controllers
                 result.ReverseFilter_Certifications_Movie = new CertificationsMovieFilter(model.ReverseFilter_Certifications);
             }
 
-            if (user.IsDonor)
-            {
-                Hangfire.BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(result.Id));
-            }
-            else
-            {
-                Hangfire.BackgroundJob.Enqueue<ProcessUserMovieListBackgroundJob>(x => x.Execute(result.Id));
-            }
+            _backgroundJobQueueService.Queue(result);
 
             return RedirectToAction(nameof(MovieList));
         }
@@ -261,14 +258,7 @@ namespace Listrr.Controllers
                 await _traktService.Update(list, true);
 
                 if (list.ScanState == ScanState.None)
-                    if (list.Owner.IsDonor)
-                    {
-                        Hangfire.BackgroundJob.Enqueue<ProcessDonorMovieListBackgroundJob>(x => x.Execute(list.Id));
-                    }
-                    else
-                    {
-                        Hangfire.BackgroundJob.Enqueue<ProcessUserMovieListBackgroundJob>(x => x.Execute(list.Id));
-                    }
+                    _backgroundJobQueueService.Queue(list);
                     
 
                 return RedirectToAction(nameof(EditMovieList), new { list.Id });
@@ -381,14 +371,7 @@ namespace Listrr.Controllers
                 result.ReverseFilter_Status = new StatusShowFilter(model.ReverseFilter_Status);
             }
 
-            if (user.IsDonor)
-            {
-                Hangfire.BackgroundJob.Enqueue<ProcessDonorShowListBackgroundJob>(x => x.Execute(result.Id));
-            }
-            else
-            {
-                Hangfire.BackgroundJob.Enqueue<ProcessUserShowListBackgroundJob>(x => x.Execute(result.Id));
-            }
+            _backgroundJobQueueService.Queue(result);
 
             return RedirectToAction(nameof(ShowList));
         }
@@ -509,15 +492,8 @@ namespace Listrr.Controllers
                 await _traktService.Update(list, true);
 
                 if (list.ScanState == ScanState.None)
-                    if (list.Owner.IsDonor)
-                    {
-                        Hangfire.BackgroundJob.Enqueue<ProcessDonorShowListBackgroundJob>(x => x.Execute(list.Id));
-                    }
-                    else
-                    {
-                        Hangfire.BackgroundJob.Enqueue<ProcessUserShowListBackgroundJob>(x => x.Execute(list.Id));
-                    }
-                
+                    _backgroundJobQueueService.Queue(list);
+
                 return RedirectToAction(nameof(EditShowList), new { list.Id });
             }
 

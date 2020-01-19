@@ -4,18 +4,10 @@ namespace Listrr.Configuration
 {
     public class GithubAPIConfiguration
     {
-
-        public int DelaySearch { get; set; }
-
-        public int DelayList { get; set; }
-
         public string ClientId { get; set; }
 
         public string ClientSecret { get; set; }
 
-        public uint? FetchLimitSearch { get; set; }
-
-        public uint? FetchLimitList { get; set; }
-        
+        public string Token { get; set; }
     }
 }

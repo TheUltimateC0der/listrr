@@ -13,14 +13,12 @@ using TraktNet.Exceptions;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
-
-    [Queue("donor")]
-    public class ProcessDonorMovieListBackgroundJob : IBackgroundJob<uint>
+    public class ProcessShowListBackgroundJob : IBackgroundJob<uint>
     {
         private readonly ITraktService _traktService;
         private TraktList traktList;
-        
-        public ProcessDonorMovieListBackgroundJob(ITraktService traktService)
+
+        public ProcessShowListBackgroundJob(ITraktService traktService)
         {
             _traktService = traktService;
         }
@@ -34,17 +32,17 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 await _traktService.Update(traktList);
 
-                var found = await _traktService.MovieSearch(traktList);
-                var existing = await _traktService.GetMovies(traktList);
-                
-                var remove = existing.Except(found, new TraktMovieComparer()).ToList();
-                var add = found.Except(existing, new TraktMovieComparer()).ToList();
+                var found = await _traktService.ShowSearch(traktList);
+                var existing = await _traktService.GetShows(traktList);
+
+                var remove = existing.Except(found, new TraktShowComparer()).ToList();
+                var add = found.Except(existing, new TraktShowComparer()).ToList();
 
                 if (add.Any())
                 {
                     foreach (var toAddChunk in add.ChunkBy(500))
                     {
-                        await _traktService.AddMovies(toAddChunk, traktList);
+                        await _traktService.AddShows(toAddChunk, traktList);
                     }
                 }
 
@@ -52,7 +50,7 @@ namespace Listrr.Jobs.BackgroundJobs
                 {
                     foreach (var toRemoveChunk in remove.ChunkBy(500))
                     {
-                        await _traktService.RemoveMovies(toRemoveChunk, traktList);
+                        await _traktService.RemoveShows(toRemoveChunk, traktList);
                     }
                 }
 
@@ -68,6 +66,12 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 await _traktService.Update(traktList);
             }
+        }
+
+        [Queue("donor")]
+        public async Task ExecutePriorized(uint param)
+        {
+            await Execute(param);
         }
     }
 }
