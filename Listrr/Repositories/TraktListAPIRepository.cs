@@ -143,27 +143,27 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (traktSearchResult.Movie.Votes != null && model.Filter_Ratings.Votes > 0)
+                    if (traktSearchResult.Movie?.Votes != null && model.Filter_Ratings.Votes > 0)
                         if (!(traktSearchResult.Movie.Votes >= model.Filter_Ratings.Votes))
                             continue;
 
-                    if (model.ReverseFilter_Certifications_Movie.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
+                    if (model.ReverseFilter_Certifications_Movie?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
                         if (model.ReverseFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
                             continue;
 
-                    if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
+                    if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
                         if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
                             continue;
 
-                    if (model.ReverseFilter_Genres.Genres != null && traktSearchResult.Movie.Genres != null)
+                    if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Movie.Genres != null)
                         if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
                             continue;
 
-                    if (model.ReverseFilter_Languages.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
+                    if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
                         if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
                             continue;
 
-                    if (model.ReverseFilter_Translations.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
+                    if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
                         if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
                             continue;
 
@@ -426,15 +426,15 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (traktSearchResult.Show.Votes != null && model.Filter_Ratings.Votes > 0)
+                    if (traktSearchResult.Show?.Votes != null && model.Filter_Ratings.Votes > 0)
                         if (!(traktSearchResult.Show.Votes >= model.Filter_Ratings.Votes))
                             continue;
 
-                    if (model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
+                    if (model.ReverseFilter_Certifications_Show?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
                         if(model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
                             continue;
 
-                    if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
+                    if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
                         if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
                             continue;
 
@@ -442,19 +442,19 @@ namespace Listrr.Repositories
                         if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
                             continue;
 
-                    if (model.ReverseFilter_Languages.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
+                    if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
                         if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
                             continue;
 
-                    if (model.ReverseFilter_Networks.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
+                    if (model.ReverseFilter_Networks?.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
                         if (model.ReverseFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
                             continue;
 
-                    if (model.ReverseFilter_Status.Status != null && traktSearchResult.Show.Status != null)
+                    if (model.ReverseFilter_Status?.Status != null && traktSearchResult.Show.Status != null)
                         if (model.ReverseFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
                             continue;
 
-                    if (model.ReverseFilter_Translations.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
+                    if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
                         if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
                             continue;
 
