@@ -25,13 +25,15 @@ namespace Listrr.Controllers
         private readonly ITraktService _traktService;
         private readonly UserManager<User> _userManager;
         private readonly IBackgroundJobQueueService _backgroundJobQueueService;
+        private readonly LimitConfigurationList _limitConfigurationList;
 
-        public ListController(AppDbContext appDbContext, ITraktService traktService, UserManager<User> userManager, IBackgroundJobQueueService backgroundJobQueueService)
+        public ListController(AppDbContext appDbContext, ITraktService traktService, UserManager<User> userManager, IBackgroundJobQueueService backgroundJobQueueService, LimitConfigurationList limitConfigurationList)
         {
             _appDbContext = appDbContext;
             _traktService = traktService;
             _userManager = userManager;
             _backgroundJobQueueService = backgroundJobQueueService;
+            _limitConfigurationList = limitConfigurationList;
         }
 
 
@@ -39,15 +41,27 @@ namespace Listrr.Controllers
         [Authorize]
         public async Task<IActionResult> My()
         {
-            ViewData["Message"] = "Overview of your lists";
-
-            return View(await _traktService.Get(await _userManager.GetUserAsync(User)));
+            var user = await _userManager.GetUserAsync(User);
+            var lists = await _traktService.Get(user);
+            
+            return View(new MyViewModel()
+            {
+                TraktLists = lists,
+                User = user
+            });
         }
 
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Scan(uint id)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var lists = await _traktService.Get(user);
+
+            if (lists.Count > _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
+                return View("Error");
+
+
             var list = await _traktService.Get(id);
             if (list == null) return RedirectToAction(nameof(My));
 
@@ -66,8 +80,6 @@ namespace Listrr.Controllers
         [Authorize]
         public async Task<IActionResult> MovieList()
         {
-            ViewData["Message"] = "Create a new list for movies";
-
             var dbGenres = await _appDbContext.TraktMovieGenres.ToListAsync();
             var dbCertifications = await _appDbContext.TraktMovieCertifications.OrderBy(x => x.Description).ToListAsync();
             var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
@@ -94,8 +106,12 @@ namespace Listrr.Controllers
         [Authorize]
         public async Task<IActionResult> MovieList(CreateMovieListViewModel model)
         {
-            ViewData["Message"] = "Create a new list for movies";
+            var user = await _userManager.GetUserAsync(User);
+            var lists = await _traktService.Get(user);
 
+            if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
+                return View("Error");
+            
             var dbGenres = await _appDbContext.TraktMovieGenres.ToListAsync();
             var dbCertifications = await _appDbContext.TraktMovieCertifications.ToListAsync();
             var dbCountryCodes = await _appDbContext.CountryCodes.OrderBy(x => x.Name).ToListAsync();
@@ -113,9 +129,7 @@ namespace Listrr.Controllers
             model.ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
 
             if (!ModelState.IsValid) return View(model);
-
-            var user = await _userManager.GetUserAsync(User);
-
+            
             var result = await _traktService.Create(new TraktList()
             {
                 Name = model.Name,
@@ -306,7 +320,11 @@ namespace Listrr.Controllers
         [Authorize]
         public async Task<IActionResult> ShowList(CreateShowListViewModel model)
         {
-            ViewData["Message"] = "Create a new list for shows";
+            var user = await _userManager.GetUserAsync(User);
+            var lists = await _traktService.Get(user);
+
+            if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
+                return View("Error");
 
             var dbGenres = await _appDbContext.TraktShowGenres.ToListAsync();
             var dbCertifications = await _appDbContext.TraktShowCertifications.ToListAsync();
@@ -331,8 +349,6 @@ namespace Listrr.Controllers
             model.ReverseStatus = new MultiSelectList(dbStatus, nameof(TraktShowStatus.Name), nameof(TraktShowStatus.Name));
 
             if (!ModelState.IsValid) return View(model);
-
-            var user = await _userManager.GetUserAsync(User);
 
             var result = await _traktService.Create(new TraktList()
             {
