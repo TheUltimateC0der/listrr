@@ -1,78 +1,77 @@
-﻿using Listrr.Comparer;
-using Listrr.Extensions;
-using Listrr.Services;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Hangfire;
+
+using Listrr.Comparer;
+using Listrr.Data.Trakt;
+using Listrr.Extensions;
+using Listrr.Services;
+
 using TraktNet.Exceptions;
-using TraktNet.Objects.Get.Shows;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
     public class ProcessShowListBackgroundJob : IBackgroundJob<uint>
     {
-
-        private readonly ITraktService traktService;
+        private readonly ITraktService _traktService;
+        private TraktList traktList;
 
         public ProcessShowListBackgroundJob(ITraktService traktService)
         {
-            this.traktService = traktService;
+            _traktService = traktService;
         }
 
         public async Task Execute(uint param)
         {
             try
             {
-                var list = await traktService.Get(param, true);
+                traktList = await _traktService.Get(param, true);
+                traktList.ScanState = ScanState.Updating;
 
-                var found = await traktService.ShowSearch(list);
-                var existing = await traktService.GetShows(list);
+                await _traktService.Update(traktList);
 
-                var toRemove = new List<ITraktShow>();
-                foreach (var existingShow in existing)
+                var found = await _traktService.ShowSearch(traktList);
+                var existing = await _traktService.GetShows(traktList);
+
+                var remove = existing.Except(found, new TraktShowComparer()).ToList();
+                var add = found.Except(existing, new TraktShowComparer()).ToList();
+
+                if (add.Any())
                 {
-                    if (!found.Contains(existingShow, new TraktShowComparer()))
-                        toRemove.Add(existingShow);
-                }
-
-                var toAdd = new List<ITraktShow>();
-                foreach (var foundShow in found)
-                {
-                    if (!existing.Contains(foundShow, new TraktShowComparer()))
-                        toAdd.Add(foundShow);
-                }
-
-                if (toAdd.Any())
-                {
-                    //Chunking to 100 items per list cause trakt api does not like 10000s of items
-                    foreach (var toAddChunk in toAdd.ChunkBy(100))
+                    foreach (var toAddChunk in add.ChunkBy(500))
                     {
-                        await traktService.AddShows(toAddChunk, list);
+                        await _traktService.AddShows(toAddChunk, traktList);
                     }
                 }
 
-                if (toRemove.Any())
+                if (remove.Any())
                 {
-                    //Chunking to 100 items per list cause trakt api does not like 10000s of items
-                    foreach (var toRemoveChunk in toRemove.ChunkBy(100))
+                    foreach (var toRemoveChunk in remove.ChunkBy(500))
                     {
-                        await traktService.RemoveShows(toRemoveChunk, list);
+                        await _traktService.RemoveShows(toRemoveChunk, traktList);
                     }
                 }
 
-                list = await traktService.Get(list.Id, true);
-
-                list.LastProcessed = DateTime.Now;
-
-                await traktService.Update(list);
+                traktList.LastProcessed = DateTime.Now;
             }
             catch (TraktListNotFoundException)
             {
-                await traktService.Delete(await traktService.Get(param));
+                await _traktService.Delete(new TraktList { Id = param });
             }
+            finally
+            {
+                traktList.ScanState = ScanState.None;
+
+                await _traktService.Update(traktList);
+            }
+        }
+
+        [Queue("donor")]
+        public async Task ExecutePriorized(uint param)
+        {
+            await Execute(param);
         }
     }
 }

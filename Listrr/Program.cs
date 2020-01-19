@@ -1,7 +1,8 @@
-﻿using System.IO;
-using Microsoft.AspNetCore;
+using System.IO;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Listrr
 {
@@ -9,18 +10,20 @@ namespace Listrr
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                    config.AddCommandLine(args);
+                    config.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
-                .UseStartup<Startup>();
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

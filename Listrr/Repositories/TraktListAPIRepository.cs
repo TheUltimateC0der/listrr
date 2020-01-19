@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Identity;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Listrr.Data;
 using TraktNet;
 using TraktNet.Enums;
 using TraktNet.Objects.Authentication;
@@ -25,12 +26,12 @@ namespace Listrr.Repositories
     {
 
         private readonly TraktClient _traktClient;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         
 
-        public TraktListAPIRepository(UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
+        public TraktListAPIRepository(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
         {
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
@@ -70,7 +71,7 @@ namespace Listrr.Repositories
             await _traktClient.Users.DeleteCustomListAsync(model.Owner.UserName, model.Slug);
         }
 
-        public async Task<TraktList> Get(uint id, IdentityUser user = null)
+        public async Task<TraktList> Get(uint id, User user = null)
         {
             await PrepareForApiRequest(user);
 
@@ -142,27 +143,27 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (traktSearchResult.Movie.Votes != null && model.Filter_Ratings.Votes > 0)
+                    if (traktSearchResult.Movie?.Votes != null && model.Filter_Ratings.Votes > 0)
                         if (!(traktSearchResult.Movie.Votes >= model.Filter_Ratings.Votes))
                             continue;
 
-                    if (model.ReverseFilter_Certifications_Movie.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
+                    if (model.ReverseFilter_Certifications_Movie?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
                         if (model.ReverseFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
                             continue;
 
-                    if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
+                    if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
                         if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
                             continue;
 
-                    if (model.ReverseFilter_Genres.Genres != null && traktSearchResult.Movie.Genres != null)
+                    if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Movie.Genres != null)
                         if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
                             continue;
 
-                    if (model.ReverseFilter_Languages.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
+                    if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
                         if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
                             continue;
 
-                    if (model.ReverseFilter_Translations.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
+                    if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
                         if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
                             continue;
 
@@ -267,6 +268,8 @@ namespace Listrr.Repositories
             );
 
             if (!result.IsSuccess) throw result.Exception;
+
+            list.Items += result.Value.Added.Movies;
         }
 
         public async Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list)
@@ -278,8 +281,10 @@ namespace Listrr.Repositories
                 list.Slug,
                 TraktUserCustomListItemsPost.Builder().AddMovies(movies).Build()
             );
-
+            
             if (!result.IsSuccess) throw result.Exception;
+
+            list.Items -= result.Value.Deleted.Movies;
         }
 
 
@@ -336,6 +341,8 @@ namespace Listrr.Repositories
             );
 
             if (!result.IsSuccess) throw result.Exception;
+
+            list.Items += result.Value.Added.Shows;
         }
 
         public async Task RemoveShows(IEnumerable<ITraktShow> shows, TraktList list)
@@ -349,6 +356,8 @@ namespace Listrr.Repositories
             );
 
             if (!result.IsSuccess) throw result.Exception;
+
+            list.Items -= result.Value.Deleted.Shows;
         }
 
 
@@ -417,35 +426,35 @@ namespace Listrr.Repositories
 
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (traktSearchResult.Show.Votes != null && model.Filter_Ratings.Votes > 0)
+                    if (traktSearchResult.Show?.Votes != null && model.Filter_Ratings.Votes > 0)
                         if (!(traktSearchResult.Show.Votes >= model.Filter_Ratings.Votes))
                             continue;
 
-                    if (model.ReverseFilter_Certifications_Show.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
+                    if (model.ReverseFilter_Certifications_Show?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
                         if(model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
                             continue;
 
-                    if (model.ReverseFilter_Countries.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
+                    if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
                         if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
                             continue;
 
-                    if (model.ReverseFilter_Genres.Genres != null && traktSearchResult.Show.Genres != null)
+                    if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Show.Genres != null)
                         if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
                             continue;
 
-                    if (model.ReverseFilter_Languages.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
+                    if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
                         if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
                             continue;
 
-                    if (model.ReverseFilter_Networks.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
+                    if (model.ReverseFilter_Networks?.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
                         if (model.ReverseFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
                             continue;
 
-                    if (model.ReverseFilter_Status.Status != null && traktSearchResult.Show.Status != null)
+                    if (model.ReverseFilter_Status?.Status != null && traktSearchResult.Show.Status != null)
                         if (model.ReverseFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
                             continue;
 
-                    if (model.ReverseFilter_Translations.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
+                    if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
                         if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
                             continue;
 
@@ -464,7 +473,7 @@ namespace Listrr.Repositories
 
 
 
-        private async Task PrepareForApiRequest(IdentityUser user = null)
+        private async Task PrepareForApiRequest(User user = null)
         {
             if (user == null && _httpContextAccessor.HttpContext != null)
             {
@@ -477,14 +486,20 @@ namespace Listrr.Repositories
                 var access_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken);
                 var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
 
+                _traktClient.Authorization = TraktAuthorization.CreateWith(access_token, refresh_token);
+
                 var expiresAt = DateTime.Parse(expiresAtToken);
 
-                if (expiresAt < DateTime.Now)
+                if (expiresAt < DateTime.Now.AddDays(-5))
                 {
-                    //Refresh the token
+                    var tokenResponse = await _traktClient.Authentication.RefreshAuthorizationAsync();
+                    if (tokenResponse.IsSuccess)
+                    {
+                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt, tokenResponse.Value.CreatedAt.AddSeconds(Convert.ToInt32(tokenResponse.Value.ExpiresInSeconds)).ToString(CultureInfo.InvariantCulture));
+                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken, tokenResponse.Value.AccessToken);
+                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken, tokenResponse.Value.RefreshToken);
+                    }
                 }
-
-                _traktClient.Authorization = TraktAuthorization.CreateWith(access_token);
             }
         }
 

@@ -2,76 +2,91 @@
 @inject ToplistConfiguration ToplistConfiguration
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - listrr.pro</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/bootstrap-dark.min.css" />
     <link rel="stylesheet" href="~/css/select2.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link asp-append-version="true" rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">listrr.pro</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">listrr.pro</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li>
-                            <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a>
-                        </li>
-                        <li>
-                            <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a>
-                        </li>
-                        <li>
-                            <a asp-area="" asp-controller="Home" asp-action="Lists">Your Lists</a>
-                        </li>
-                        <li>
-                            <a asp-area="" asp-controller="Home" asp-action="MovieList">Create movie list</a>
-                        </li>
-                        <li>
-                            <a asp-area="" asp-controller="Home" asp-action="ShowList">Create show list</a>
-                        </li>
-                        <li>
-                            <a asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count lists</a>
-                        </li>
-                    }
-                </ul>
-                <partial name="_LoginPartial" />
-            </div>
-        </div>
-    </nav>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
 
-    <partial name="_CookieConsentPartial" />
+                    <partial name="_LoginPartial" />
 
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Management</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="My">My lists</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="MovieList">New movie list</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="ShowList">New show list</a>
+                                </div>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Donating</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-area="" asp-controller="donor" asp-action="WhyDonate">Why donate?</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a>
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login" asp-route-handler="LinkLogin" asp-route-provider="GitHub">Link GitHub account</a>
+                                </div>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count</a>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+    </header>
     <div class="container">
-        @RenderBody()
+        <main role="main" class="pb-3">
+            <div class="page-header">
+                <h1>@ViewData["Title"]</h1>
+                <h4>@ViewData["Message"]</h4>
+            </div>
+
+            <hr />
+            
+            @if (User.Identity.IsAuthenticated)
+            {
+                @await Html.PartialAsync("_LimitNotification")
+            }
+
+            @RenderBody()
+        </main>
     </div>
 
-    <footer class="footer">
+    <footer class="border-top footer text-muted">
         <div class="container">
-            <p class="text-muted">&copy; 2018 - @DateTime.Now.Year | <a href="https://listrr.pro">listrr.pro</a> | <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a> | <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a></p>
+            &copy; 2018 - @DateTime.Now.Year | <a href="https://listrr.pro">listrr.pro</a> | <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a> | <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/select2.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-
-
-@RenderSection("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

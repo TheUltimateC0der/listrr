@@ -1,0 +1,56 @@
+﻿@inject LimitConfigurationList LimitConfigurationList
+@inject UserManager<User> UserManager
+@inject ITraktService TraktService
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var lists = await TraktService.Get(user);
+    var limitConfig = LimitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
+}
+
+@if (lists.Count > limitConfig.ListLimit)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Attention!</h4>
+                <p>You currently have @lists.Count lists. But you can only have @limitConfig.ListLimit lists</p>
+                <p>As long as you have more lists than you should, your lists will not get updated, and you cannot create more lists!</p>
+                <hr>
+                <p class="mb-0">Hint: If you <a asp-controller="Donor" asp-action="WhyDonate">donate</a>, you will be able to increase your list limit!</p>
+            </div>
+        </div>
+    </div>
+}
+else if (lists.Count == limitConfig.ListLimit)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">Attention!</h4>
+                <p>You have reached your maximum list count of @limitConfig.ListLimit lists. You cannot create any more lists.</p>
+                @if (limitConfig.Level == UserLevel.User)
+                {
+                    <hr>
+                    <p class="mb-0">Hint: If you <a asp-controller="Donor" asp-action="WhyDonate">donate</a>, you will be able to increase your list limit!</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">Hi there!</h4>
+                <p>You currently have @lists.Count of @limitConfig.ListLimit lists created.</p>
+                @if (limitConfig.Level == UserLevel.User)
+                {
+                    <hr>
+                    <p class="mb-0">Hint: If you <a asp-controller="Donor" asp-action="WhyDonate">donate</a>, you will be able to increase your list limit!</p>
+                }
+            </div>
+        </div>
+    </div>
+}
