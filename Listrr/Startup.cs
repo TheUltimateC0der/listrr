@@ -60,6 +60,10 @@ namespace Listrr
             Configuration.Bind("LimitConfig", limitConfigurationList);
             services.AddSingleton(limitConfigurationList);
 
+            var userMappingConfigurationList = new UserMappingConfigurationList();
+            Configuration.Bind("UserMappingConfig", userMappingConfigurationList);
+            services.AddSingleton(userMappingConfigurationList);
+
 
             // Multi Instance LB
             services.AddDbContext<DataProtectionDbContext>(options =>
