@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Listrr.Obsolete", "Listrr.Obsolete\Listrr.Obsolete.csproj", "{258668A6-1EE5-4F2F-8BED-72539D7E85E4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Listrr", "Listrr\Listrr.csproj", "{B19F348F-E41B-460C-8514-D50B34226B96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Listrr", "Listrr\Listrr.csproj", "{B19F348F-E41B-460C-8514-D50B34226B96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{258668A6-1EE5-4F2F-8BED-72539D7E85E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{258668A6-1EE5-4F2F-8BED-72539D7E85E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{258668A6-1EE5-4F2F-8BED-72539D7E85E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{258668A6-1EE5-4F2F-8BED-72539D7E85E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B19F348F-E41B-460C-8514-D50B34226B96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B19F348F-E41B-460C-8514-D50B34226B96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B19F348F-E41B-460C-8514-D50B34226B96}.Release|Any CPU.ActiveCfg = Release|Any CPU
