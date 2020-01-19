@@ -12,12 +12,12 @@ namespace Listrr.Controllers
     public class DonorController : Controller
     {
         private readonly AppDbContext _appDbContext;
-        private readonly LimitConfiguration _donorConfiguration;
+        private readonly LimitConfigurationList _limitConfigurationList;
 
-        public DonorController(AppDbContext appDbContext, LimitConfiguration donorConfiguration)
+        public DonorController(AppDbContext appDbContext, LimitConfigurationList limitConfigurationList)
         {
             _appDbContext = appDbContext;
-            _donorConfiguration = donorConfiguration;
+            _limitConfigurationList = limitConfigurationList;
         }
         
 
@@ -40,14 +40,17 @@ namespace Listrr.Controllers
                 x.ReverseFilter_Status?.Status?.Length > 0 ||
                 x.ReverseFilter_Translations?.Translations?.Length > 0
             ).ToList();
-            
+
+            var userConfiguration = _limitConfigurationList.LimitConfigurations.FirstOrDefault(x => x.Level == UserLevel.User);
+
+
             return View(new WhyDonateViewModel()
             {
                 Lists = lists.Count,
                 Users = await _appDbContext.Users.CountAsync(),
                 ListsWithExclusionFilters = listsWithExclusionFilters.Count(),
                 UsersWithExclusionFilters = listsWithExclusionFilters.Select(x => x.Owner).Distinct().Count(),
-                UserListLimit = _donorConfiguration.ListLimit
+                UserListLimit = userConfiguration?.ListLimit ?? 0 
             });
         }
     }
