@@ -14,19 +14,17 @@ namespace Listrr.Areas.Identity.Pages.Account.Manage
     public class DeletePersonalDataModel : PageModel
     {
         private readonly UserManager<User> _userManager;
-        private readonly AppDbContext _appDbContext;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
 
         public DeletePersonalDataModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            ILogger<DeletePersonalDataModel> logger, AppDbContext appDbContext)
+            ILogger<DeletePersonalDataModel> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
-            _appDbContext = appDbContext;
         }
 
         [BindProperty]
@@ -71,15 +69,12 @@ namespace Listrr.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            _appDbContext.Users.Remove(user);
-            await _appDbContext.SaveChangesAsync();
-
-            //var result = await _userManager.DeleteAsync(user);
+            var result = await _userManager.DeleteAsync(user);
             var userId = await _userManager.GetUserIdAsync(user);
-            //if (!result.Succeeded)
-            //{
-            //    throw new InvalidOperationException($"Unexpected error occurred deleting user with ID '{userId}'.");
-            //}
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException($"Unexpected error occurred deleting user with ID '{userId}'.");
+            }
 
             await _signInManager.SignOutAsync();
 
