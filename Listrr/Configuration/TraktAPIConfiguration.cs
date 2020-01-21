@@ -16,6 +16,8 @@ namespace Listrr.Configuration
         public uint? FetchLimitSearch { get; set; }
 
         public uint? FetchLimitList { get; set; }
+
+        public int ChunkBy { get; set; }    
         
     }
 }
