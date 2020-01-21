@@ -19,6 +19,8 @@ namespace Listrr.Areas.Identity.Pages.Account.Manage
 
         public IActionResult OnGet()
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             if (RecoveryCodes == null || RecoveryCodes.Length == 0)
             {
                 return RedirectToPage("./TwoFactorAuthentication");

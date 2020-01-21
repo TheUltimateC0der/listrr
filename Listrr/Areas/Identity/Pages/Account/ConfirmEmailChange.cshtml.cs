@@ -28,6 +28,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(string userId, string email, string code)
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             if (userId == null || email == null || code == null)
             {
                 return RedirectToPage("/Index");

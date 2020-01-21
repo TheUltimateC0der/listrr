@@ -108,6 +108,12 @@ namespace Listrr.Data
 
             builder
                 .Entity<TraktList>()
+                .HasOne<User>(x => x.Owner)
+                .WithMany(x => x.TraktLists)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .Entity<TraktList>()
                 .Property(x => x.ScanState)
                 .HasDefaultValue(ScanState.None);
 
@@ -294,6 +300,11 @@ namespace Listrr.Data
             builder.Entity<User>()
                 .Property(x => x.Level)
                 .HasDefaultValue(UserLevel.User);
+
+            builder.Entity<User>()
+                .HasMany<TraktList>(x => x.TraktLists)
+                .WithOne(x => x.Owner)
+                .OnDelete(DeleteBehavior.Cascade);
 
             #endregion
 

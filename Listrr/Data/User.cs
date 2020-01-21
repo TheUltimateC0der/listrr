@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using Listrr.Data.Trakt;
 using Microsoft.AspNetCore.Identity;
 
 namespace Listrr.Data
@@ -20,6 +21,8 @@ namespace Listrr.Data
         public bool IsDonor => Level != UserLevel.User;
 
         public UserLevel Level { get; set; }
+
+        public IList<TraktList> TraktLists { get; set; }
         
     }
 }
