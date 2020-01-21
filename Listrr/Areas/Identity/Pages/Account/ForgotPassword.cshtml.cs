@@ -38,6 +38,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);

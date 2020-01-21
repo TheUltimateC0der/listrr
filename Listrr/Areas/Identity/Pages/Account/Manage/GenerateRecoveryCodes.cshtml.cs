@@ -31,6 +31,8 @@ namespace Listrr.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -49,6 +51,8 @@ namespace Listrr.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

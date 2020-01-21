@@ -40,6 +40,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             // Ensure the user has gone through the username & password screen first
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
@@ -54,6 +56,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             if (!ModelState.IsValid)
             {
                 return Page();

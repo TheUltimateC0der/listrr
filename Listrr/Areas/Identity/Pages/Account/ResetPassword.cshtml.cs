@@ -47,6 +47,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public IActionResult OnGet(string code = null)
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             if (code == null)
             {
                 return BadRequest("A code must be supplied for password reset.");
@@ -63,6 +65,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+            return RedirectToAction("Index", "Home", new { Area = "" });
+
             if (!ModelState.IsValid)
             {
                 return Page();
