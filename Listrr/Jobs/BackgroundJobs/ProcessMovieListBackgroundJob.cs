@@ -65,9 +65,12 @@ namespace Listrr.Jobs.BackgroundJobs
             }
             finally
             {
-                traktList.ScanState = ScanState.None;
+                if (traktList != null)
+                {
+                    traktList.ScanState = ScanState.None;
 
-                await _traktService.Update(traktList);
+                    await _traktService.Update(traktList);
+                }
             }
         }
 
