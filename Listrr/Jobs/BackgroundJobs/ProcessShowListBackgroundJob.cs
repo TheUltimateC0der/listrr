@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 
 using Listrr.Comparer;
+using Listrr.Configuration;
 using Listrr.Data.Trakt;
 using Listrr.Extensions;
 using Listrr.Services;
@@ -16,11 +17,13 @@ namespace Listrr.Jobs.BackgroundJobs
     public class ProcessShowListBackgroundJob : IBackgroundJob<uint>
     {
         private readonly ITraktService _traktService;
+        private readonly TraktAPIConfiguration _traktApiConfiguration;
         private TraktList traktList;
 
-        public ProcessShowListBackgroundJob(ITraktService traktService)
+        public ProcessShowListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration)
         {
             _traktService = traktService;
+            _traktApiConfiguration = traktApiConfiguration;
         }
 
         public async Task Execute(uint param)
@@ -40,7 +43,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 if (add.Any())
                 {
-                    foreach (var toAddChunk in add.ChunkBy(500))
+                    foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy))
                     {
                         await _traktService.AddShows(toAddChunk, traktList);
                     }
@@ -48,7 +51,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 if (remove.Any())
                 {
-                    foreach (var toRemoveChunk in remove.ChunkBy(500))
+                    foreach (var toRemoveChunk in remove.ChunkBy(_traktApiConfiguration.ChunkBy))
                     {
                         await _traktService.RemoveShows(toRemoveChunk, traktList);
                     }

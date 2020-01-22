@@ -305,7 +305,7 @@ namespace Listrr.Repositories
         {
             var result = await _traktClient.Users.GetCustomListItemsAsync(
                 model.Owner.UserName,
-                model.Slug,
+                model.Id.ToString(),
                 TraktListItemType.Show,
                 new TraktExtendedInfo().SetMetadata(),
                 new TraktPagedParameters(
@@ -318,6 +318,16 @@ namespace Listrr.Repositories
 
             foreach (var traktSearchResult in result.Value)
             {
+                if (traktSearchResult.Show.Year.HasValue && traktSearchResult.Show.Year.ToString().Length == 1)
+                    traktSearchResult.Show.Year *= 1000;
+
+                if (traktSearchResult.Show.Year.HasValue && traktSearchResult.Show.Year.ToString().Length == 2)
+                    traktSearchResult.Show.Year *= 100;
+
+                if (traktSearchResult.Show.Year.HasValue && traktSearchResult.Show.Year.ToString().Length == 3)
+                    traktSearchResult.Show.Year *= 10;
+
+
                 list.Add(traktSearchResult.Show);
             }
 
