@@ -37,7 +37,7 @@ namespace Listrr.Jobs.RecurringJobs
                 
                 if (lists.Count > limitConfig.ListLimit)
                 {
-                    foreach (var traktList in lists)
+                    foreach (var traktList in lists.Where(x => x.Process))
                     {
                         traktList.Process = false;
 
@@ -46,7 +46,7 @@ namespace Listrr.Jobs.RecurringJobs
                 }
                 else
                 {
-                    foreach (var traktList in lists)
+                    foreach (var traktList in lists.Where(x => x.Process == false))
                     {
                         traktList.Process = true;
 
