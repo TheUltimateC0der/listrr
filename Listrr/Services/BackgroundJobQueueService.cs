@@ -38,6 +38,9 @@ namespace Listrr.Services
 
                     break;
                 case UserLevel.Donor:
+                case UserLevel.DonorPlus:
+                case UserLevel.DonorPlusPlus:
+                case UserLevel.Developer:
                     BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id));
 
                     break;
@@ -55,6 +58,9 @@ namespace Listrr.Services
 
                     break;
                 case UserLevel.Donor:
+                case UserLevel.DonorPlus:
+                case UserLevel.DonorPlusPlus:
+                case UserLevel.Developer:
                     BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id));
 
                     break;
