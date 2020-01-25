@@ -38,9 +38,12 @@ namespace Listrr.Jobs.RecurringJobs
                 {
                     if (!newDonors.Contains(login.ProviderKey))
                     {
-                        donor.Level = UserLevel.User;
+                        if (donor.Level != UserLevel.User)
+                        {
+                            donor.Level = UserLevel.User;
 
-                        await _appDbContext.SaveChangesAsync();
+                            await _appDbContext.SaveChangesAsync();
+                        }
                     }
                 }
             }
@@ -67,9 +70,12 @@ namespace Listrr.Jobs.RecurringJobs
                 var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.UserName == userMappingConfiguration.User && x.Level == UserLevel.User);
                 if (user != null)
                 {
-                    user.Level = userMappingConfiguration.UserLevel;
+                    if (user.Level != userMappingConfiguration.UserLevel)
+                    {
+                        user.Level = userMappingConfiguration.UserLevel;
 
-                    await _appDbContext.SaveChangesAsync();
+                        await _appDbContext.SaveChangesAsync();
+                    }
                 }
             }
         }
