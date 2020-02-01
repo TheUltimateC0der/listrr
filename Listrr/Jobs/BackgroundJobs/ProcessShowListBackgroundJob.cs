@@ -61,7 +61,15 @@ namespace Listrr.Jobs.BackgroundJobs
             }
             catch (TraktListNotFoundException)
             {
-                await _traktService.Delete(new TraktList {Id = param});
+                if (traktList != null)
+                {
+                    await _traktService.Delete(traktList);
+                    traktList = null;
+                }
+                else
+                {
+                    await _traktService.Delete(new TraktList {Id = param});
+                }
             }
             catch (TraktAuthorizationException)
             {
