@@ -35,6 +35,7 @@ namespace Listrr.Repositories
                 .OrderByDescending(x => x.Likes)
                 .Take(count)
                 .Where(x => x.Likes > threshold)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -42,6 +43,7 @@ namespace Listrr.Repositories
         {
             return await appDbContext.TraktLists
                 .Include(x => x.Owner)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
@@ -51,6 +53,7 @@ namespace Listrr.Repositories
                 .Include(x => x.Owner)
                 .Where(x => x.Owner.Id == user.Id)
                 .OrderBy(x => x.LastProcessed)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -60,6 +63,7 @@ namespace Listrr.Repositories
                 .Include(x => x.Owner)
                 .Where(x => x.Process && x.Owner.Level == userLevel)
                 .OrderBy(x => x.LastProcessed)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -70,6 +74,7 @@ namespace Listrr.Repositories
                 .Where(x => x.Process && x.Owner.Level == userLevel)
                 .OrderBy(x => x.LastProcessed)
                 .Take(take)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
