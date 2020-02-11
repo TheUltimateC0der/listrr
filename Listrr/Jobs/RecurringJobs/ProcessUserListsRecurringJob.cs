@@ -27,7 +27,7 @@ namespace Listrr.Jobs.RecurringJobs
 
             foreach (var traktList in lists)
             {
-                _backgroundJobQueueService.Queue(traktList);
+                _backgroundJobQueueService.Queue(traktList, true);
             }
         }
 
