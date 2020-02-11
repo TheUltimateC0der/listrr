@@ -1,14 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Listrr.Comparer;
 using Listrr.Configuration;
 using Listrr.Data.Trakt;
 using Listrr.Extensions;
+using Listrr.Jobs.RecurringJobs;
 using Listrr.Services;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktNet.Exceptions;
 
@@ -18,15 +19,18 @@ namespace Listrr.Jobs.BackgroundJobs
     {
         private readonly ITraktService _traktService;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
+        private readonly IBackgroundJobQueueService _backgroundJobQueueService;
+
         private TraktList traktList;
         
-        public ProcessMovieListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration)
+        public ProcessMovieListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration, IBackgroundJobQueueService backgroundJobQueueService)
         {
             _traktService = traktService;
             _traktApiConfiguration = traktApiConfiguration;
+            _backgroundJobQueueService = backgroundJobQueueService;
         }
 
-        public async Task Execute(uint param)
+        public async Task Execute(uint param, bool queueNext = false)
         {
             try
             {
@@ -86,12 +90,15 @@ namespace Listrr.Jobs.BackgroundJobs
                     await _traktService.Update(traktList);
                 }
             }
+
+            if(queueNext)
+                BackgroundJob.Enqueue<ProcessUserListsRecurringJob>(x => x.Execute());
         }
 
         [Queue("donor")]
-        public async Task ExecutePriorized(uint param)
+        public async Task ExecutePriorized(uint param, bool queueNext = false)
         {
-            await Execute(param);
+            await Execute(param, queueNext);
         }
     }
 }

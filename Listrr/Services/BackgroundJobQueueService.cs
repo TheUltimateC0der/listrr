@@ -10,7 +10,7 @@ namespace Listrr.Services
 {
     public class BackgroundJobQueueService : IBackgroundJobQueueService
     {
-        public void Queue(TraktList list)
+        public void Queue(TraktList list, bool queueNext = false)
         {
             switch (list.Type)
             {
@@ -29,19 +29,19 @@ namespace Listrr.Services
 
 
 
-        private void MovieList(TraktList traktList)
+        private void MovieList(TraktList traktList, bool queueNext = false)
         {
             switch (traktList.Owner.Level)
             {
                 case UserLevel.User:
-                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id));
+                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id, queueNext));
 
                     break;
                 case UserLevel.Donor:
                 case UserLevel.DonorPlus:
                 case UserLevel.DonorPlusPlus:
                 case UserLevel.Developer:
-                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id));
+                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext));
 
                     break;
                 default:
@@ -49,19 +49,19 @@ namespace Listrr.Services
             }
         }
         
-        private void ShowList(TraktList traktList)
+        private void ShowList(TraktList traktList, bool queueNext = false)
         {
             switch (traktList.Owner.Level)
             {
                 case UserLevel.User:
-                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id));
+                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id, queueNext));
 
                     break;
                 case UserLevel.Donor:
                 case UserLevel.DonorPlus:
                 case UserLevel.DonorPlusPlus:
                 case UserLevel.Developer:
-                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id));
+                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext));
 
                     break;
                 default:
