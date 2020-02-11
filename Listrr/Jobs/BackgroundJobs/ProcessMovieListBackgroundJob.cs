@@ -19,15 +19,12 @@ namespace Listrr.Jobs.BackgroundJobs
     {
         private readonly ITraktService _traktService;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
-        private readonly IBackgroundJobQueueService _backgroundJobQueueService;
-
         private TraktList traktList;
         
-        public ProcessMovieListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration, IBackgroundJobQueueService backgroundJobQueueService)
+        public ProcessMovieListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration)
         {
             _traktService = traktService;
             _traktApiConfiguration = traktApiConfiguration;
-            _backgroundJobQueueService = backgroundJobQueueService;
         }
 
         public async Task Execute(uint param, bool queueNext = false)
@@ -63,23 +60,26 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 traktList.LastProcessed = DateTime.Now;
             }
-            catch (TraktListNotFoundException)
+            catch (Exception ex)
             {
-                if (traktList != null)
+                if (ex is TraktListNotFoundException)
                 {
-                    await _traktService.Delete(traktList);
-                    traktList = null;
+                    if (traktList != null)
+                    {
+                        await _traktService.Delete(traktList);
+                        traktList = null;
+                    }
+                    else
+                    {
+                        await _traktService.Delete(new TraktList { Id = param });
+                    }
                 }
-                else
+                else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException)
                 {
-                    await _traktService.Delete(new TraktList { Id = param });
+                    traktList = await _traktService.Get(param);
+                    traktList.LastProcessed = DateTime.Now;
+                    traktList.Process = false;
                 }
-            }
-            catch (TraktAuthorizationException)
-            {
-                traktList = await _traktService.Get(param);
-                traktList.LastProcessed = DateTime.Now;
-                traktList.Process = false;
             }
             finally
             {
