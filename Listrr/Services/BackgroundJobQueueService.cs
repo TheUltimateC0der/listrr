@@ -15,11 +15,11 @@ namespace Listrr.Services
             switch (list.Type)
             {
                 case ListType.Movie:
-                    MovieList(list);
+                    MovieList(list, queueNext);
 
                     break;
                 case ListType.Show:
-                    ShowList(list);
+                    ShowList(list, queueNext);
 
                     break;
                 default:
