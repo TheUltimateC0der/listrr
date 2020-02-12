@@ -28,7 +28,7 @@ namespace Listrr.Data
         
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
 
