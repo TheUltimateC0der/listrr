@@ -31,7 +31,7 @@ namespace Listrr.Jobs.BackgroundJobs
         {
             try
             {
-                traktList = await _traktService.Get(param, true);
+                traktList = await _traktService.Get(param);
                 traktList.ScanState = ScanState.Updating;
 
                 await _traktService.Update(traktList);
