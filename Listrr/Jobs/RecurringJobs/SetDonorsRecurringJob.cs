@@ -34,49 +34,39 @@ namespace Listrr.Jobs.RecurringJobs
             foreach (var donor in currentDonors)
             {
                 var login = await _appDbContext.UserLogins.FirstOrDefaultAsync(x => x.LoginProvider == "GitHub" && x.UserId == donor.Id);
-                if (login != null)
-                {
-                    if (!newDonors.Contains(login.ProviderKey))
-                    {
-                        if (donor.Level != UserLevel.User)
-                        {
-                            donor.Level = UserLevel.User;
+                if (login == null) continue;
+                if (newDonors.ContainsKey(login.ProviderKey)) continue;
+                if (donor.Level == UserLevel.User) continue;
 
-                            await _appDbContext.SaveChangesAsync();
-                        }
-                    }
-                }
+                donor.Level = UserLevel.User;
+
+                await _appDbContext.SaveChangesAsync();
             }
             
             //Activate donors
-            foreach (var donor in newDonors)
+            foreach (var newDonor in newDonors)
             {
-                var login = await _appDbContext.UserLogins.FirstOrDefaultAsync(x => x.LoginProvider == "GitHub" && x.ProviderKey == donor);
-                if (login != null)
-                {
-                    var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.Id == login.UserId && x.Level == UserLevel.User);
-                    if (user != null)
-                    {
-                        user.Level = UserLevel.Donor;
+                var login = await _appDbContext.UserLogins.FirstOrDefaultAsync(x => x.LoginProvider == "GitHub" && x.ProviderKey == newDonor.Key);
+                if (login == null) continue;
 
-                        await _appDbContext.SaveChangesAsync();
-                    }
-                }
+                var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.Id == login.UserId && x.Level != newDonor.Value.Level);
+                if (user == null) continue;
+
+                user.Level = newDonor.Value.Level;
+
+                await _appDbContext.SaveChangesAsync();
             }
 
             //Hand edited donors
             foreach (var userMappingConfiguration in _userMappingConfigurationList.UserMappingConfigurations)
             {
                 var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.UserName == userMappingConfiguration.User && x.Level == userMappingConfiguration.UserLevel);
-                if (user != null)
-                {
-                    if (user.Level != userMappingConfiguration.UserLevel)
-                    {
-                        user.Level = userMappingConfiguration.UserLevel;
+                if (user == null) continue;
+                if (user.Level == userMappingConfiguration.UserLevel) continue;
 
-                        await _appDbContext.SaveChangesAsync();
-                    }
-                }
+                user.Level = userMappingConfiguration.UserLevel;
+
+                await _appDbContext.SaveChangesAsync();
             }
         }
 

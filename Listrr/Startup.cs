@@ -264,6 +264,7 @@ namespace Listrr
 
             RecurringJob.AddOrUpdate<ProcessDonorListsRecurringJob>(x => x.Execute(), Cron.Daily);
             RecurringJob.AddOrUpdate<ProcessUserListsRecurringJob>(x => x.Execute(), Cron.Never);
+            RecurringJob.AddOrUpdate<UpdateAllListsRecurringJob>(x => x.Execute(), Cron.Never);
 
             RecurringJob.AddOrUpdate<EnforceListLimitRecurringJob>(x => x.Execute(), "*/5 * * * *");
             RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(), "*/5 * * * *");

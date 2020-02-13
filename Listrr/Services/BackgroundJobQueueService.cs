@@ -28,7 +28,6 @@ namespace Listrr.Services
         }
 
 
-
         private void MovieList(TraktList traktList, bool queueNext = false)
         {
             switch (traktList.Owner.Level)

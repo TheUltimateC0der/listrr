@@ -21,6 +21,8 @@ namespace Listrr.Services
         Task<IList<ITraktMovie>> GetMovies(TraktList model);
         Task<IList<ITraktShow>> GetShows(TraktList model);
 
+
+        Task<IList<TraktList>> GetLists();
         Task<IList<TraktList>> GetLists(UserLevel userLevel);
         Task<IList<TraktList>> GetLists(UserLevel userLevel, int take);
 

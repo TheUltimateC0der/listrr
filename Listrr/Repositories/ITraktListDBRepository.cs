@@ -10,6 +10,10 @@ namespace Listrr.Repositories
     {
 
         Task<IList<TraktList>> Top(int count, int threshold);
+
+
+        Task<IList<TraktList>> Get();
+
         Task<TraktList> Get(uint id);
         Task<IList<TraktList>> Get(IdentityUser user);
 
