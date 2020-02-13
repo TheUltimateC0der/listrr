@@ -8,8 +8,9 @@ namespace Listrr.Configuration
 {
     public interface ILimitConfiguration
     {
-
         public int ListLimit { get; set; }
+
+        public int Amount { get; set; }
 
         public bool ExclusionFilters { get; set; }
 

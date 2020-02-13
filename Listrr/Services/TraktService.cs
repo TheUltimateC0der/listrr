@@ -86,6 +86,11 @@ namespace Listrr.Services
             return await _traktListApiRepository.Exists(model);
         }
 
+        public async Task<IList<TraktList>> GetLists()
+        {
+            return await _traktListDbRepository.Get();
+        }
+
         public async Task<IList<TraktList>> GetLists(UserLevel userLevel)
         {
             return await _traktListDbRepository.Get(userLevel);

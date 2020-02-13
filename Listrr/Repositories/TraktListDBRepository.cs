@@ -38,13 +38,21 @@ namespace Listrr.Repositories
                 .ToListAsync();
         }
 
+
+        public async Task<IList<TraktList>> Get()
+        {
+            return await appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .ToListAsync();
+        }
+
         public async Task<TraktList> Get(uint id)
         {
             return await appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-
+        
         public async Task<IList<TraktList>> Get(IdentityUser user)
         {
             return await appDbContext.TraktLists

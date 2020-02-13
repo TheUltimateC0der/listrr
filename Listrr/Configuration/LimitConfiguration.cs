@@ -5,6 +5,7 @@ namespace Listrr.Configuration
     public class LimitConfiguration : ILimitConfiguration
     {
         public int ListLimit { get; set; }
+        public int Amount { get; set; }
         public bool ExclusionFilters { get; set; }
         public bool UpdateAfterEdit { get; set; }
         public bool UpdateManual { get; set; }
