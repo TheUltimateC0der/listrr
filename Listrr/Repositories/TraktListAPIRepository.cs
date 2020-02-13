@@ -48,7 +48,7 @@ namespace Listrr.Repositories
             var response = await _traktClient.Users.CreateCustomListAsync(
                 "me",
                 model.Name,
-                Constants.LIST_Description,
+                $"{Constants.LIST_Description}\r\n\r\n{model.GetDescriptionText()}",
                 TraktAccessScope.Public,
                 false,
                 false
@@ -182,12 +182,12 @@ namespace Listrr.Repositories
         public async Task<TraktList> Update(TraktList model)
         {
             await PrepareForApiRequest(model.Owner);
-
+            
             await _traktClient.Users.UpdateCustomListAsync(
                 "me",
                 model.Id.ToString(),
                 model.Name,
-                Constants.LIST_Description,
+                $"{Constants.LIST_Description}\r\n\r\n{model.GetDescriptionText()}",
                 TraktAccessScope.Public,
                 false,
                 false
