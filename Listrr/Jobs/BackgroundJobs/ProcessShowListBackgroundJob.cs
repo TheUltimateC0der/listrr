@@ -27,7 +27,7 @@ namespace Listrr.Jobs.BackgroundJobs
             _traktApiConfiguration = traktApiConfiguration;
         }
 
-        public async Task Execute(uint param, bool queueNext = false)
+        public async Task Execute(uint param, bool queueNext = false, bool forceRefresh = false)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Listrr.Jobs.BackgroundJobs
                 {
                     traktList.ScanState = ScanState.None;
 
-                    await _traktService.Update(traktList);
+                    await _traktService.Update(traktList, forceRefresh);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace Listrr.Jobs.BackgroundJobs
         }
 
         [Queue("donor")]
-        public async Task ExecutePriorized(uint param, bool queueNext = false)
+        public async Task ExecutePriorized(uint param, bool queueNext = false, bool forceRefresh = false)
         {
             await Execute(param, queueNext);
         }

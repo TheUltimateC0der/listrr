@@ -5,7 +5,7 @@ namespace Listrr.Services
     public interface IBackgroundJobQueueService
     {
 
-        void Queue(TraktList list, bool queueNext = false);
+        void Queue(TraktList list, bool queueNext = false, bool forceRefresh = false);
 
     }
 }
