@@ -11,10 +11,12 @@ namespace Listrr.Jobs.RecurringJobs
     public class UpdateAllListsRecurringJob : IRecurringJob
     {
         private readonly ITraktService _traktService;
+        private readonly IBackgroundJobQueueService _backgroundJobQueueService;
 
-        public UpdateAllListsRecurringJob(ITraktService traktService)
+        public UpdateAllListsRecurringJob(ITraktService traktService, IBackgroundJobQueueService backgroundJobQueueService)
         {
             _traktService = traktService;
+            _backgroundJobQueueService = backgroundJobQueueService;
         }
 
 
@@ -24,9 +26,7 @@ namespace Listrr.Jobs.RecurringJobs
 
             foreach (var traktList in lists)
             {
-                await _traktService.Update(traktList, true);
-
-                await Task.Delay(500);
+                _backgroundJobQueueService.Queue(traktList, false, true);
             }
         }
 

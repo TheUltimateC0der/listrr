@@ -38,7 +38,7 @@ namespace Listrr.Data.Trakt
         public int? Items { get; set; }
 
         public int? Likes { get; set; }
-
+        
         public DateTime LastProcessed { get; set; }
 
         public User Owner { get; set; }

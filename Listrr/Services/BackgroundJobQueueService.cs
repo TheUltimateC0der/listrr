@@ -10,16 +10,16 @@ namespace Listrr.Services
 {
     public class BackgroundJobQueueService : IBackgroundJobQueueService
     {
-        public void Queue(TraktList list, bool queueNext = false)
+        public void Queue(TraktList list, bool queueNext = false, bool forceRefresh = false)
         {
             switch (list.Type)
             {
                 case ListType.Movie:
-                    MovieList(list, queueNext);
+                    MovieList(list, queueNext, forceRefresh);
 
                     break;
                 case ListType.Show:
-                    ShowList(list, queueNext);
+                    ShowList(list, queueNext, forceRefresh);
 
                     break;
                 default:
@@ -28,19 +28,19 @@ namespace Listrr.Services
         }
 
 
-        private void MovieList(TraktList traktList, bool queueNext = false)
+        private void MovieList(TraktList traktList, bool queueNext = false, bool forceRefresh = false)
         {
             switch (traktList.Owner.Level)
             {
                 case UserLevel.User:
-                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id, queueNext));
+                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id, queueNext, forceRefresh));
 
                     break;
                 case UserLevel.Donor:
                 case UserLevel.DonorPlus:
                 case UserLevel.DonorPlusPlus:
                 case UserLevel.Developer:
-                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext));
+                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext, forceRefresh));
 
                     break;
                 default:
@@ -48,19 +48,19 @@ namespace Listrr.Services
             }
         }
         
-        private void ShowList(TraktList traktList, bool queueNext = false)
+        private void ShowList(TraktList traktList, bool queueNext = false, bool forceRefresh = false)
         {
             switch (traktList.Owner.Level)
             {
                 case UserLevel.User:
-                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id, queueNext));
+                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id, queueNext, forceRefresh));
 
                     break;
                 case UserLevel.Donor:
                 case UserLevel.DonorPlus:
                 case UserLevel.DonorPlusPlus:
                 case UserLevel.Developer:
-                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext));
+                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext, forceRefresh));
 
                     break;
                 default:
