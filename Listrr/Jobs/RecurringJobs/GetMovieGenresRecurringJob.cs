@@ -1,13 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Listrr.Configuration;
-using Listrr.Data;
 using Listrr.Data.Trakt;
+using Listrr.Repositories;
 
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktNet;
 
@@ -17,15 +15,14 @@ namespace Listrr.Jobs.RecurringJobs
     [Queue("system")]
     public class GetMovieGenresRecurringJob : IRecurringJob
     {
-
         private readonly TraktClient _traktClient;
-        private readonly AppDbContext _appDbContext;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
+        private readonly ITraktMovieRepository _traktMovieRepository;
 
-        public GetMovieGenresRecurringJob(AppDbContext appDbContext, TraktAPIConfiguration traktApiConfiguration)
+        public GetMovieGenresRecurringJob(TraktAPIConfiguration traktApiConfiguration, ITraktMovieRepository traktMovieRepository)
         {
-            _appDbContext = appDbContext;
             _traktApiConfiguration = traktApiConfiguration;
+            _traktMovieRepository = traktMovieRepository;
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
         }
@@ -37,18 +34,19 @@ namespace Listrr.Jobs.RecurringJobs
 
             if (result.IsSuccess)
             {
-                var currentGenres = await _appDbContext.TraktMovieGenres.ToListAsync();
+                var currentGenres = await _traktMovieRepository.GetGenres();
 
                 foreach (var traktGenre in result.Value)
                 {
-                    if (currentGenres.All(x => x.Slug != traktGenre.Slug))
+                    var currentGenre = currentGenres.FirstOrDefault(x => x.Slug == traktGenre.Slug);
+
+                    if (currentGenre == null)
                     {
-                        await _appDbContext.TraktMovieGenres.AddAsync(new TraktMovieGenre()
+                        await _traktMovieRepository.CreateGenre(new TraktMovieGenre()
                         {
                             Name = traktGenre.Name,
                             Slug = traktGenre.Slug
                         });
-                        await _appDbContext.SaveChangesAsync();
                     }
                 }
             }

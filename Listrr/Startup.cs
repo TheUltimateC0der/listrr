@@ -155,8 +155,11 @@ namespace Listrr
 
             services.AddScoped<IGitHubGraphService, GitHubGraphService>();
             services.AddScoped<IBackgroundJobQueueService, BackgroundJobQueueService>();
-            services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
-            services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
+            services.AddScoped<ITraktListRepository, TraktListRepository>();
+            services.AddScoped<ITraktMovieRepository, TraktMovieRepository>();
+            services.AddScoped<ITraktShowRepository, TraktShowRepository>();
+            services.AddScoped<ITraktCodeRepository, TraktCodeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITraktService, TraktService>();
 
             services.AddControllersWithViews();

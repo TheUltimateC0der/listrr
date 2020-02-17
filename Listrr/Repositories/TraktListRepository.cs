@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Listrr.Data;
+﻿using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace Listrr.Repositories
 {
-    public class TraktListDBRepository : ITraktListDBRepository
+    public class TraktListRepository : ITraktListRepository
     {
         private readonly AppDbContext appDbContext;
 
-        public TraktListDBRepository(AppDbContext appDbContext)
+        public TraktListRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
