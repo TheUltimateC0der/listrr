@@ -86,6 +86,10 @@ namespace Listrr.Jobs.BackgroundJobs
                     traktList.LastProcessed = DateTime.Now;
                     traktList.Process = false;
                 }
+                else
+                {
+                    throw ex;
+                }
             }
             finally
             {
