@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Hangfire;
+
+using Listrr.Data;
+using Listrr.Repositories;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Hangfire;
-
-using Listrr.Data;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -14,12 +15,11 @@ namespace Listrr.Jobs.RecurringJobs
     [Queue("system")]
     public class GetCountryCodesRecurringJob : IRecurringJob
     {
+        private readonly ITraktCodeRepository _traktCodeRepository;
 
-        private readonly AppDbContext _appDbContext;
-
-        public GetCountryCodesRecurringJob(AppDbContext appDbContext)
+        public GetCountryCodesRecurringJob(ITraktCodeRepository traktCodeRepository)
         {
-            _appDbContext = appDbContext;
+            _traktCodeRepository = traktCodeRepository;
         }
 
 
@@ -42,18 +42,18 @@ namespace Listrr.Jobs.RecurringJobs
 
             foreach (var regionInfo in countries)
             {
-                if (_appDbContext.CountryCodes.Any(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower())) continue;
+                var countryCode = await _traktCodeRepository.GetCountryCode(regionInfo.TwoLetterISORegionName.ToLower());
+
+                if (countryCode != null) continue;
                 if (regionInfo.TwoLetterISORegionName.Length != 2) continue;
 
-                await _appDbContext.CountryCodes.AddAsync(
+                await _traktCodeRepository.CreateCountryCode(
                     new CountryCode()
                     {
                         Code = regionInfo.TwoLetterISORegionName.ToLower(),
                         Name = regionInfo.DisplayName
                     }
                 );
-
-                await _appDbContext.SaveChangesAsync();
             }
 
 

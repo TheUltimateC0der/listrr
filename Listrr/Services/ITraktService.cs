@@ -13,32 +13,23 @@ namespace Listrr.Services
     public interface ITraktService
     {
 
-        Task<IList<TraktList>> Top(int count, int threshold);
-        Task<TraktList> Get(uint id, bool forceAPI = false);
-        Task<IList<TraktList>> Get(IdentityUser user);
-        Task Delete(TraktList model, bool onlyLocal = true);
-
+        Task<TraktList> Get(TraktList model);
         Task<IList<ITraktMovie>> GetMovies(TraktList model);
         Task<IList<ITraktShow>> GetShows(TraktList model);
 
+        Task<TraktList> Create(TraktList model);
+        Task<TraktList> Update(TraktList model);
+        Task Delete(TraktList model);
 
-        Task<IList<TraktList>> GetLists();
-        Task<IList<TraktList>> GetLists(UserLevel userLevel);
-        Task<IList<TraktList>> GetLists(UserLevel userLevel, int take);
-
+        Task<bool> Exists(TraktList model);
+        
 
         Task AddMovies(IList<ITraktMovie> movies, TraktList list);
         Task RemoveMovies(IEnumerable<ITraktMovie> movies, TraktList list);
 
 
-        Task AddShows(IList<ITraktShow> movies, TraktList list);
-        Task RemoveShows(IEnumerable<ITraktShow> movies, TraktList list);
-
-
-        Task<TraktList> Create(TraktList model);
-        Task<TraktList> Update(TraktList model, bool api = false);
-
-        Task<bool> Exists(TraktList model);
+        Task AddShows(IList<ITraktShow> shows, TraktList list);
+        Task RemoveShows(IEnumerable<ITraktShow> shows, TraktList list);
 
 
         Task<IList<ITraktMovie>> MovieSearch(TraktList model);

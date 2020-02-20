@@ -1,13 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Listrr.Configuration;
-using Listrr.Data;
 using Listrr.Data.Trakt;
+using Listrr.Repositories;
 
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktNet;
 
@@ -19,13 +17,13 @@ namespace Listrr.Jobs.RecurringJobs
     {
 
         private readonly TraktClient _traktClient;
-        private readonly AppDbContext _appDbContext;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
+        private readonly ITraktShowRepository _traktShowRepository;
 
-        public GetShowCertificationsRecurringJob(AppDbContext appDbContext, TraktAPIConfiguration traktApiConfiguration)
+        public GetShowCertificationsRecurringJob(TraktAPIConfiguration traktApiConfiguration, ITraktShowRepository traktShowRepository)
         {
-            _appDbContext = appDbContext;
             _traktApiConfiguration = traktApiConfiguration;
+            _traktShowRepository = traktShowRepository;
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
         }
@@ -37,19 +35,20 @@ namespace Listrr.Jobs.RecurringJobs
 
             if (result.IsSuccess)
             {
-                var currentCertifications = await _appDbContext.TraktShowCertifications.ToListAsync();
+                var currentCertifications = await _traktShowRepository.GetCertifications();
 
                 foreach (var traktCertification in result.Value.US)
                 {
-                    if (currentCertifications.All(x => x.Slug != traktCertification.Slug))
+                    var currentCertification = currentCertifications.FirstOrDefault(x => x.Slug != traktCertification.Slug);
+
+                    if (currentCertification == null)
                     {
-                        await _appDbContext.TraktShowCertifications.AddAsync(new TraktShowCertification()
+                        await _traktShowRepository.CreateCertification(new TraktShowCertification()
                         {
                             Name = traktCertification.Name,
                             Description = traktCertification.Description,
                             Slug = traktCertification.Slug
                         });
-                        await _appDbContext.SaveChangesAsync();
                     }
                 }
             }

@@ -1,32 +1,30 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-
-using Listrr.Configuration;
-using Listrr.Data;
+﻿using Listrr.Configuration;
 using Listrr.Models;
-using Listrr.Services;
+using Listrr.Repositories;
 
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Listrr.Controllers
 {
     public class HomeController : Controller
     {
 
-        private readonly ITraktService _traktService;
+        private readonly ITraktListRepository _traktRepository;
         private readonly ToplistConfiguration _toplistConfiguration;
 
-        public HomeController(ITraktService traktService, ToplistConfiguration toplistConfiguration)
+        public HomeController(ToplistConfiguration toplistConfiguration, ITraktListRepository traktRepository)
         {
-            _traktService = traktService;
             _toplistConfiguration = toplistConfiguration;
+            _traktRepository = traktRepository;
         }
 
 
         public async Task<IActionResult> Index()
         {
-            var lists = await _traktService.Top(_toplistConfiguration.Count, _toplistConfiguration.Threshold);
+            var lists = await _traktRepository.Top(_toplistConfiguration.Count, _toplistConfiguration.Threshold);
 
             return View(lists);
         }

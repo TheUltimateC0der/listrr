@@ -1,12 +1,12 @@
-﻿using Listrr.Configuration;
-using Listrr.Data;
-using Listrr.Data.Trakt;
+﻿using Hangfire;
 
-using Microsoft.EntityFrameworkCore;
+using Listrr.Configuration;
+using Listrr.Data.Trakt;
+using Listrr.Repositories;
 
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire;
+
 using TraktNet;
 
 namespace Listrr.Jobs.RecurringJobs
@@ -15,14 +15,12 @@ namespace Listrr.Jobs.RecurringJobs
     [Queue("system")]
     public class GetShowGenresRecurringJob : IRecurringJob
     {
-
         private readonly TraktClient _traktClient;
-        private readonly AppDbContext _appDbContext;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
+        private readonly ITraktShowRepository _traktShowRepository;
 
-        public GetShowGenresRecurringJob(AppDbContext appDbContext, TraktAPIConfiguration traktApiConfiguration)
+        public GetShowGenresRecurringJob(TraktAPIConfiguration traktApiConfiguration)
         {
-            _appDbContext = appDbContext;
             _traktApiConfiguration = traktApiConfiguration;
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
@@ -35,18 +33,19 @@ namespace Listrr.Jobs.RecurringJobs
 
             if (result.IsSuccess)
             {
-                var currentGenres = await _appDbContext.TraktShowGenres.ToListAsync();
+                var currentGenres = await _traktShowRepository.GetGenres();
 
                 foreach (var traktGenre in result.Value)
                 {
-                    if (currentGenres.All(x => x.Slug != traktGenre.Slug))
+                    var currentGenre = currentGenres.FirstOrDefault(x => x.Slug != traktGenre.Slug);
+
+                    if (currentGenre == null)
                     {
-                        await _appDbContext.TraktShowGenres.AddAsync(new TraktShowGenre()
+                        await _traktShowRepository.CreateGenre(new TraktShowGenre()
                         {
                             Name = traktGenre.Name,
                             Slug = traktGenre.Slug
                         });
-                        await _appDbContext.SaveChangesAsync();
                     }
                 }
             }

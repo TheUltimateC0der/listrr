@@ -1,10 +1,10 @@
-﻿using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Listrr.Data;
+using Listrr.Repositories;
+
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -12,12 +12,11 @@ namespace Listrr.Jobs.RecurringJobs
     [Queue("system")]
     public class GetLanguageCodesRecurringJob : IRecurringJob
     {
+        private readonly ITraktCodeRepository _traktCodeRepository;
 
-        private readonly AppDbContext _appDbContext;
-
-        public GetLanguageCodesRecurringJob(AppDbContext appDbContext)
+        public GetLanguageCodesRecurringJob(ITraktCodeRepository traktCodeRepository)
         {
-            _appDbContext = appDbContext;
+            _traktCodeRepository = traktCodeRepository;
         }
 
 
@@ -25,17 +24,17 @@ namespace Listrr.Jobs.RecurringJobs
         {
             foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
             {
-                if (!_appDbContext.LanguageCodes.Any(x => x.Code == culture.TwoLetterISOLanguageName && x.Name == culture.NativeName))
+                var languageCode = _traktCodeRepository.GetLanguageCode(culture.NativeName);
+
+                if (languageCode == null)
                 {
-                    await _appDbContext.LanguageCodes.AddAsync(
+                    await _traktCodeRepository.CreateLanguageCode(
                         new LanguageCode()
                         {
                             Code = culture.TwoLetterISOLanguageName,
                             Name = culture.NativeName
                         }
                     );
-
-                    await _appDbContext.SaveChangesAsync();
                 }
             }
         }

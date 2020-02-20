@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Hangfire;
+
+using Listrr.Data.Trakt;
+using Listrr.Repositories;
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Hangfire;
-
-using Listrr.Data;
-using Listrr.Data.Trakt;
-
-using Microsoft.EntityFrameworkCore;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -15,12 +13,11 @@ namespace Listrr.Jobs.RecurringJobs
     [Queue("system")]
     public class GetShowStatusRecurringJob : IRecurringJob
     {
+        private readonly ITraktShowRepository _traktShowRepository;
 
-        private readonly AppDbContext _appDbContext;
-
-        public GetShowStatusRecurringJob(AppDbContext appDbContext)
+        public GetShowStatusRecurringJob(ITraktShowRepository traktShowRepository)
         {
-            _appDbContext = appDbContext;
+            _traktShowRepository = traktShowRepository;
         }
 
 
@@ -34,17 +31,18 @@ namespace Listrr.Jobs.RecurringJobs
                 TraktNet.Enums.TraktShowStatus.Canceled.ObjectName
             };
 
-            var currentStatus = await _appDbContext.TraktShowStatuses.ToListAsync();
+            var currentStatuses = await _traktShowRepository.GetStatuses();
 
             foreach (var traktStatus in result)
             {
-                if (currentStatus.All(x => x.Name != traktStatus))
+                var currentStatus = currentStatuses.FirstOrDefault(x => x.Name == traktStatus);
+
+                if (currentStatus == null)
                 {
-                    await _appDbContext.TraktShowStatuses.AddAsync(new TraktShowStatus()
+                    await _traktShowRepository.CreateStatus(new TraktShowStatus()
                     {
                         Name = traktStatus
                     });
-                    await _appDbContext.SaveChangesAsync();
                 }
             }
         }
