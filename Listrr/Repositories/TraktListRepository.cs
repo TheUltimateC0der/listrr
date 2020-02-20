@@ -22,7 +22,7 @@ namespace Listrr.Repositories
 
         public async Task<TraktList> Create(TraktList model)
         {
-            appDbContext.TraktLists.Add(model);
+            await appDbContext.TraktLists.AddAsync(model);
             await appDbContext.SaveChangesAsync();
 
             return model;

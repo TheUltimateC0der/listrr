@@ -18,6 +18,21 @@ namespace Listrr.Repositories
             _appDbContext = appDbContext;
         }
 
+        public async Task<TraktMovieCertification> CreateCertification(TraktMovieCertification model)
+        {
+            await _appDbContext.TraktMovieCertifications.AddAsync(model);
+            await _appDbContext.SaveChangesAsync();
+
+            return model;
+        }
+
+        public async Task<TraktMovieGenre> CreateGenre(TraktMovieGenre model)
+        {
+            await _appDbContext.TraktMovieGenres.AddAsync(model);
+            await _appDbContext.SaveChangesAsync();
+
+            return model;
+        }
 
         public async Task<IList<TraktMovieCertification>> GetCertifications()
         {

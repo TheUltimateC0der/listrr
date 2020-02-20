@@ -20,7 +20,7 @@ namespace Listrr.Repositories
 
         public async Task<TraktShowCertification> CreateCertification(TraktShowCertification model)
         {
-            _appDbContext.TraktShowCertifications.Add(model);
+            await _appDbContext.TraktShowCertifications.AddAsync(model);
             await _appDbContext.SaveChangesAsync();
 
             return model;
@@ -28,7 +28,7 @@ namespace Listrr.Repositories
 
         public async Task<TraktShowGenre> CreateGenre(TraktShowGenre model)
         {
-            _appDbContext.TraktShowGenres.Add(model);
+            await _appDbContext.TraktShowGenres.AddAsync(model);
             await _appDbContext.SaveChangesAsync();
 
             return model;
@@ -36,7 +36,7 @@ namespace Listrr.Repositories
 
         public async Task<TraktShowNetwork> CreateNetwork(TraktShowNetwork model)
         {
-            _appDbContext.TraktShowNetworks.Add(model);
+            await _appDbContext.TraktShowNetworks.AddAsync(model);
             await _appDbContext.SaveChangesAsync();
 
             return model;
@@ -44,7 +44,7 @@ namespace Listrr.Repositories
 
         public async Task<TraktShowStatus> CreateStatus(TraktShowStatus model)
         {
-            _appDbContext.TraktShowStatuses.Add(model);
+            await _appDbContext.TraktShowStatuses.AddAsync(model);
             await _appDbContext.SaveChangesAsync();
 
             return model;

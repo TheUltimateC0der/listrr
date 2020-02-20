@@ -25,6 +25,14 @@ namespace Listrr.Repositories
             return model;
         }
 
+        public async Task<LanguageCode> CreateLanguageCode(LanguageCode model)
+        {
+            _appDbContext.LanguageCodes.Add(model);
+            await _appDbContext.SaveChangesAsync();
+
+            return model;
+        }
+
         public async Task<CountryCode> GetCountryCode(string name)
         {
             return await _appDbContext.CountryCodes.FirstOrDefaultAsync(x => x.Name == name);
