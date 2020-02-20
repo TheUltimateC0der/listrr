@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
@@ -13,8 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Razor.Language;
-using Microsoft.EntityFrameworkCore;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Controllers
 {
@@ -29,9 +27,8 @@ namespace Listrr.Controllers
         private readonly IBackgroundJobQueueService _backgroundJobQueueService;
         private readonly LimitConfigurationList _limitConfigurationList;
 
-        public ListController(TraktService traktService, UserManager<User> userManager, IBackgroundJobQueueService backgroundJobQueueService, LimitConfigurationList limitConfigurationList, ITraktListRepository traktRepository, ITraktMovieRepository traktMovieRepository, ITraktShowRepository traktShowRepository, ITraktCodeRepository traktCodesRepository)
+        public ListController(UserManager<User> userManager, IBackgroundJobQueueService backgroundJobQueueService, LimitConfigurationList limitConfigurationList, ITraktListRepository traktRepository, ITraktMovieRepository traktMovieRepository, ITraktShowRepository traktShowRepository, ITraktCodeRepository traktCodesRepository, ITraktService traktService)
         {
-            _traktService = traktService;
             _userManager = userManager;
             _backgroundJobQueueService = backgroundJobQueueService;
             _limitConfigurationList = limitConfigurationList;
@@ -39,6 +36,7 @@ namespace Listrr.Controllers
             _traktMovieRepository = traktMovieRepository;
             _traktShowRepository = traktShowRepository;
             _traktCodesRepository = traktCodesRepository;
+            _traktService = traktService;
         }
 
 
@@ -134,7 +132,7 @@ namespace Listrr.Controllers
             model.ReverseTranslations = new MultiSelectList(dbLanguageCodes, nameof(LanguageCode.Code), nameof(LanguageCode.Description));
 
             if (!ModelState.IsValid) return View(model);
-            
+
             var result = await _traktService.Create(new TraktList()
             {
                 Name = model.Name,
@@ -168,6 +166,8 @@ namespace Listrr.Controllers
                 result.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
                 result.ReverseFilter_Certifications_Movie = new CertificationsMovieFilter(model.ReverseFilter_Certifications);
             }
+
+            await _traktRepository.Create(result);
 
             _backgroundJobQueueService.Queue(result);
 
@@ -394,6 +394,8 @@ namespace Listrr.Controllers
                 result.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
                 result.ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.ReverseFilter_Certifications);
             }
+
+            await _traktRepository.Create(result);
 
             _backgroundJobQueueService.Queue(result);
 
