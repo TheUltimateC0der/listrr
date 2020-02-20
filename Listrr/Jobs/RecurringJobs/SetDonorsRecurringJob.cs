@@ -60,7 +60,7 @@ namespace Listrr.Jobs.RecurringJobs
             //Hand edited donors
             foreach (var userMappingConfiguration in _userMappingConfigurationList.UserMappingConfigurations)
             {
-                var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.UserName == userMappingConfiguration.User && x.Level == userMappingConfiguration.UserLevel);
+                var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.UserName == userMappingConfiguration.User && x.Level != userMappingConfiguration.UserLevel);
                 if (user == null) continue;
                 if (user.Level == userMappingConfiguration.UserLevel) continue;
 

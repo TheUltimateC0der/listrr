@@ -1,39 +1,37 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Listrr.Configuration;
-using Listrr.Data;
-using Listrr.Services;
+using Listrr.Repositories;
 
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
     [Queue("system")]
     public class EnforceListLimitRecurringJob : IRecurringJob
     {
-        private readonly AppDbContext _appDbContext;
-        private readonly ITraktService _traktService;
+        private readonly IUserRepository _userRepository;
+        private readonly ITraktListRepository _traktRepository;
+        
         private readonly LimitConfigurationList _limitConfigurationList;
 
-        public EnforceListLimitRecurringJob(AppDbContext appDbContext, LimitConfigurationList limitConfigurationList, ITraktService traktService)
+        public EnforceListLimitRecurringJob(LimitConfigurationList limitConfigurationList, IUserRepository userRepository, ITraktListRepository traktRepository)
         {
-            _appDbContext = appDbContext;
             _limitConfigurationList = limitConfigurationList;
-            _traktService = traktService;
+            _userRepository = userRepository;
+            _traktRepository = traktRepository;
         }
 
 
         public async Task Execute()
         {
-            var users = await _appDbContext.Users.ToListAsync();
+            var users = await _userRepository.Get();
 
             foreach (var user in users)
             {
                 var limitConfig = _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
-                var lists = await _traktService.Get(user);
+                var lists = await _traktRepository.Get(user);
                 
                 if (lists.Count > limitConfig.ListLimit)
                 {
@@ -41,7 +39,7 @@ namespace Listrr.Jobs.RecurringJobs
                     {
                         traktList.Process = false;
 
-                        await _traktService.Update(traktList);
+                        await _traktRepository.Update(traktList);
                     }
                 }
                 else
@@ -50,7 +48,7 @@ namespace Listrr.Jobs.RecurringJobs
                     {
                         traktList.Process = true;
 
-                        await _traktService.Update(traktList);
+                        await _traktRepository.Update(traktList);
                     }
                 }
             }

@@ -1,10 +1,11 @@
-﻿@inject LimitConfigurationList LimitConfigurationList
+﻿@using Listrr.Repositories
+@inject LimitConfigurationList LimitConfigurationList
 @inject UserManager<User> UserManager
-@inject ITraktService TraktService
+@inject ITraktListRepository TraktListRepository
 
 @{
     var user = await UserManager.GetUserAsync(User);
-    var lists = await TraktService.Get(user);
+    var lists = await TraktListRepository.Get(user);
     var limitConfig = LimitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
 }
 

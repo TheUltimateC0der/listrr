@@ -5,6 +5,7 @@ using Listrr.Configuration;
 using Listrr.Data.Trakt;
 using Listrr.Extensions;
 using Listrr.Jobs.RecurringJobs;
+using Listrr.Repositories;
 using Listrr.Services;
 
 using System;
@@ -18,12 +19,15 @@ namespace Listrr.Jobs.BackgroundJobs
     public class ProcessShowListBackgroundJob : IBackgroundJob<uint>
     {
         private readonly ITraktService _traktService;
+        private readonly ITraktListRepository _traktRepository;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
+
         private TraktList traktList;
 
-        public ProcessShowListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration)
+        public ProcessShowListBackgroundJob(ITraktService traktService, TraktAPIConfiguration traktApiConfiguration, ITraktListRepository traktRepository)
         {
             _traktService = traktService;
+            _traktRepository = traktRepository;
             _traktApiConfiguration = traktApiConfiguration;
         }
 
@@ -31,10 +35,12 @@ namespace Listrr.Jobs.BackgroundJobs
         {
             try
             {
-                traktList = await _traktService.Get(param);
+                traktList = await _traktRepository.Get(param);
+                traktList = await _traktService.Get(traktList);
+
                 traktList.ScanState = ScanState.Updating;
 
-                await _traktService.Update(traktList);
+                await _traktRepository.Update(traktList);
 
                 var found = await _traktService.ShowSearch(traktList);
                 var existing = await _traktService.GetShows(traktList);
@@ -76,9 +82,13 @@ namespace Listrr.Jobs.BackgroundJobs
                 }
                 else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException)
                 {
-                    traktList = await _traktService.Get(param);
+                    traktList = await _traktRepository.Get(param);
                     traktList.LastProcessed = DateTime.Now;
                     traktList.Process = false;
+                }
+                else
+                {
+                    throw ex;
                 }
             }
             finally
@@ -87,7 +97,10 @@ namespace Listrr.Jobs.BackgroundJobs
                 {
                     traktList.ScanState = ScanState.None;
 
-                    await _traktService.Update(traktList, forceRefresh);
+                    if (forceRefresh)
+                        await _traktService.Update(traktList);
+
+                    await _traktRepository.Update(traktList);
                 }
             }
 

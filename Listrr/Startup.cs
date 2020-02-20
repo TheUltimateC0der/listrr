@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Hangfire;
@@ -22,6 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MoreLinq;
 
 namespace Listrr
 {
@@ -155,8 +157,11 @@ namespace Listrr
 
             services.AddScoped<IGitHubGraphService, GitHubGraphService>();
             services.AddScoped<IBackgroundJobQueueService, BackgroundJobQueueService>();
-            services.AddScoped<ITraktListDBRepository, TraktListDBRepository>();
-            services.AddScoped<ITraktListAPIRepository, TraktListAPIRepository>();
+            services.AddScoped<ITraktListRepository, TraktListRepository>();
+            services.AddScoped<ITraktMovieRepository, TraktMovieRepository>();
+            services.AddScoped<ITraktShowRepository, TraktShowRepository>();
+            services.AddScoped<ITraktCodeRepository, TraktCodeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITraktService, TraktService>();
 
             services.AddControllersWithViews();
@@ -237,7 +242,7 @@ namespace Listrr
             var queues = new List<string>();
             queues.Add("system");
 
-            foreach (var limitConfiguration in limitConfigurationList.LimitConfigurations)
+            foreach (var limitConfiguration in limitConfigurationList.LimitConfigurations.DistinctBy(x => x.QueueName))
             {
                 queues.Add(limitConfiguration.QueueName);
             }

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.API.Trakt.Models.Filters;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
+
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Listrr.Models
 {
@@ -13,6 +13,9 @@ namespace Listrr.Models
         [Display(Name = "List Name", Prompt = "List Name")]
         public string Name { get; set; }
 
+        [Display(Name = "Create another?", Prompt = "Create another?")]
+        public bool CreateAnother { get; set; }
+        
         [Display(Name = "Search query", Prompt = "Search query")]
         public string Query { get; set; }
 
