@@ -40,7 +40,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 traktList.ScanState = ScanState.Updating;
                 
-                await _traktService.Update(traktList);
+                await _traktRepository.Update(traktList);
 
                 var found = await _traktService.MovieSearch(traktList);
                 var existing = await _traktService.GetMovies(traktList);
@@ -72,12 +72,12 @@ namespace Listrr.Jobs.BackgroundJobs
                 {
                     if (traktList != null)
                     {
-                        await _traktService.Delete(traktList);
+                        await _traktRepository.Delete(traktList);
                         traktList = null;
                     }
                     else
                     {
-                        await _traktService.Delete(new TraktList { Id = param });
+                        await _traktRepository.Delete(new TraktList { Id = param });
                     }
                 }
                 else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException)
