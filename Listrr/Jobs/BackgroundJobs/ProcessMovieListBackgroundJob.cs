@@ -40,7 +40,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 traktList.ScanState = ScanState.Updating;
                 
-                await _traktService.Update(traktList);
+                await _traktRepository.Update(traktList);
 
                 var found = await _traktService.MovieSearch(traktList);
                 var existing = await _traktService.GetMovies(traktList);
