@@ -1,58 +1,52 @@
-﻿@model IList<Listrr.Data.Trakt.TraktList>
-@inject ToplistConfiguration ToplistConfiguration
+﻿@model PaginationViewModel<Listrr.Data.Trakt.TraktList>
 
 @{
-    ViewData["Title"] = $"Top {ToplistConfiguration.Count}";
-    ViewData["Message"] = $"Lists that have more votes than {ToplistConfiguration.Threshold}";
+    ViewData["Title"] = $"Welcome";
 }
 
-<div class="row">
-    @if (Model.Count == 0)
-    {
-        <div class="col-md-12">
-            <div class="alert alert-info" role="alert">
-                #FeelsBadMan There are no lists currently :(
-            </div>
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="display-3">Welcome to listrr.pro!</h1>
+        <p>With listrr.pro, you can create personalized trakt.tv lists for tv shows and movies with a variety of different filters, and use them with your ultimate PLEX setup.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Community driven</h3>
+            <p>
+                The community decides!
+            </p>
+            <p>
+                This project is driven by the <a href="https://github.com/TheUltimateC0der/Listrr/issues" target="_blank">awesome ideas</a> of our community.
+            </p>
+            <p>
+                The project is also funded entirely through donations of awesome people inside our community. Check out our <a href="https://discord.gg/6PQseA7" target="_blank">discord</a> for joining us.
+            </p>
         </div>
-    }
-    else
-    {
-        <div class="col-md-12">
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <td>
-                        <b>Name</b>
-                    </td>
-                    <td>
-                        <b>Type</b>
-                    </td>
-                    <td>
-                        <b>Items</b>
-                    </td>
-                    <td>
-                        <b>Likes</b>
-                    </td>
-                    <td>
-                        <b>Action</b>
-                    </td>
-                </tr>
-                </thead>
-                @foreach (var list in Model)
-                {
-                    <tr>
-                        <td>
-                            @list.Name
-                        </td>
-                        <td>@list.Type</td>
-                        <td>@list.Items</td>
-                        <td>@list.Likes</td>
-                        <td>
-                            <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-primary btn-xs">Open on Trakt</a>
-                        </td>
-                    </tr>
-                }
-            </table>
+        <div class="col-md-4">
+            <h3>Automated updates</h3>
+            <p>
+                All lists you create get updated completely automated every few days.
+            </p>
+            <p>
+                As a donor, your lists get updated every 24 hours at night time, or you can update them manually.
+            </p>
+            <p>
+                Check our <a asp-controller="Donor" asp-action="WhyDonate">Why Donate?</a> page for more information about donor perks!
+            </p>
         </div>
-    }
+        <div class="col-md-4">
+            <h3>
+                Open Source
+            </h3>
+            <p>
+                We aim to be as transparent as possible with processing your data, thats why we decided to have all the source code available on GitHub for everyone to take a look onto how data gets processed.
+            </p>
+            <p>
+                <a href="https://github.com/TheUltimateC0der/Listrr" target="_blank">Take a look</a> at our code to make yourself familiar how listrr.pro works. Contributions are also welcome!
+            </p>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,77 @@
+﻿@model PaginationViewModel<Listrr.Data.Trakt.TraktList>
+
+@{
+    ViewData["Title"] = $"User lists";
+    ViewData["Message"] = $"All lists that have been created by our users";
+}
+
+    <div class="row">
+
+        @if (Model.Pages > 0)
+        {
+            @await Html.PartialAsync("_PaginationPartial")
+        }
+
+        @if (Model.Items.Count == 0)
+        {
+            <div class="col-md-12">
+                <div class="alert alert-info" role="alert">
+                    #FeelsBadMan There are no lists currently :(
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-12">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <td>
+                                <b>Name</b>
+                            </td>
+                            <td>
+                                <b>Type</b>
+                            </td>
+                            <td>
+                                <b>Items</b>
+                            </td>
+                            <td>
+                                <b>Likes</b>
+                            </td>
+                            <td>
+                                <b>Action</b>
+                            </td>
+                        </tr>
+                    </thead>
+                    @foreach (var list in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @list.Name
+                            </td>
+                            <td>@list.Type</td>
+                            <td>@list.Items</td>
+                            <td>@list.Likes</td>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <td>
+                                    <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-primary btn-sm">Open on Trakt</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-sm">Sign in to show link</a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </table>
+            </div>
+        }
+
+        @if (Model.Pages > 0)
+        {
+            @await Html.PartialAsync("_PaginationPartial")
+        }
+    </div>

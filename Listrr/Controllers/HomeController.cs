@@ -1,4 +1,5 @@
-﻿using Listrr.Configuration;
+﻿using System;
+using Listrr.Configuration;
 using Listrr.Models;
 using Listrr.Repositories;
 
@@ -6,44 +7,46 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Listrr.Data.Trakt;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Listrr.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ITraktListRepository _traktListRepository;
+        private readonly ListPaginationConfiguration _listPaginationConfiguration;
 
-        private readonly ITraktListRepository _traktRepository;
-        private readonly ToplistConfiguration _toplistConfiguration;
-
-        public HomeController(ToplistConfiguration toplistConfiguration, ITraktListRepository traktRepository)
+        public HomeController(ITraktListRepository traktListRepository, ListPaginationConfiguration listPaginationConfiguration)
         {
-            _toplistConfiguration = toplistConfiguration;
-            _traktRepository = traktRepository;
+            _traktListRepository = traktListRepository;
+            _listPaginationConfiguration = listPaginationConfiguration;
         }
 
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var lists = await _traktRepository.Top(_toplistConfiguration.Count, _toplistConfiguration.Threshold);
-
-            return View(lists);
-        }
-
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
             return View();
         }
 
-        public IActionResult Contact()
+        public async Task<IActionResult> Lists(int id)
         {
-            ViewData["Message"] = "Your contact page.";
+            var listCount = await _traktListRepository.Count();
+            var pageCount = (listCount + 9) / _listPaginationConfiguration.PageSize;
 
-            return View();
+            if (id > pageCount) return RedirectToAction("Error");
+            if (id < 0) return RedirectToAction("Error");
+
+            var lists = await _traktListRepository.Get(_listPaginationConfiguration.PageSize, _listPaginationConfiguration.PageSize * id + (id != 0 ? 1 : 0));
+
+            return View(new PaginationViewModel<TraktList>
+            {
+                Items = lists, 
+                Pages = pageCount, 
+                Page = id
+            });
         }
-
+        
         public IActionResult Privacy()
         {
             return View();
