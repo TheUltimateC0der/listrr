@@ -12,50 +12,49 @@ namespace Listrr.Repositories
 {
     public class TraktListRepository : ITraktListRepository
     {
-        private readonly AppDbContext appDbContext;
+        private readonly AppDbContext _appDbContext;
 
         public TraktListRepository(AppDbContext appDbContext)
         {
-            this.appDbContext = appDbContext;
+            _appDbContext = appDbContext;
         }
 
 
         public async Task<TraktList> Create(TraktList model)
         {
-            await appDbContext.TraktLists.AddAsync(model);
-            await appDbContext.SaveChangesAsync();
+            await _appDbContext.TraktLists.AddAsync(model);
+            await _appDbContext.SaveChangesAsync();
 
             return model;
         }
 
-        public async Task<IList<TraktList>> Top(int count, int threshold)
+        public async Task<IList<TraktList>> Get(int take, int skip)
         {
-            return await appDbContext.TraktLists
+            return await _appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .OrderByDescending(x => x.Likes)
-                .Take(count)
-                .Where(x => x.Likes > threshold)
+                .Skip(skip)
+                .Take(take)
                 .ToListAsync();
         }
 
-
         public async Task<IList<TraktList>> Get()
         {
-            return await appDbContext.TraktLists
+            return await _appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .ToListAsync();
         }
 
         public async Task<TraktList> Get(uint id)
         {
-            return await appDbContext.TraktLists
+            return await _appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
         
         public async Task<IList<TraktList>> Get(IdentityUser user)
         {
-            return await appDbContext.TraktLists
+            return await _appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .Where(x => x.Owner.Id == user.Id)
                 .OrderBy(x => x.LastProcessed)
@@ -64,7 +63,7 @@ namespace Listrr.Repositories
 
         public async Task<IList<TraktList>> Get(UserLevel userLevel)
         {
-            return await appDbContext.TraktLists
+            return await _appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .Where(x => x.Process && x.Owner.Level == userLevel)
                 .OrderBy(x => x.LastProcessed)
@@ -73,7 +72,7 @@ namespace Listrr.Repositories
 
         public async Task<IList<TraktList>> Get(UserLevel userLevel, int take)
         {
-            return await appDbContext.TraktLists
+            return await _appDbContext.TraktLists
                 .Include(x => x.Owner)
                 .Where(x => x.Process && x.Owner.Level == userLevel)
                 .OrderBy(x => x.LastProcessed)
@@ -81,19 +80,26 @@ namespace Listrr.Repositories
                 .ToListAsync();
         }
 
+
+        public async Task<int> Count()
+        {
+            return await _appDbContext.TraktLists.CountAsync();
+        }
+
+
         public async Task<TraktList> Update(TraktList model)
         {
-            appDbContext.TraktLists.Update(model);
-            await appDbContext.SaveChangesAsync();
+            _appDbContext.TraktLists.Update(model);
+            await _appDbContext.SaveChangesAsync();
 
             return model;
         }
 
         public async Task Delete(TraktList model)
         {
-            appDbContext.TraktLists.Remove(model);
+            _appDbContext.TraktLists.Remove(model);
 
-            await appDbContext.SaveChangesAsync();
+            await _appDbContext.SaveChangesAsync();
         }
     }
 }

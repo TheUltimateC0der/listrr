@@ -1,0 +1,80 @@
+﻿@model PaginationViewModel<TraktList>
+
+<div class="col-12 d-flex justify-content-center">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.Page - 1 >= 0 ? "" : "disabled")">
+                <a class="page-link" asp-route-id="@(Model.Page - 1)">Previous</a>
+            </li>
+
+            @if (Model.Page - 2 > 0 && Model.Page - 3 != 0)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="0">1</a>
+                </li>
+                <li class="page-item disabled">
+                    <p class="page-link">...</p>
+                </li>
+            }
+
+            @if (Model.Page - 3 == 0)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="0">1</a>
+                </li>
+            }
+
+            @if (Model.Page - 2 >= 0)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="@(Model.Page - 2)">@(Model.Page - 1)</a>
+                </li>
+            }
+            @if (Model.Page - 1 >= 0)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="@(Model.Page - 1)">@(Model.Page)</a>
+                </li>
+            }
+            <li class="page-item active">
+                <span class="page-link">
+                    @(Model.Page + 1)
+                    <span class="sr-only">(current)</span>
+                </span>
+            </li>
+            @if (Model.Page + 1 <= Model.Pages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="@(Model.Page + 1)">@(Model.Page + 2)</a>
+                </li>
+            }
+            @if (Model.Page + 2 <= Model.Pages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="@(Model.Page + 2)">@(Model.Page + 3)</a>
+                </li>
+            }
+
+            @if (Model.Page + 3 == Model.Pages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="@Model.Pages">@(Model.Pages + 1)</a>
+                </li>
+            }
+
+            @if (Model.Page + 2 < Model.Pages && Model.Page + 3 != Model.Pages)
+            {
+                <li class="page-item disabled">
+                    <p class="page-link">...</p>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-route-id="@Model.Pages">@(Model.Pages + 1)</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.Page == Model.Pages ? "disabled" : "")">
+                <a class="page-link" asp-route-id="@(Model.Page + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>

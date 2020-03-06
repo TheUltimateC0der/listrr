@@ -46,9 +46,9 @@ namespace Listrr
             Configuration.Bind("Hangfire", hangfireConfiguration);
             services.AddSingleton(hangfireConfiguration);
 
-            var toplistConfiguration = new ToplistConfiguration();
-            Configuration.Bind("Toplist", toplistConfiguration);
-            services.AddSingleton(toplistConfiguration);
+            var listPaginationConfiguration = new ListPaginationConfiguration();
+            Configuration.Bind("ListPagination", listPaginationConfiguration);
+            services.AddSingleton(listPaginationConfiguration);
 
             var traktApiConfiguration = new TraktAPIConfiguration();
             Configuration.Bind("Trakt", traktApiConfiguration);
@@ -105,6 +105,9 @@ namespace Listrr
                     options.ClientId = traktApiConfiguration.ClientId;
                     options.ClientSecret = traktApiConfiguration.ClientSecret;
                     options.SaveTokens = true;
+
+                    options.ClaimActions.MapJsonSubKey(Constants.Trakt_Claim_Ids_Slug, "ids", "slug");
+
                     options.Events.OnCreatingTicket = ctx =>
                     {
                         List<AuthenticationToken> tokens = ctx.Properties.GetTokens() as List<AuthenticationToken>;

@@ -1,7 +1,4 @@
-﻿@using Listrr.Configuration
-@inject ToplistConfiguration ToplistConfiguration
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,8 +6,9 @@
 
     <title>@ViewData["Title"] - listrr.pro</title>
 
-    <link rel="stylesheet" href="~/css/bootstrap-dark.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/select2.min.css" />
+    <link rel="stylesheet" href="~/css/fontawesome.min.css" />
     <link asp-append-version="true" rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
@@ -50,7 +48,7 @@
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Top @ToplistConfiguration.Count</a>
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Lists">All lists</a>
                         </li>
                     </ul>
 
@@ -60,16 +58,15 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            <div class="page-header">
-                <h1>@ViewData["Title"]</h1>
-                <h4>@ViewData["Message"]</h4>
-            </div>
 
-            <hr />
-            
-            @if (User.Identity.IsAuthenticated)
+            @if (ViewData["Title"] != null && ViewData["Message"] != null)
             {
-                @await Html.PartialAsync("_LimitNotification")
+                <div class="page-header">
+                    <h1>@ViewData["Title"]</h1>
+                    <h4>@ViewData["Message"]</h4>
+                </div>
+
+                <hr />
             }
 
             @RenderBody()
@@ -78,7 +75,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2018 - @DateTime.Now.Year | <a href="https://listrr.pro">listrr.pro</a> | <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a> | <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a> | <a href="https://github.com/TheUltimateC0der/Listrr" target="_blank">GitHub</a>
+            &copy; 2018 - @DateTime.Now.Year | <a href="https://listrr.pro">listrr.pro</a> | <a href="https://discord.gg/6PQseA7" target="_blank">Discord</a> | <a href="https://github.com/sponsors/TheUltimateC0der" target="_blank">Donate</a> | <a href="https://github.com/TheUltimateC0der/Listrr" target="_blank">GitHub</a> | Theme: <a href="https://bootswatch.com/darkly/" target="_blank">Darkly</a>
         </div>
     </footer>
 

@@ -10,5 +10,7 @@
 
         public const string LIST_Description = "List created and maintained by https://listrr.pro";
 
+        public const string Trakt_Claim_Ids_Slug = "urn:trakt:ids:slug";
+
     }
 }

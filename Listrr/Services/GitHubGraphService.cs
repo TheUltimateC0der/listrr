@@ -1,12 +1,15 @@
-﻿using GraphQL;
-using GraphQL.Client.Http;
+﻿using GraphQL.Client.Http;
 
 using Listrr.Configuration;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using GraphQL.Client.Serializer.Newtonsoft;
+using Listrr.API.GitHub;
+using GraphQLRequest = GraphQL.GraphQLRequest;
 
 namespace Listrr.Services
 {
@@ -44,18 +47,21 @@ namespace Listrr.Services
                 }"
             };
 
-            var grapqlClient = new GraphQLHttpClient("https://api.github.com/graphql");
+            var grapqlClient = new GraphQLHttpClient(o => {
+                o.EndPoint = new Uri("https://api.github.com/graphql");
+                o.JsonSerializer = new NewtonsoftJsonSerializer();
+            });
             grapqlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_githubApiConfiguration.Token}");
             grapqlClient.HttpClient.DefaultRequestHeaders.Add("User-Agent", "listrr.pro graphql client");
 
-            var graphqlResponse = await grapqlClient.SendQueryAsync<dynamic>(donorRequest);
+            var graphqlResponse = await grapqlClient.SendQueryAsync<GitHubDonorResponse>(donorRequest);
 
-            foreach (var node in graphqlResponse.Data.viewer.sponsorshipsAsMaintainer.nodes)
+            foreach (var node in graphqlResponse.Data.Viewer.SponsorshipsAsMaintainer.Nodes)
             {
-                var limitConfig = _limitConfigurationList.LimitConfigurations.FirstOrDefault(x => x.Amount == Convert.ToInt32(node.tier.monthlyPriceInDollars));
+                var limitConfig = _limitConfigurationList.LimitConfigurations.FirstOrDefault(x => x.Amount == Convert.ToInt32(node.Tier.MonthlyPriceInDollars));
 
                 if(limitConfig != null)
-                    result.Add(node.sponsor.databaseId.ToString(), limitConfig);
+                    result.Add(node.Sponsor.DatabaseId.ToString(), limitConfig);
             }
 
             return result;
