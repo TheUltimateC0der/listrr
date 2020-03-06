@@ -6,62 +6,64 @@
     ViewData["Message"] = "Overview of your lists";
 }
 
-    <div class="row">
-        
-        @if (Model.TraktLists.Count == 0)
-        {
-            <div class="col-md-12">
-                <div class="alert alert-info" role="alert">
-                    #FeelsBadMan You currently have exactly 0 lists. I am pretty sure you want to create a new <a class="btn btn-xs btn-primary" asp-action="MovieList" role="button">movie list</a> or a new <a class="btn btn-xs btn-primary" asp-action="ShowList" role="button">show list</a>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="col-md-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <td><b>Name</b></td>
-                            <td><b>Last processed</b></td>
-                            <td><b>Type</b></td>
-                            <td><b>State</b></td>
-                            <td><b>Items</b></td>
-                            <td><b>Action</b></td>
-                        </tr>
-                    </thead>
-                    @foreach (var list in Model.TraktLists)
-                    {
-                        <tr>
-                            <td>@list.Name</td>
-                            <td>@list.LastProcessed</td>
-                            <td>@list.Type</td>
-                            <td>@list.ScanState</td>
-                            <td>@list.Items</td>
-                            <td>
-                                <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-primary btn-sm">Show</a>
-                                @switch (list.Type)
-                                {
-                                    case ListType.Movie:
-                                        <a asp-action="EditMovieList" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+<partial name="_LimitNotification" />
 
-                                        break;
-                                    case ListType.Show:
-                                        <a asp-action="EditShowList" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+<div class="row">
 
-                                        break;
-                                    default:
-                                        throw new ArgumentOutOfRangeException();
-                                }
-                                @if (list.ScanState == ScanState.None && list.Owner.IsDonor)
-                                {
-                                    <a asp-action="Scan" asp-route-id="@list.Id" class="btn btn-success btn-sm">Update</a>
-                                }
-                                <a asp-action="Delete" asp-route-Id="@list.Id" class="btn btn-danger btn-sm">Delete</a>
-                            </td>
-                        </tr>
-                    }
-                </table>
+    @if (Model.TraktLists.Count == 0)
+    {
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert">
+                #FeelsBadMan You currently have exactly 0 lists. I am pretty sure you want to create a new <a class="btn btn-xs btn-primary" asp-action="MovieList" role="button">movie list</a> or a new <a class="btn btn-xs btn-primary" asp-action="ShowList" role="button">show list</a>
             </div>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td><b>Name</b></td>
+                        <td><b>Last processed</b></td>
+                        <td><b>Type</b></td>
+                        <td><b>State</b></td>
+                        <td><b>Items</b></td>
+                        <td><b>Action</b></td>
+                    </tr>
+                </thead>
+                @foreach (var list in Model.TraktLists)
+                {
+                    <tr>
+                        <td>@list.Name</td>
+                        <td>@list.LastProcessed</td>
+                        <td>@list.Type</td>
+                        <td>@list.ScanState</td>
+                        <td>@list.Items</td>
+                        <td>
+                            <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-primary btn-sm">Show</a>
+                            @switch (list.Type)
+                            {
+                                case ListType.Movie:
+                                    <a asp-action="EditMovieList" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+
+                                    break;
+                                case ListType.Show:
+                                    <a asp-action="EditShowList" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                            @if (list.ScanState == ScanState.None && list.Owner.IsDonor)
+                            {
+                                <a asp-action="Scan" asp-route-id="@list.Id" class="btn btn-success btn-sm">Update</a>
+                            }
+                            <a asp-action="Delete" asp-route-Id="@list.Id" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>

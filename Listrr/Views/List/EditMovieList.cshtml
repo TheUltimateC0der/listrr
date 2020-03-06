@@ -6,6 +6,8 @@
     ViewData["Message"] = $"Edit your '{Model.Name}' list";
 }
 
+<partial name="_LimitNotification" />
+
 <div class="row">
     <div class="col-md-12">
         <form asp-action="EditMovieList" method="post">

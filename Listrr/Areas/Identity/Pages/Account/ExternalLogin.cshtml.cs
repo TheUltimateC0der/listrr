@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -56,7 +57,8 @@ namespace Listrr.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
+
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
@@ -71,16 +73,18 @@ namespace Listrr.Areas.Identity.Pages.Account
 
             // Sign in the user with this external login provider if the user already has a login.
             var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true, true);
+            var userNameClaim = info.Principal.Claims.First(x => x.Type == Constants.Trakt_Claim_Ids_Slug);
+
             if (signInResult.Succeeded)
             {
                 await UpdateTokens(
                     await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey),
                     info.LoginProvider,
-                    info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_AccessToken).Value,
-                    info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_RefreshToken).Value,
-                    info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_ExpiresAt).Value
+                    info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_AccessToken)?.Value,
+                    info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_RefreshToken)?.Value,
+                    info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_ExpiresAt)?.Value
                 );
-
+                
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
@@ -90,7 +94,7 @@ namespace Listrr.Areas.Identity.Pages.Account
             }
             else
             {
-                var user = new User { UserName = info.ProviderKey };
+                var user = new User { UserName = userNameClaim.Value };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -102,9 +106,9 @@ namespace Listrr.Areas.Identity.Pages.Account
                         await UpdateTokens(
                             await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey),
                             info.LoginProvider,
-                            info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_AccessToken).Value,
-                            info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_RefreshToken).Value,
-                            info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_ExpiresAt).Value
+                            info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_AccessToken)?.Value,
+                            info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_RefreshToken)?.Value,
+                            info.AuthenticationTokens.FirstOrDefault(x => x.Name == Constants.TOKEN_ExpiresAt)?.Value
                         );
 
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
@@ -121,11 +125,11 @@ namespace Listrr.Areas.Identity.Pages.Account
         }
 
 
-        private async Task UpdateTokens(User user, string loginProvider, string access_token, string refresh_token, string expires_at)
+        private async Task UpdateTokens(User user, string loginProvider, string accessToken, string refreshToken, string expiresAt)
         {
-            await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_AccessToken, access_token);
-            await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_RefreshToken, refresh_token);
-            await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_ExpiresAt, expires_at);
+            await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_AccessToken, accessToken);
+            await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_RefreshToken, refreshToken);
+            await _userManager.SetAuthenticationTokenAsync(user, loginProvider, Constants.TOKEN_ExpiresAt, expiresAt);
         }
     }
 }

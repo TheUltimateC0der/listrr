@@ -16,7 +16,7 @@
             <div class="alert alert-danger" role="alert">
                 <h4 class="alert-heading">Attention!</h4>
                 <p>You currently have @lists.Count lists. But you can only have @limitConfig.ListLimit lists</p>
-                <p>As long as you have more lists than you should, your lists will not get updated, and you cannot create more lists!</p>
+                <p class="mb-0">As long as you have more lists than you should, your lists will not get updated, and you cannot create more lists!</p>
                 <hr>
                 <p class="mb-0">Hint: If you <a asp-controller="Donor" asp-action="WhyDonate">donate</a>, you will be able to increase your list limit!</p>
             </div>
@@ -29,7 +29,7 @@ else if (lists.Count == limitConfig.ListLimit)
         <div class="col-md-12">
             <div class="alert alert-warning" role="alert">
                 <h4 class="alert-heading">Attention!</h4>
-                <p>You have reached your maximum list count of @limitConfig.ListLimit lists. You cannot create any more lists.</p>
+                <p class="mb-0">You have reached your maximum list count of @limitConfig.ListLimit lists. You cannot create any more lists.</p>
                 @if (limitConfig.Level == UserLevel.User)
                 {
                     <hr>
@@ -43,9 +43,9 @@ else
 {
     <div class="row">
         <div class="col-md-12">
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-secondary" role="alert">
                 <h4 class="alert-heading">Hi there!</h4>
-                <p>You currently have @lists.Count of @limitConfig.ListLimit lists created.</p>
+                <p class="mb-0">You currently have @lists.Count of @limitConfig.ListLimit lists created.</p>
                 @if (limitConfig.Level == UserLevel.User)
                 {
                     <hr>
