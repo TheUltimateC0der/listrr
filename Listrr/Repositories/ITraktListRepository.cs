@@ -1,10 +1,10 @@
-﻿using Listrr.Data;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Identity;
-
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Listrr.Repositories
 {

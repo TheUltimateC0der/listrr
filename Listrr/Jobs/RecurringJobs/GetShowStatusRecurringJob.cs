@@ -1,11 +1,11 @@
-﻿using Hangfire;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Hangfire;
 
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {

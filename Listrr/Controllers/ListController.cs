@@ -1,4 +1,7 @@
-﻿using Listrr.API.Trakt.Models.Filters;
+﻿using System.Linq;
+using System.Threading.Tasks;
+
+using Listrr.API.Trakt.Models.Filters;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
@@ -10,9 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Listrr.Controllers
 {
@@ -46,8 +46,8 @@ namespace Listrr.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var lists = await _traktRepository.Get(user);
-            
-            return View(new MyViewModel()
+
+            return View(new MyViewModel
             {
                 TraktLists = lists,
                 User = user
@@ -79,6 +79,7 @@ namespace Listrr.Controllers
             return RedirectToAction(nameof(My));
         }
 
+
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> MovieList()
@@ -88,7 +89,7 @@ namespace Listrr.Controllers
             var dbCountryCodes = await _traktCodesRepository.GetCountryCodes();
             var dbLanguageCodes = await _traktCodesRepository.GetLanguageCodes();
 
-            var model = new CreateMovieListViewModel()
+            var model = new CreateMovieListViewModel
             {
                 Genres = new MultiSelectList(dbGenres, nameof(TraktMovieGenre.Slug), nameof(TraktMovieGenre.Slug)),
                 Certifications = new MultiSelectList(dbCertifications, nameof(TraktMovieCertification.Slug), nameof(TraktMovieCertification.Description)),
@@ -114,7 +115,7 @@ namespace Listrr.Controllers
 
             if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
                 return View("Error");
-            
+
             var dbGenres = await _traktMovieRepository.GetGenres();
             var dbCertifications = await _traktMovieRepository.GetCertifications();
             var dbCountryCodes = await _traktCodesRepository.GetCountryCodes();
@@ -133,7 +134,7 @@ namespace Listrr.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _traktService.Create(new TraktList()
+            var result = await _traktService.Create(new TraktList
             {
                 Name = model.Name,
                 Query = model.Query ?? "",
@@ -155,9 +156,10 @@ namespace Listrr.Controllers
                 Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
                 Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
                 Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                ContentType = ListContentType.Filters,
                 Owner = user
             });
-            
+
             if (user.IsDonor)
             {
                 result.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
@@ -172,6 +174,44 @@ namespace Listrr.Controllers
             _backgroundJobQueueService.Queue(result);
 
             return RedirectToAction(nameof(MovieList));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult MovieListFile()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> MovieListFile(CreateMovieListFileViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var lists = await _traktRepository.Get(user);
+
+            if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
+                return View("Error");
+
+            if (_limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListsFromNames)
+                return View("Error");
+
+            if (!ModelState.IsValid) return View(model);
+
+            var result = await _traktService.Create(new TraktList
+            {
+                Name = model.Name,
+                Type = ListType.Movie,
+                ContentType = ListContentType.Names,
+                ItemList = model.ItemList,
+                Owner = user
+            });
+
+            await _traktRepository.Create(result);
+
+            _backgroundJobQueueService.Queue(result);
+
+            return RedirectToAction(nameof(MovieListFile));
         }
 
         [HttpGet]
@@ -247,6 +287,7 @@ namespace Listrr.Controllers
             {
                 list.Name = model.Name;
                 list.Query = model.Query ?? "";
+                list.ContentType = ListContentType.Filters;
                 list.SearchByAlias = model.SearchByAlias;
                 list.SearchByBiography = model.SearchByBiography;
                 list.SearchByDescription = model.SearchByDescription;
@@ -279,14 +320,14 @@ namespace Listrr.Controllers
 
                 if (list.ScanState == ScanState.None)
                     _backgroundJobQueueService.Queue(list);
-                    
+
 
                 return RedirectToAction(nameof(EditMovieList), new { list.Id });
             }
 
             return RedirectToAction(nameof(My));
         }
-        
+
 
         [HttpGet]
         [Authorize]
@@ -302,7 +343,7 @@ namespace Listrr.Controllers
             var dbCountryCodes = await _traktCodesRepository.GetCountryCodes();
             var dbLanguageCodes = await _traktCodesRepository.GetLanguageCodes();
 
-            var model = new CreateShowListViewModel()
+            var model = new CreateShowListViewModel
             {
                 Genres = new MultiSelectList(dbGenres, nameof(TraktShowGenre.Slug), nameof(TraktShowGenre.Name)),
                 Certifications = new MultiSelectList(dbCertifications, nameof(TraktShowCertification.Slug), nameof(TraktShowCertification.Description)),
@@ -358,7 +399,7 @@ namespace Listrr.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _traktService.Create(new TraktList()
+            var result = await _traktService.Create(new TraktList
             {
                 Name = model.Name,
                 Query = model.Query ?? "",
@@ -400,6 +441,44 @@ namespace Listrr.Controllers
             _backgroundJobQueueService.Queue(result);
 
             return RedirectToAction(nameof(ShowList));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ShowListFile()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ShowListFile(CreateMovieListFileViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var lists = await _traktRepository.Get(user);
+
+            if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
+                return View("Error");
+
+            if (_limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListsFromNames)
+                return View("Error");
+
+            if (!ModelState.IsValid) return View(model);
+
+            var result = await _traktService.Create(new TraktList
+            {
+                Name = model.Name,
+                Type = ListType.Show,
+                ContentType = ListContentType.Names,
+                ItemList = model.ItemList,
+                Owner = user
+            });
+
+            await _traktRepository.Create(result);
+
+            _backgroundJobQueueService.Queue(result);
+
+            return RedirectToAction(nameof(ShowListFile));
         }
 
         [HttpGet]
@@ -504,7 +583,7 @@ namespace Listrr.Controllers
                 list.Filter_Countries = new CountriesCommonFilter(model.Filter_Countries);
                 list.Filter_Networks = new NetworksShowFilter(model.Filter_Networks);
                 list.Filter_Status = new StatusShowFilter(model.Filter_Status);
-                
+
                 if (list.Owner.IsDonor)
                 {
                     list.ReverseFilter_Status = new StatusShowFilter(model.ReverseFilter_Status);

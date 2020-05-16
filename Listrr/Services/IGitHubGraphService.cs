@@ -1,7 +1,7 @@
-﻿using Listrr.Configuration;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using Listrr.Configuration;
 
 namespace Listrr.Services
 {

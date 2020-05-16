@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using Hangfire;
 
 using Listrr.Configuration;
-using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 using TraktNet;
 

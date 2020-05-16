@@ -1,0 +1,74 @@
+﻿@model CreateMovieListFileViewModel
+@inject UserManager<User> userManager
+@inject LimitConfigurationList LimitConfigurationList
+
+@{
+    ViewData["Title"] = "Movie list";
+    ViewData["Message"] = "Create a new list for movies from a list of movie names";
+
+    var user = await userManager.GetUserAsync(User);
+    var userLimitConfiguration = LimitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
+}
+
+<partial name="_LimitNotification" />
+
+@if (!userLimitConfiguration.ListsFromNames)
+{
+    <partial name="_PreviewDonorOnlyPartial" />
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="MovieListFile" method="post">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">List settings</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">All information that is needed to create a list</h6>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input asp-for="Name" class="form-control" />
+                                <small class="form-text text-muted">* Give your list a name that makes it easier to find after creating.</small>
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info" role="alert">
+                                Please stick to the pattern as shown below to minimize false positives. Everything that is not this pattern will be ignored.
+                            </div>
+                            <textarea asp-for="ItemList" class="form-control" id="exampleTextarea" rows="12" placeholder="2-Headed Shark Attack (2012)
+20 Feet from Stardom (2013)
+20,000 Leagues Under the Sea (1954)
+88 Minutes (2007)
+89 (2017)
+Command Performance (2009)
+Commando (1985)
+The Commitments (1991)
+Cosy Dens (1999)
+Cottage Country (2013)
+The Cotton Club (1984)
+Knock Down the House (2019)
+Knock Knock (2015)
+Once Upon a Time in Mexico (2003)
+Once Upon a Time in the West (1968)
+Once Upon a Time in Venice (2017)"></textarea>
+                            <span asp-validation-for="ItemList" class="text-danger"></span>
+                            <small class="form-text text-muted">Example of how your list should look like</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            @if (userLimitConfiguration.ListsFromNames)
+            {
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+            }
+        </form>
+    </div>
+</div>

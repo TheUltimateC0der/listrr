@@ -1,11 +1,11 @@
-﻿using Hangfire;
+﻿using System.Linq;
+using System.Threading.Tasks;
+
+using Hangfire;
 
 using Listrr.Configuration;
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
-
-using System.Linq;
-using System.Threading.Tasks;
 
 using TraktNet;
 

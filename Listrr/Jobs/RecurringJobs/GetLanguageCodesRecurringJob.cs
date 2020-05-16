@@ -1,10 +1,10 @@
-﻿using Hangfire;
+﻿using System.Globalization;
+using System.Threading.Tasks;
+
+using Hangfire;
 
 using Listrr.Data;
 using Listrr.Repositories;
-
-using System.Globalization;
-using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {

@@ -227,6 +227,8 @@
                     }
                     else
                     {
+                        @await Html.PartialAsync("_DonorPerkExplanationPartial")
+
                         @await Html.PartialAsync("_ReverseFiltersExplanationPartial")
                     }
                 </div>

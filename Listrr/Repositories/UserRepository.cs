@@ -1,9 +1,9 @@
-﻿using Listrr.Data;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Listrr.Data;
 
 using Microsoft.EntityFrameworkCore;
-
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Listrr.Repositories
 {
