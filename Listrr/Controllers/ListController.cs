@@ -193,7 +193,7 @@ namespace Listrr.Controllers
             if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
                 return View("Error");
 
-            if (_limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListsFromNames)
+            if (!_limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListsFromNames)
                 return View("Error");
 
             if (!ModelState.IsValid) return View(model);
@@ -460,7 +460,7 @@ namespace Listrr.Controllers
             if (lists.Count >= _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListLimit)
                 return View("Error");
 
-            if (_limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListsFromNames)
+            if (!_limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level).ListsFromNames)
                 return View("Error");
 
             if (!ModelState.IsValid) return View(model);
