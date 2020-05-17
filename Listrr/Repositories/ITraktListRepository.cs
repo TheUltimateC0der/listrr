@@ -18,6 +18,8 @@ namespace Listrr.Repositories
         Task<IList<TraktList>> Get(UserLevel userClass);
         Task<IList<TraktList>> Get(UserLevel userClass, int take);
 
+        Task<TraktList> GetNextForUpdate(UserLevel userLevel);
+
         Task<int> Count();
 
         Task<TraktList> Create(TraktList model);

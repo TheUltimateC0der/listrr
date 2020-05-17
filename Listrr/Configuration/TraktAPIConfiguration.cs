@@ -17,5 +17,7 @@
         public uint? FetchLimitList { get; set; }
 
         public int ChunkBy { get; set; }
+
+        public int DelayRequeue { get; set; }
     }
 }

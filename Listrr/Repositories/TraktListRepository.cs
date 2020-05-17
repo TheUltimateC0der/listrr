@@ -80,6 +80,14 @@ namespace Listrr.Repositories
                 .ToListAsync();
         }
 
+        public async Task<TraktList> GetNextForUpdate(UserLevel userLevel)
+        {
+            return await _appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .OrderBy(x => x.LastProcessed)
+                .FirstOrDefaultAsync(x => x.Process && x.Owner.Level == userLevel && x.ContentType == ListContentType.Filters);
+        }
+
 
         public async Task<int> Count()
         {

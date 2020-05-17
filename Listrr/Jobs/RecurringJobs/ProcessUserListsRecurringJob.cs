@@ -24,11 +24,10 @@ namespace Listrr.Jobs.RecurringJobs
 
         public async Task Execute()
         {
-            var lists = await _traktRepository.Get(UserLevel.User, 1);
-
-            foreach (var traktList in lists)
+            var list = await _traktRepository.GetNextForUpdate(UserLevel.User);
+            if (list != null)
             {
-                _backgroundJobQueueService.Queue(traktList, true);
+                _backgroundJobQueueService.Queue(list, true);
             }
         }
 
