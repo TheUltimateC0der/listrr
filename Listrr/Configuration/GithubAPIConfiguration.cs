@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Listrr.Configuration
+﻿namespace Listrr.Configuration
 {
     public class GithubAPIConfiguration
     {

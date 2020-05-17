@@ -1,4 +1,10 @@
-﻿using Hangfire;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+using Hangfire;
 
 using Listrr.Comparer;
 using Listrr.Configuration;
@@ -8,11 +14,8 @@ using Listrr.Jobs.RecurringJobs;
 using Listrr.Repositories;
 using Listrr.Services;
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
 using TraktNet.Exceptions;
+using TraktNet.Objects.Get.Shows;
 
 namespace Listrr.Jobs.BackgroundJobs
 {
@@ -42,25 +45,61 @@ namespace Listrr.Jobs.BackgroundJobs
 
                 await _traktRepository.Update(traktList);
 
-                var found = await _traktService.ShowSearch(traktList);
-                var existing = await _traktService.GetShows(traktList);
-
-                var remove = existing.Except(found, new TraktShowComparer()).ToList();
-                var add = found.Except(existing, new TraktShowComparer()).ToList();
-
-                if (add.Any())
+                if (string.IsNullOrWhiteSpace(traktList.ItemList))
                 {
-                    foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy))
+                    var found = await _traktService.ShowSearch(traktList);
+                    var existing = await _traktService.GetShows(traktList);
+
+                    var remove = existing.Except(found, new TraktShowComparer()).ToList();
+                    var add = found.Except(existing, new TraktShowComparer()).ToList();
+
+                    if (add.Any())
                     {
-                        await _traktService.AddShows(toAddChunk, traktList);
+                        foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy))
+                        {
+                            await _traktService.AddShows(toAddChunk, traktList);
+                        }
+                    }
+
+                    if (remove.Any())
+                    {
+                        foreach (var toRemoveChunk in remove.ChunkBy(_traktApiConfiguration.ChunkBy))
+                        {
+                            await _traktService.RemoveShows(toRemoveChunk, traktList);
+                        }
                     }
                 }
-
-                if (remove.Any())
+                else
                 {
-                    foreach (var toRemoveChunk in remove.ChunkBy(_traktApiConfiguration.ChunkBy))
+                    var add = new List<ITraktShow>();
+                    var regex = new Regex(@"(.*)\(([0-9]{4})\)");
+
+                    foreach (var line in traktList.ItemList.Split("\r\n"))
                     {
-                        await _traktService.RemoveShows(toRemoveChunk, traktList);
+                        var processedLine = regex.Match(line);
+                        if (processedLine.Success && processedLine.Groups.Count == 3)
+                        {
+                            var cleanShowName = processedLine.Groups[1].Value.Trim();
+                            var itemYearParseResult = int.TryParse(processedLine.Groups[2].Value, out var showYear);
+                            if (itemYearParseResult)
+                            {
+                                var itemResult = await _traktService.ShowSearch(traktList, cleanShowName, showYear);
+                                if (itemResult != null)
+                                {
+                                    add.Add(itemResult);
+                                }
+
+                                await Task.Delay(_traktApiConfiguration.DelayIdSearch);
+                            }
+                        }
+                    }
+
+                    if (add.Any())
+                    {
+                        foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy))
+                        {
+                            await _traktService.AddShows(toAddChunk, traktList);
+                        }
                     }
                 }
 
@@ -105,7 +144,7 @@ namespace Listrr.Jobs.BackgroundJobs
             }
 
             if (queueNext)
-                BackgroundJob.Enqueue<ProcessUserListsRecurringJob>(x => x.Execute());
+                BackgroundJob.Schedule<ProcessUserListsRecurringJob>(x => x.Execute(), TimeSpan.FromSeconds(_traktApiConfiguration.DelayRequeue));
         }
 
         [Queue("donor")]

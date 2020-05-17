@@ -31,8 +31,11 @@
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="My">My lists</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="MovieList">New movie list</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="ShowList">New show list</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="MovieList">New movie list (filters)</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="ShowList">New show list (filters)</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="MovieListFile">New movie list (names)</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="List" asp-action="ShowListFile">New show list (names)</a>
                                 </div>
                             </li>
 
@@ -80,10 +83,10 @@
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/select2.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @RenderSection("Scripts", required: false)
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

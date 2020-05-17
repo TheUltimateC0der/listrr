@@ -1,16 +1,16 @@
-﻿using Listrr.Comparer;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Listrr.Comparer;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 using TraktNet;
 using TraktNet.Enums;
@@ -78,7 +78,7 @@ namespace Listrr.Services
             var response = await _traktClient.Users.GetCustomListAsync("me", model.Id.ToString());
 
             if (!response.IsSuccess) throw response.Exception;
-            
+
             model.Id = response.Value.Ids.Trakt;
             model.Slug = response.Value.Ids.Slug;
             model.Name = response.Value.Name;
@@ -97,22 +97,41 @@ namespace Listrr.Services
             return list;
         }
 
+        public async Task<ITraktMovie> MovieSearch(TraktList model, string name, int year)
+        {
+            var result = await _traktClient.Search.GetTextQueryResultsAsync(
+                TraktSearchResultType.Movie,
+                name,
+                null,
+                new TraktSearchFilter(year, year),
+                new TraktExtendedInfo().SetFull(),
+                new TraktPagedParameters(null, 1)
+            );
+
+            if (!result.IsSuccess) throw result.Exception;
+
+            return result.Value.FirstOrDefault()?.Movie;
+        }
+
+
+
+
         private async Task MovieSearch(TraktList model, IList<ITraktMovie> list)
         {
             uint? page = 0;
 
             TraktSearchField searchFields = new TraktSearchField();
 
-            if (model.SearchByAlias) searchFields = searchFields | TraktSearchField.Aliases;
-            if (model.SearchByBiography) searchFields = searchFields | TraktSearchField.Biography;
-            if (model.SearchByDescription) searchFields = searchFields | TraktSearchField.Description;
-            if (model.SearchByName) searchFields = searchFields | TraktSearchField.Name;
-            if (model.SearchByOverview) searchFields = searchFields | TraktSearchField.Overview;
-            if (model.SearchByPeople) searchFields = searchFields | TraktSearchField.People;
-            if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
-            if (model.SearchByTitle) searchFields = searchFields | TraktSearchField.Title;
-            if (model.SearchByTranslations) searchFields = searchFields | TraktSearchField.Translations;
-            if (model.SearchByTagline) searchFields = searchFields | TraktSearchField.Tagline;
+            if (model.SearchByAlias) searchFields |= TraktSearchField.Aliases;
+            if (model.SearchByBiography) searchFields |= TraktSearchField.Biography;
+            if (model.SearchByDescription) searchFields |= TraktSearchField.Description;
+            if (model.SearchByName) searchFields |= TraktSearchField.Name;
+            if (model.SearchByOverview) searchFields |= TraktSearchField.Overview;
+            if (model.SearchByPeople) searchFields |= TraktSearchField.People;
+            if (model.SearchByTagline) searchFields |= TraktSearchField.Tagline;
+            if (model.SearchByTitle) searchFields |= TraktSearchField.Title;
+            if (model.SearchByTranslations) searchFields |= TraktSearchField.Translations;
+            if (model.SearchByTagline) searchFields |= TraktSearchField.Tagline;
 
             while (true)
             {
@@ -377,6 +396,22 @@ namespace Listrr.Services
             await ShowSearch(model, list);
 
             return list;
+        }
+
+        public async Task<ITraktShow> ShowSearch(TraktList model, string name, int year)
+        {
+            var result = await _traktClient.Search.GetTextQueryResultsAsync(
+                TraktSearchResultType.Show,
+                name,
+                null,
+                new TraktSearchFilter(year, year),
+                new TraktExtendedInfo().SetFull(),
+                new TraktPagedParameters(null, 1)
+            );
+
+            if (!result.IsSuccess) throw result.Exception;
+
+            return result.Value.FirstOrDefault()?.Show;
         }
 
         private async Task ShowSearch(TraktList model, IList<ITraktShow> list)

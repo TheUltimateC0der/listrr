@@ -1,9 +1,9 @@
-﻿using Hangfire;
+﻿using System.Threading.Tasks;
 
-using Listrr.Services;
+using Hangfire;
 
-using System.Threading.Tasks;
 using Listrr.Repositories;
+using Listrr.Services;
 
 namespace Listrr.Jobs.RecurringJobs
 {
