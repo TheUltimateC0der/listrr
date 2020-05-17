@@ -40,9 +40,10 @@ namespace Listrr.Jobs.RecurringJobs
                 }
             }
 
+            var dbCountryCodes = await _traktCodeRepository.GetCountryCodes();
             foreach (var regionInfo in countries)
             {
-                var countryCode = await _traktCodeRepository.GetCountryCode(regionInfo.TwoLetterISORegionName.ToLower());
+                var countryCode = dbCountryCodes.FirstOrDefault(x => x.Code == regionInfo.TwoLetterISORegionName.ToLower(CultureInfo.InvariantCulture));
 
                 if (countryCode != null) continue;
                 if (regionInfo.TwoLetterISORegionName.Length != 2) continue;
@@ -50,13 +51,11 @@ namespace Listrr.Jobs.RecurringJobs
                 await _traktCodeRepository.CreateCountryCode(
                     new CountryCode()
                     {
-                        Code = regionInfo.TwoLetterISORegionName.ToLower(),
+                        Code = regionInfo.TwoLetterISORegionName.ToLower(CultureInfo.InvariantCulture),
                         Name = regionInfo.DisplayName
                     }
                 );
             }
-
-
         }
     }
 }

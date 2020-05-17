@@ -19,9 +19,10 @@ namespace Listrr.Jobs.RecurringJobs
         private readonly TraktAPIConfiguration _traktApiConfiguration;
         private readonly ITraktShowRepository _traktShowRepository;
 
-        public GetShowGenresRecurringJob(TraktAPIConfiguration traktApiConfiguration)
+        public GetShowGenresRecurringJob(TraktAPIConfiguration traktApiConfiguration, ITraktShowRepository traktShowRepository)
         {
             _traktApiConfiguration = traktApiConfiguration;
+            _traktShowRepository = traktShowRepository;
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, _traktApiConfiguration.ClientSecret);
         }
