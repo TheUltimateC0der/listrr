@@ -1,12 +1,12 @@
-﻿using Listrr.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Listrr.Repositories
 {
@@ -51,7 +51,7 @@ namespace Listrr.Repositories
                 .Include(x => x.Owner)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-        
+
         public async Task<IList<TraktList>> Get(IdentityUser user)
         {
             return await _appDbContext.TraktLists
@@ -78,6 +78,14 @@ namespace Listrr.Repositories
                 .OrderBy(x => x.LastProcessed)
                 .Take(take)
                 .ToListAsync();
+        }
+
+        public async Task<TraktList> GetNextForUpdate(UserLevel userLevel)
+        {
+            return await _appDbContext.TraktLists
+                .Include(x => x.Owner)
+                .OrderBy(x => x.LastProcessed)
+                .FirstOrDefaultAsync(x => x.Process && x.Owner.Level == userLevel && x.ContentType == ListContentType.Filters);
         }
 
 

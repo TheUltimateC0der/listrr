@@ -1,14 +1,12 @@
-﻿using System;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
+
 using Listrr.Configuration;
+using Listrr.Data.Trakt;
 using Listrr.Models;
 using Listrr.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Listrr.Data.Trakt;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Listrr.Controllers
 {

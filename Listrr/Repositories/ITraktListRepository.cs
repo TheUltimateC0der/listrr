@@ -1,10 +1,10 @@
-﻿using Listrr.Data;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Listrr.Data;
 using Listrr.Data.Trakt;
 
 using Microsoft.AspNetCore.Identity;
-
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Listrr.Repositories
 {
@@ -17,6 +17,8 @@ namespace Listrr.Repositories
         Task<IList<TraktList>> Get(IdentityUser user);
         Task<IList<TraktList>> Get(UserLevel userClass);
         Task<IList<TraktList>> Get(UserLevel userClass, int take);
+
+        Task<TraktList> GetNextForUpdate(UserLevel userLevel);
 
         Task<int> Count();
 

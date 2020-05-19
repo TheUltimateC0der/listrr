@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using Refit;
 
 namespace Listrr.API.Trakt.Models.Filters

@@ -1,7 +1,7 @@
-﻿using Listrr.Data;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using Listrr.Data;
 
 namespace Listrr.Repositories
 {

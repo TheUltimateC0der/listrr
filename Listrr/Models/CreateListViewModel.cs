@@ -1,9 +1,9 @@
-﻿using Listrr.API.Trakt.Models.Filters;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+using Listrr.API.Trakt.Models.Filters;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
-
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Listrr.Models
 {
