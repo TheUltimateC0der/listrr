@@ -43,6 +43,8 @@ namespace Listrr.Services
 
         public async Task<TraktList> Create(TraktList model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             await PrepareForApiRequest(model.Owner);
 
             var response = await _traktClient.Users.CreateCustomListAsync(
