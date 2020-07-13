@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 
 using Listrr.API.GitHub;
 using Listrr.Configuration;
-
-using GraphQL.Client.Serializer.Newtonsoft;
 
 using GraphQLRequest = GraphQL.GraphQLRequest;
 
@@ -21,8 +20,8 @@ namespace Listrr.Services
 
         public GitHubGraphService(GithubAPIConfiguration githubApiConfiguration, LimitConfigurationList limitConfigurationList)
         {
-            _githubApiConfiguration = githubApiConfiguration;
-            _limitConfigurationList = limitConfigurationList;
+            _githubApiConfiguration = githubApiConfiguration ?? throw new ArgumentNullException(nameof(githubApiConfiguration));
+            _limitConfigurationList = limitConfigurationList ?? throw new ArgumentNullException(nameof(limitConfigurationList));
         }
 
 
