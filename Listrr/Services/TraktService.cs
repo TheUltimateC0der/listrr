@@ -33,9 +33,9 @@ namespace Listrr.Services
 
         public TraktService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
         {
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
-            _traktApiConfiguration = traktApiConfiguration;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _traktApiConfiguration = traktApiConfiguration ?? throw new ArgumentNullException(nameof(traktApiConfiguration));
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, traktApiConfiguration.ClientSecret);
         }
