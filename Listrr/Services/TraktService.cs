@@ -533,6 +533,7 @@ namespace Listrr.Services
                 var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
 
                 _traktClient.Authorization = TraktAuthorization.CreateWith(access_token, refresh_token);
+                _traktClient.Configuration.ForceAuthorization = true;
 
                 var expiresAt = DateTime.Parse(expiresAtToken);
 
