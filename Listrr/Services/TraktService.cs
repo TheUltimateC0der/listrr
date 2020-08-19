@@ -33,9 +33,9 @@ namespace Listrr.Services
 
         public TraktService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
         {
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
-            _traktApiConfiguration = traktApiConfiguration;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _traktApiConfiguration = traktApiConfiguration ?? throw new ArgumentNullException(nameof(traktApiConfiguration));
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, traktApiConfiguration.ClientSecret);
         }
@@ -43,6 +43,8 @@ namespace Listrr.Services
 
         public async Task<TraktList> Create(TraktList model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             await PrepareForApiRequest(model.Owner);
 
             var response = await _traktClient.Users.CreateCustomListAsync(
@@ -531,6 +533,7 @@ namespace Listrr.Services
                 var refresh_token = await _userManager.GetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken);
 
                 _traktClient.Authorization = TraktAuthorization.CreateWith(access_token, refresh_token);
+                _traktClient.Configuration.ForceAuthorization = true;
 
                 var expiresAt = DateTime.Parse(expiresAtToken);
 

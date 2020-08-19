@@ -20,8 +20,8 @@ namespace Listrr.Services
 
         public GitHubGraphService(GithubAPIConfiguration githubApiConfiguration, LimitConfigurationList limitConfigurationList)
         {
-            _githubApiConfiguration = githubApiConfiguration;
-            _limitConfigurationList = limitConfigurationList;
+            _githubApiConfiguration = githubApiConfiguration ?? throw new ArgumentNullException(nameof(githubApiConfiguration));
+            _limitConfigurationList = limitConfigurationList ?? throw new ArgumentNullException(nameof(limitConfigurationList));
         }
 
 
@@ -29,14 +29,16 @@ namespace Listrr.Services
         {
             var result = new Dictionary<string, LimitConfiguration>();
 
-            var donorRequest = new GraphQLRequest {Query = @"
-                query { 
-                  viewer { 
+            var donorRequest = new GraphQLRequest
+            {
+                Query = @"
+                query {
+                  viewer {
                     sponsorshipsAsMaintainer (includePrivate: true, first: 100) {
                       nodes {
                         sponsor {
                           login,
-                          databaseId          
+                          databaseId
                         },
                         tier {
                           monthlyPriceInDollars
@@ -47,10 +49,7 @@ namespace Listrr.Services
                 }"
             };
 
-            var grapqlClient = new GraphQLHttpClient(o => {
-                o.EndPoint = new Uri("https://api.github.com/graphql");
-                o.JsonSerializer = new NewtonsoftJsonSerializer();
-            });
+            var grapqlClient = new GraphQLHttpClient("https://api.github.com/graphql", new NewtonsoftJsonSerializer());
             grapqlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_githubApiConfiguration.Token}");
             grapqlClient.HttpClient.DefaultRequestHeaders.Add("User-Agent", "listrr.pro graphql client");
 
@@ -60,7 +59,7 @@ namespace Listrr.Services
             {
                 var limitConfig = _limitConfigurationList.LimitConfigurations.FirstOrDefault(x => x.Amount == Convert.ToInt32(node.Tier.MonthlyPriceInDollars));
 
-                if(limitConfig != null)
+                if (limitConfig != null)
                     result.Add(node.Sponsor.DatabaseId.ToString(), limitConfig);
             }
 

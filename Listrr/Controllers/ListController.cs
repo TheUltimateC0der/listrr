@@ -71,7 +71,7 @@ namespace Listrr.Controllers
             if (list.Owner.IsDonor && list.Owner.UserName == User.Identity.Name && list.ScanState == ScanState.None)
             {
                 list.ScanState = ScanState.Scheduled;
-                await _traktService.Update(list);
+                await _traktRepository.Update(list);
 
                 _backgroundJobQueueService.Queue(list);
             }
