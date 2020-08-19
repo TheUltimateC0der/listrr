@@ -147,7 +147,7 @@ namespace Listrr.Data.Trakt
             {
                 case ListContentType.Filters:
                     result = "Normal Filters:\r\n";
-                    result += "Content Type: Filters";
+                    result += "Content Type: Filters\r\n";
 
                     if (Filter_Certifications_Movie?.Certifications != null)
                         result += $"Certifications: {string.Join(", ", Filter_Certifications_Movie?.Certifications)}\r\n";
