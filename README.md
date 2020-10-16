@@ -11,10 +11,10 @@ Listrr creates lists for shows and movies based on your filters. The created lis
 
 # What can I use this for ?
 
-## Radarr
+## ![Radarr Logo](https://radarr.video/img/logo.png "Radarr") Radarr
 You can create lists with listrr and add them to your Radarr instance. Radarr automatically adds the items from the list.
 
-## Sonarr
+## ![Sonarr Logo](https://sonarr.tv/img/logo.png "Sonarr") Sonarr
 You can create lists with listrr and add them to your Sonarr instance. Sonarr automatically adds the items from the list.
 
 ## Traktarr
