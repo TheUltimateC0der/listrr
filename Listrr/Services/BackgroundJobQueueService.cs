@@ -33,34 +33,34 @@ namespace Listrr.Services
             switch (traktList.Owner.Level)
             {
                 case UserLevel.User:
-                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id, queueNext, forceRefresh));
+                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.Execute(traktList.Id, null, queueNext, forceRefresh));
 
                     break;
                 case UserLevel.Donor:
                 case UserLevel.DonorPlus:
                 case UserLevel.DonorPlusPlus:
                 case UserLevel.Developer:
-                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext, forceRefresh));
+                    BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, null, queueNext, forceRefresh));
 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(traktList.Owner.Level), traktList.Owner.Level, null);
             }
         }
-        
+
         private void ShowList(TraktList traktList, bool queueNext = false, bool forceRefresh = false)
         {
             switch (traktList.Owner.Level)
             {
                 case UserLevel.User:
-                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id, queueNext, forceRefresh));
+                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.Execute(traktList.Id, null, queueNext, forceRefresh));
 
                     break;
                 case UserLevel.Donor:
                 case UserLevel.DonorPlus:
                 case UserLevel.DonorPlusPlus:
                 case UserLevel.Developer:
-                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, queueNext, forceRefresh));
+                    BackgroundJob.Enqueue<ProcessShowListBackgroundJob>(x => x.ExecutePriorized(traktList.Id, null, queueNext, forceRefresh));
 
                     break;
                 default:

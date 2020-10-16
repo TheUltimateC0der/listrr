@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Hangfire;
+using Hangfire.Console;
+using Hangfire.Server;
 
 using Listrr.Comparer;
 using Listrr.Configuration;
@@ -34,8 +36,11 @@ namespace Listrr.Jobs.BackgroundJobs
             _traktApiConfiguration = traktApiConfiguration;
         }
 
-        public async Task Execute(uint param, bool queueNext = false, bool forceRefresh = false)
+        public async Task Execute(uint param, PerformContext context, bool queueNext = false, bool forceRefresh = false)
         {
+            var addProgressBar = context.WriteProgressBar();
+            var removeProgressBar = context.WriteProgressBar();
+
             try
             {
                 traktList = await _traktRepository.Get(param);
@@ -55,7 +60,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                     if (add.Any())
                     {
-                        foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy))
+                        foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy).WithProgress(addProgressBar))
                         {
                             await _traktService.AddMovies(toAddChunk, traktList);
                         }
@@ -63,7 +68,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                     if (remove.Any())
                     {
-                        foreach (var toRemoveChunk in remove.ChunkBy(_traktApiConfiguration.ChunkBy))
+                        foreach (var toRemoveChunk in remove.ChunkBy(_traktApiConfiguration.ChunkBy).WithProgress(removeProgressBar))
                         {
                             await _traktService.RemoveMovies(toRemoveChunk, traktList);
                         }
@@ -96,7 +101,7 @@ namespace Listrr.Jobs.BackgroundJobs
 
                     if (add.Any())
                     {
-                        foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy))
+                        foreach (var toAddChunk in add.ChunkBy(_traktApiConfiguration.ChunkBy).WithProgress(addProgressBar))
                         {
                             await _traktService.AddMovies(toAddChunk, traktList);
                         }
@@ -148,9 +153,9 @@ namespace Listrr.Jobs.BackgroundJobs
         }
 
         [Queue("donor")]
-        public async Task ExecutePriorized(uint param, bool queueNext = false, bool forceRefresh = false)
+        public async Task ExecutePriorized(uint param, PerformContext context, bool queueNext = false, bool forceRefresh = false)
         {
-            await Execute(param, queueNext, forceRefresh);
+            await Execute(param, context, queueNext, forceRefresh);
         }
     }
 }

@@ -13,7 +13,9 @@
     <PackageReference Include="GraphQL.Client" Version="3.1.4" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="3.1.4" />
     <PackageReference Include="HangFire" Version="1.7.12" />
+    <PackageReference Include="Hangfire.Console" Version="1.4.2" />
     <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="1.1.0" />
+    <PackageReference Include="Hangfire.Dashboard.Dark" Version="2.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="3.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.7" />

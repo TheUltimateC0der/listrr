@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Hangfire;
+using Hangfire.Console;
+using Hangfire.Dashboard.Dark;
 
 using HangfireBasicAuthenticationFilter;
 
@@ -29,14 +31,14 @@ namespace Listrr
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
@@ -97,7 +99,12 @@ namespace Listrr
                 options.User.AllowedUserNameCharacters = null;
             }).AddEntityFrameworkStores<AppDbContext>();
             services.AddHangfire(x =>
-                x.UseSqlServerStorage(connectionString));
+            {
+                x.UseSqlServerStorage(connectionString)
+                    .WithJobExpirationTimeout(TimeSpan.FromHours(24));
+
+                x.UseConsole();
+            });
 
             services.AddAuthentication()
                 .AddTrakt(options =>
@@ -171,7 +178,6 @@ namespace Listrr
             services.AddRazorPages();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration, LimitConfigurationList limitConfigurationList)
         {
             InitializeDatabase(app);
@@ -208,9 +214,7 @@ namespace Listrr
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
                 endpoints.MapHangfireDashboard(new DashboardOptions
                 {
@@ -226,24 +230,20 @@ namespace Listrr
             });
         }
 
-
-
         private void InitializeDatabase(IApplicationBuilder app)
         {
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-                serviceScope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.Migrate();
-            }
+            using var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+
+            serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+            serviceScope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.Migrate();
         }
 
         private void InitializeHangfire(IApplicationBuilder app, IServiceProvider serviceProvider, HangFireConfiguration hangFireConfiguration, LimitConfigurationList limitConfigurationList)
         {
-            GlobalConfiguration.Configuration
-                .UseActivator(new HangfireActivator(serviceProvider));
+            GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
+            GlobalConfiguration.Configuration.UseDarkDashboard();
 
-            var queues = new List<string>();
-            queues.Add("system");
+            var queues = new List<string> { "system" };
 
             foreach (var limitConfiguration in limitConfigurationList.LimitConfigurations.DistinctBy(x => x.QueueName))
             {
@@ -258,7 +258,11 @@ namespace Listrr
 
             app.UseHangfireDashboard(hangFireConfiguration.DashboardPath ?? "/jobs", new DashboardOptions
             {
-                Authorization = new[] { new HangfireCustomBasicAuthenticationFilter { User = hangFireConfiguration.Username ?? "Admin", Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123" } }
+                Authorization = new[] { new HangfireCustomBasicAuthenticationFilter
+                {
+                    User = hangFireConfiguration.Username ?? "Admin",
+                    Pass = hangFireConfiguration.Password ?? "SuperSecurePWD!123"
+                } }
             });
 
             RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
@@ -284,7 +288,6 @@ namespace Listrr
             //    RecurringJob.Trigger(recurringJob.Id);
             //}
         }
-
 
     }
 }
