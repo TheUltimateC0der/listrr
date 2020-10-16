@@ -11,8 +11,14 @@ Listrr creates lists for shows and movies based on your filters. The created lis
 
 # What can I use this for ?
 
+## ![Radarr Logo](https://radarr.video/img/logo.png "Radarr") Radarr
+You can create lists with listrr and add them to your Radarr instance. Radarr automatically adds the items from the list.
+
+## ![Sonarr Logo](https://sonarr.tv/img/logo.png "Sonarr") Sonarr
+You can create lists with listrr and add them to your Sonarr instance. Sonarr automatically adds the items from the list.
+
 ## Traktarr
 You can create lists with listrr and add them to your traktarr configuration. Traktarr automatically adds the items to your *arr instances.
 
 ## Python-PlexLibrary
-You can create libraries from your the trakt lists you created with Listrr. As your lists get updated every 24 hours, so does your libraries
+You can create libraries from your the trakt lists you created with Listrr. As your lists get updated every 24 hours, so does your libraries.

@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+using TraktNet.Exceptions;
+
 namespace Listrr.Controllers
 {
     public class ListController : Controller
@@ -635,12 +637,18 @@ namespace Listrr.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var list = await _traktRepository.Get(model.Id);
-
             if (list == null) return RedirectToAction(nameof(My));
 
             if (list.Owner.UserName == User.Identity.Name)
             {
-                await _traktService.Delete(list);
+                try
+                {
+                    await _traktService.Delete(list);
+                }
+                catch (TraktListNotFoundException)
+                {
+                }
+
                 await _traktRepository.Delete(list);
             }
 
