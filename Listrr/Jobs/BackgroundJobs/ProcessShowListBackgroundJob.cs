@@ -130,6 +130,10 @@ namespace Listrr.Jobs.BackgroundJobs
                     traktList.LastProcessed = DateTime.Now;
                     traktList.Process = false;
                 }
+                else if (ex is ArgumentOutOfRangeException)
+                {
+
+                }
                 else
                 {
                     throw ex;
