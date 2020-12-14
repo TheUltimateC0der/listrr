@@ -537,7 +537,7 @@ namespace Listrr.Services
                 _traktClient.Authorization = TraktAuthorization.CreateWith(access_token, refresh_token);
                 _traktClient.Configuration.ForceAuthorization = true;
 
-                var expiresAt = DateTime.ParseExact(expiresAtToken, new[] { "yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss.fffffffK", "MM/dd/yyyy HH:mm:ss" }, null, DateTimeStyles.None);
+                var expiresAt = DateTime.ParseExact(expiresAtToken, new[] { "yyyy-MM-ddTHH:mm:ss.fffffffK", "MM/dd/yyyy HH:mm:ss" }, null, DateTimeStyles.None);
                 if (expiresAt < DateTime.Now.AddDays(-5))
                 {
                     try
