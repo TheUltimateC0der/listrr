@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Listrr.Comparer;
+using Listrr.Configuration;
+using Listrr.Data;
+using Listrr.Data.Trakt;
+using Listrr.Exceptions;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Listrr.Comparer;
-using Listrr.Configuration;
-using Listrr.Data;
-using Listrr.Data.Trakt;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-
 using TraktNet;
 using TraktNet.Enums;
+using TraktNet.Exceptions;
 using TraktNet.Objects.Authentication;
 using TraktNet.Objects.Get.Movies;
 using TraktNet.Objects.Get.Shows;
@@ -535,16 +537,23 @@ namespace Listrr.Services
                 _traktClient.Authorization = TraktAuthorization.CreateWith(access_token, refresh_token);
                 _traktClient.Configuration.ForceAuthorization = true;
 
-                var expiresAt = DateTime.Parse(expiresAtToken);
-
+                var expiresAt = DateTime.ParseExact(expiresAtToken, new[] { "yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss.fffffffK", "MM/dd/yyyy HH:mm:ss" }, null, DateTimeStyles.None);
                 if (expiresAt < DateTime.Now.AddDays(-5))
                 {
-                    var tokenResponse = await _traktClient.Authentication.RefreshAuthorizationAsync();
-                    if (tokenResponse.IsSuccess)
+                    try
                     {
-                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt, tokenResponse.Value.CreatedAt.AddSeconds(Convert.ToInt32(tokenResponse.Value.ExpiresInSeconds)).ToString(CultureInfo.InvariantCulture));
-                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken, tokenResponse.Value.AccessToken);
-                        await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken, tokenResponse.Value.RefreshToken);
+                        var tokenResponse = await _traktClient.Authentication.RefreshAuthorizationAsync();
+
+                        if (tokenResponse.IsSuccess)
+                        {
+                            await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_ExpiresAt, tokenResponse.Value.CreatedAt.AddSeconds(Convert.ToInt32(tokenResponse.Value.ExpiresInSeconds)).ToString(CultureInfo.InvariantCulture));
+                            await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_AccessToken, tokenResponse.Value.AccessToken);
+                            await _userManager.SetAuthenticationTokenAsync(user, Constants.TOKEN_LoginProvider, Constants.TOKEN_RefreshToken, tokenResponse.Value.RefreshToken);
+                        }
+                    }
+                    catch (TraktBadRequestException e)
+                    {
+                        throw new RefreshTokenBadRequestException();
                     }
                 }
             }

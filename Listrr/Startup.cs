@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Dashboard.Dark;
@@ -26,6 +22,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using MoreLinq;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Listrr
 {
@@ -67,6 +67,10 @@ namespace Listrr
             var userMappingConfigurationList = new UserMappingConfigurationList();
             Configuration.Bind("UserMappingConfig", userMappingConfigurationList);
             services.AddSingleton(userMappingConfigurationList);
+
+            var notificationConfiguration = new NotificationConfiguration();
+            Configuration.Bind("Notification", notificationConfiguration);
+            services.AddSingleton(notificationConfiguration);
 
 
             // Multi Instance LB
@@ -280,6 +284,7 @@ namespace Listrr
 
             RecurringJob.AddOrUpdate<EnforceListLimitRecurringJob>(x => x.Execute(), "*/5 * * * *");
             RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(), "*/5 * * * *");
+
 
 
             ////Starting all jobs here for initial db fill

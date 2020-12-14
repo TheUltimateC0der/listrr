@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Console;
 using Hangfire.Server;
 
 using Listrr.Comparer;
 using Listrr.Configuration;
 using Listrr.Data.Trakt;
+using Listrr.Exceptions;
 using Listrr.Extensions;
 using Listrr.Jobs.RecurringJobs;
 using Listrr.Repositories;
 using Listrr.Services;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using TraktNet.Exceptions;
 using TraktNet.Objects.Get.Shows;
@@ -124,7 +125,7 @@ namespace Listrr.Jobs.BackgroundJobs
                         await _traktRepository.Delete(new TraktList { Id = param });
                     }
                 }
-                else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException)
+                else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException || ex is RefreshTokenBadRequestException)
                 {
                     traktList = await _traktRepository.Get(param);
                     traktList.LastProcessed = DateTime.Now;

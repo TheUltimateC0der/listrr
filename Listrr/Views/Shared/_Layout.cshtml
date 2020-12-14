@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject NotificationConfiguration NotificationConfiguration
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -70,6 +72,14 @@
                 </div>
 
                 <hr />
+            }
+
+            @if (NotificationConfiguration != null)
+            {
+                <div class="@NotificationConfiguration.Class">
+                    <strong>@NotificationConfiguration.Title</strong>
+                    <p class="mb-0">@NotificationConfiguration.Text</p>
+                </div>
             }
 
             @RenderBody()
