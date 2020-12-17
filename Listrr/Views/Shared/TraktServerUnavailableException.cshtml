@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-secondary" role="alert">
+            <h4 class="alert-heading">Dang it!</h4>
+            <p>We currently have problems talking to the Trakt API. The server told us that there is too much going on. Please have patience, and try again in a few minutes.</p>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_QuotePartial")
