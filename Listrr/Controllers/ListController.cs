@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.API.Trakt.Models.Filters;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
@@ -13,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktNet.Exceptions;
 
@@ -136,31 +136,40 @@ namespace Listrr.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _traktService.Create(new TraktList
+            TraktList result = null;
+
+            try
             {
-                Name = model.Name,
-                Query = model.Query ?? "",
-                Type = ListType.Movie,
-                Filter_Years = model.Filter_Years,
-                Filter_Ratings = model.Filter_Ratings,
-                Filter_Runtimes = model.Filter_Runtimes,
-                SearchByAlias = model.SearchByAlias,
-                SearchByBiography = model.SearchByBiography,
-                SearchByDescription = model.SearchByDescription,
-                SearchByName = model.SearchByName,
-                SearchByOverview = model.SearchByOverview,
-                SearchByPeople = model.SearchByPeople,
-                SearchByTitle = model.SearchByTitle,
-                SearchByTranslations = model.SearchByTranslations,
-                SearchByTagline = model.SearchByTagline,
-                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
-                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
-                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
-                Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
-                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
-                ContentType = ListContentType.Filters,
-                Owner = user
-            });
+                result = await _traktService.Create(new TraktList
+                {
+                    Name = model.Name,
+                    Query = model.Query ?? "",
+                    Type = ListType.Movie,
+                    Filter_Years = model.Filter_Years,
+                    Filter_Ratings = model.Filter_Ratings,
+                    Filter_Runtimes = model.Filter_Runtimes,
+                    SearchByAlias = model.SearchByAlias,
+                    SearchByBiography = model.SearchByBiography,
+                    SearchByDescription = model.SearchByDescription,
+                    SearchByName = model.SearchByName,
+                    SearchByOverview = model.SearchByOverview,
+                    SearchByPeople = model.SearchByPeople,
+                    SearchByTitle = model.SearchByTitle,
+                    SearchByTranslations = model.SearchByTranslations,
+                    SearchByTagline = model.SearchByTagline,
+                    Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                    Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                    Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                    Filter_Certifications_Movie = new CertificationsMovieFilter(model.Filter_Certifications),
+                    Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                    ContentType = ListContentType.Filters,
+                    Owner = user
+                });
+            }
+            catch (TraktServerUnavailableException e)
+            {
+                return View(nameof(TraktServerUnavailableException));
+            }
 
             if (user.IsDonor)
             {
@@ -287,6 +296,13 @@ namespace Listrr.Controllers
 
             if (list.Owner.UserName == User.Identity.Name)
             {
+                var forceRefresh = false;
+
+                if (list.Name != model.Name)
+                {
+                    forceRefresh = true;
+                }
+
                 list.Name = model.Name;
                 list.Query = model.Query ?? "";
                 list.ContentType = ListContentType.Filters;
@@ -321,7 +337,7 @@ namespace Listrr.Controllers
                 await _traktRepository.Update(list);
 
                 if (list.ScanState == ScanState.None)
-                    _backgroundJobQueueService.Queue(list);
+                    _backgroundJobQueueService.Queue(list, forceRefresh: forceRefresh);
 
 
                 return RedirectToAction(nameof(EditMovieList), new { list.Id });
@@ -401,31 +417,40 @@ namespace Listrr.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _traktService.Create(new TraktList
+            TraktList result = null;
+
+            try
             {
-                Name = model.Name,
-                Query = model.Query ?? "",
-                Type = ListType.Show,
-                Filter_Years = model.Filter_Years,
-                Filter_Ratings = model.Filter_Ratings,
-                Filter_Runtimes = model.Filter_Runtimes,
-                SearchByAlias = model.SearchByAlias,
-                SearchByBiography = model.SearchByBiography,
-                SearchByDescription = model.SearchByDescription,
-                SearchByName = model.SearchByName,
-                SearchByOverview = model.SearchByOverview,
-                SearchByPeople = model.SearchByPeople,
-                SearchByTitle = model.SearchByTitle,
-                SearchByTranslations = model.SearchByTranslations,
-                Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
-                Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
-                Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
-                Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
-                Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
-                Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
-                Filter_Status = new StatusShowFilter(model.Filter_Status),
-                Owner = user
-            });
+                result = await _traktService.Create(new TraktList
+                {
+                    Name = model.Name,
+                    Query = model.Query ?? "",
+                    Type = ListType.Show,
+                    Filter_Years = model.Filter_Years,
+                    Filter_Ratings = model.Filter_Ratings,
+                    Filter_Runtimes = model.Filter_Runtimes,
+                    SearchByAlias = model.SearchByAlias,
+                    SearchByBiography = model.SearchByBiography,
+                    SearchByDescription = model.SearchByDescription,
+                    SearchByName = model.SearchByName,
+                    SearchByOverview = model.SearchByOverview,
+                    SearchByPeople = model.SearchByPeople,
+                    SearchByTitle = model.SearchByTitle,
+                    SearchByTranslations = model.SearchByTranslations,
+                    Filter_Genres = new GenresCommonFilter(model.Filter_Genres),
+                    Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages),
+                    Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations),
+                    Filter_Certifications_Show = new CertificationsShowFilter(model.Filter_Certifications),
+                    Filter_Countries = new CountriesCommonFilter(model.Filter_Countries),
+                    Filter_Networks = new NetworksShowFilter(model.Filter_Networks),
+                    Filter_Status = new StatusShowFilter(model.Filter_Status),
+                    Owner = user
+                });
+            }
+            catch (TraktServerUnavailableException e)
+            {
+                return View(nameof(TraktServerUnavailableException));
+            }
 
             if (user.IsDonor)
             {
@@ -565,6 +590,13 @@ namespace Listrr.Controllers
 
             if (list.Owner.UserName == User.Identity.Name)
             {
+                var forceRefresh = false;
+
+                if (list.Name != model.Name)
+                {
+                    forceRefresh = true;
+                }
+
                 list.Name = model.Name;
                 list.Query = model.Query ?? "";
                 list.SearchByAlias = model.SearchByAlias;
@@ -601,7 +633,7 @@ namespace Listrr.Controllers
                 await _traktRepository.Update(list);
 
                 if (list.ScanState == ScanState.None)
-                    _backgroundJobQueueService.Queue(list);
+                    _backgroundJobQueueService.Queue(list, forceRefresh: forceRefresh);
 
                 return RedirectToAction(nameof(EditShowList), new { list.Id });
             }
