@@ -108,8 +108,6 @@ namespace Listrr.Jobs.BackgroundJobs
                         }
                     }
                 }
-
-                traktList.LastProcessed = DateTime.Now;
             }
             catch (Exception ex)
             {
@@ -128,7 +126,6 @@ namespace Listrr.Jobs.BackgroundJobs
                 else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException || ex is RefreshTokenBadRequestException)
                 {
                     traktList = await _traktRepository.Get(param);
-                    traktList.LastProcessed = DateTime.Now;
                     traktList.Process = false;
                 }
                 else if (ex is ArgumentOutOfRangeException)
@@ -148,6 +145,8 @@ namespace Listrr.Jobs.BackgroundJobs
 
                     if (forceRefresh)
                         await _traktService.Update(traktList);
+
+                    traktList.LastProcessed = DateTime.Now;
 
                     await _traktRepository.Update(traktList);
                 }
