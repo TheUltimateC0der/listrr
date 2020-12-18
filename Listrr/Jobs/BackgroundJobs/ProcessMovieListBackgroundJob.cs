@@ -123,7 +123,8 @@ namespace Listrr.Jobs.BackgroundJobs
                         await _traktRepository.Delete(new TraktList { Id = param });
                     }
                 }
-                else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException || ex is RefreshTokenBadRequestException)
+                else if (ex is TraktAuthenticationOAuthException || ex is TraktAuthorizationException || ex is RefreshTokenBadRequestException ||
+                         ex.Message.Contains("Response status code was 423"))
                 {
                     traktList = await _traktRepository.Get(param);
                     traktList.Process = false;
