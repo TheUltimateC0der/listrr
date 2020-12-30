@@ -146,7 +146,8 @@ namespace Listrr.Controllers
                     Query = model.Query ?? "",
                     Type = ListType.Movie,
                     Filter_Years = model.Filter_Years,
-                    Filter_Ratings = model.Filter_Ratings,
+                    Filter_Ratings_Trakt = model.Filter_Ratings_Trakt,
+                    Filter_Ratings_IMDb = model.Filter_Ratings_IMDb,
                     Filter_Runtimes = model.Filter_Runtimes,
                     SearchByAlias = model.SearchByAlias,
                     SearchByBiography = model.SearchByBiography,
@@ -267,7 +268,8 @@ namespace Listrr.Controllers
                     SearchByTagline = list.SearchByTagline,
                     Filter_Years = list.Filter_Years,
                     Filter_Runtimes = list.Filter_Runtimes,
-                    Filter_Ratings = list.Filter_Ratings,
+                    Filter_Ratings_Trakt = list.Filter_Ratings_Trakt,
+                    Filter_Ratings_IMDb = list.Filter_Ratings_IMDb,
                     Filter_Genres = list.Filter_Genres.Genres,
                     Filter_Certifications = list.Filter_Certifications_Movie.Certifications,
                     Filter_Countries = list.Filter_Countries.Languages,
@@ -317,7 +319,8 @@ namespace Listrr.Controllers
                 list.SearchByTagline = model.SearchByTagline;
                 list.Filter_Years = model.Filter_Years;
                 list.Filter_Runtimes = model.Filter_Runtimes;
-                list.Filter_Ratings = model.Filter_Ratings;
+                list.Filter_Ratings_Trakt = model.Filter_Ratings_Trakt;
+                list.Filter_Ratings_IMDb = model.Filter_Ratings_IMDb;
                 list.Filter_Genres = new GenresCommonFilter(model.Filter_Genres);
                 list.Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages);
                 list.Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations);
@@ -427,7 +430,8 @@ namespace Listrr.Controllers
                     Query = model.Query ?? "",
                     Type = ListType.Show,
                     Filter_Years = model.Filter_Years,
-                    Filter_Ratings = model.Filter_Ratings,
+                    Filter_Ratings_Trakt = model.Filter_Ratings_Trakt,
+                    Filter_Ratings_IMDb = model.Filter_Ratings_IMDb,
                     Filter_Runtimes = model.Filter_Runtimes,
                     SearchByAlias = model.SearchByAlias,
                     SearchByBiography = model.SearchByBiography,
@@ -557,7 +561,8 @@ namespace Listrr.Controllers
                     SearchByTranslations = list.SearchByTranslations,
                     Filter_Years = list.Filter_Years,
                     Filter_Runtimes = list.Filter_Runtimes,
-                    Filter_Ratings = list.Filter_Ratings,
+                    Filter_Ratings_Trakt = list.Filter_Ratings_Trakt,
+                    Filter_Ratings_IMDb = list.Filter_Ratings_IMDb,
                     Filter_Genres = list.Filter_Genres.Genres,
                     Filter_Certifications = list.Filter_Certifications_Show.Certifications,
                     Filter_Countries = list.Filter_Countries.Languages,
@@ -609,7 +614,8 @@ namespace Listrr.Controllers
                 list.SearchByTranslations = model.SearchByTranslations;
                 list.Filter_Years = model.Filter_Years;
                 list.Filter_Runtimes = model.Filter_Runtimes;
-                list.Filter_Ratings = model.Filter_Ratings;
+                list.Filter_Ratings_Trakt = model.Filter_Ratings_Trakt;
+                list.Filter_Ratings_IMDb = model.Filter_Ratings_IMDb;
                 list.Filter_Genres = new GenresCommonFilter(model.Filter_Genres);
                 list.Filter_Languages = new LanguagesCommonFilter(model.Filter_Languages);
                 list.Filter_Translations = new TranslationsBasicFilter(model.Filter_Translations);

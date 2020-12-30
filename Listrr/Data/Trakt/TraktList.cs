@@ -1,7 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Listrr.API.Trakt.Models.Filters;
 
-using Listrr.API.Trakt.Models.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using Newtonsoft.Json;
+
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Listrr.Data.Trakt
 {
@@ -79,7 +84,9 @@ namespace Listrr.Data.Trakt
 
         public RuntimesCommonFilter Filter_Runtimes { get; set; }
 
-        public RatingsCommonFilter Filter_Ratings { get; set; }
+        public RatingsCommonFilter Filter_Ratings_Trakt { get; set; }
+
+        public RatingsCommonFilter Filter_Ratings_IMDb { get; set; }
 
         public LanguagesCommonFilter Filter_Languages { get; set; }
 
@@ -167,17 +174,20 @@ namespace Listrr.Data.Trakt
                     if (Filter_Networks?.Networks != null)
                         result += $"Networks: {string.Join(", ", Filter_Networks?.Networks)}\r\n";
 
-                    if (Filter_Ratings != null)
-                        result += $"Min rating: {Filter_Ratings?.From}\r\n";
-                    if (Filter_Ratings != null)
-                        result += $"Max rating: {Filter_Ratings?.To}\r\n";
-                    if (Filter_Ratings != null)
-                        result += $"Min votes: {Filter_Ratings?.Votes}\r\n";
+                    if (Filter_Ratings_Trakt != null)
+                    {
+                        result += $"Trakt ratings: Between {Filter_Ratings_Trakt?.From} and {Filter_Ratings_Trakt?.To} with at least {Filter_Ratings_Trakt?.Votes}\r\n";
+                    }
+
+                    if (Filter_Ratings_IMDb != null)
+                    {
+                        result += $"IMDb ratings: Between {Filter_Ratings_IMDb?.From} and {Filter_Ratings_IMDb?.To} with at least {Filter_Ratings_IMDb?.Votes}\r\n";
+                    }
 
                     if (Filter_Runtimes != null)
-                        result += $"Min runtime: {Filter_Runtimes?.From}\r\n";
-                    if (Filter_Runtimes != null)
-                        result += $"Max runtime: {Filter_Runtimes?.To}\r\n";
+                    {
+                        result += $"Rumtime: Between {Filter_Runtimes?.From} and {Filter_Runtimes?.To} minutes\r\n";
+                    }
 
                     if (Filter_Status?.Status != null)
                         result += $"States: {string.Join(", ", Filter_Status?.Status)}\r\n";
@@ -186,10 +196,9 @@ namespace Listrr.Data.Trakt
                         result += $"Translations: {string.Join(", ", Filter_Translations?.Translations)}\r\n";
 
                     if (Filter_Years != null)
-                        result += $"Min year: {Filter_Years?.From}\r\n";
-                    if (Filter_Years != null)
-                        result += $"Max year: {Filter_Years?.To}\r\n";
-
+                    {
+                        result += $"Years: Between {Filter_Years?.From} and {Filter_Years?.To}\r\n";
+                    }
 
                     if (ReverseFilter_Certifications_Movie?.Certifications != null ||
                         ReverseFilter_Certifications_Show?.Certifications != null ||
@@ -251,5 +260,164 @@ namespace Listrr.Data.Trakt
             return result;
         }
 
+    }
+
+    public class TraktListConfiguration : IEntityTypeConfiguration<TraktList>
+    {
+        public void Configure(EntityTypeBuilder<TraktList> builder)
+        {
+            builder
+                .HasIndex(x => new { x.Slug, x.Name })
+                .IsUnique();
+
+            builder
+                .HasOne<User>(x => x.Owner)
+                .WithMany(x => x.TraktLists)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .Property(x => x.ScanState)
+                .HasDefaultValue(ScanState.None);
+
+            builder
+                .Property(x => x.Filter_Countries)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CountriesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Certifications_Movie)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Certifications_Show)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Networks)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Status)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Genres)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<GenresCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Languages)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<LanguagesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Ratings_Trakt)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RatingsCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Ratings_IMDb)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RatingsCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Runtimes)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RuntimesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Years)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<YearsCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Translations)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
+                );
+            // Reverse filters
+            builder
+                .Property(x => x.ReverseFilter_Certifications_Movie)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Certifications_Show)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Countries)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CountriesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Genres)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<GenresCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Languages)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<LanguagesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Networks)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Status)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Translations)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
+                );
+        }
     }
 }

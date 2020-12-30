@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Data;
 using Listrr.Repositories;
 using Listrr.Services;
+
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -22,7 +23,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             var list = await _traktRepository.GetNextForUpdate(UserLevel.User);
             if (list != null)

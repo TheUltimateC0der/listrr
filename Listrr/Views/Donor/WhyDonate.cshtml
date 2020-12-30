@@ -30,6 +30,7 @@
                     <th scope="col">Update on edit</th>
                     <th scope="col">Update manual</th>
                     <th scope="col">Exclusion filters</th>
+                    <th scope="col">IMDb ratings</th>
                     <th scope="col">Create lists from names</th>
                     <th scope="col">High prio queue</th>
                 </tr>
@@ -43,6 +44,7 @@
                         <td>@(userLimitConfig.UpdateAfterEdit ? "Yes" : "No")</td>
                         <td>@(userLimitConfig.UpdateManual ? "Yes" : "No")</td>
                         <td>@(userLimitConfig.ExclusionFilters ? "Yes" : "No")</td>
+                        <td>@(userLimitConfig.IMDbRatings ? "Yes" : "No")</td>
                         <td>@(userLimitConfig.ListsFromNames ? "Yes" : "No")</td>
                         <td>@(userLimitConfig.QueueName == "donor" ? "Yes" : "No")</td>
                     </tr>
@@ -56,6 +58,7 @@
                         <td>@(limitConfig.UpdateAfterEdit ? "Yes" : "No")</td>
                         <td>@(limitConfig.UpdateManual ? "Yes" : "No")</td>
                         <td>@(limitConfig.ExclusionFilters ? "Yes" : "No")</td>
+                        <td>@(limitConfig.IMDbRatings ? "Yes" : "No")</td>
                         <td>@(limitConfig.ListsFromNames ? "Yes" : "No")</td>
                         <td>@(limitConfig.QueueName == "donor" ? "Yes" : "No")</td>
                     </tr>

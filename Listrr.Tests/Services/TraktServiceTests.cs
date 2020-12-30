@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Listrr.Configuration;
+﻿using Listrr.Configuration;
 using Listrr.Data;
+using Listrr.Repositories;
 using Listrr.Services;
 using Listrr.Tests.Helpers;
 
@@ -10,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 using Moq;
+
+using System;
+using System.Collections.Generic;
 
 using Xunit;
 
@@ -19,12 +20,12 @@ namespace Listrr.Tests.Services
     {
         [Theory]
         [MemberData(nameof(NullParameterData))]
-        public void CreateTraktServiceWithNullParametersThowsNullReferenceException(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
+        public void CreateTraktServiceWithNullParametersThowsNullReferenceException(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration, IUserLimitService userLimitService, IIMDbRepository imDbRepository)
         {
             // Arrange
             // Act
             // Assert
-            Assert.Throws<ArgumentNullException>(() => { new TraktService(userManager, httpContextAccessor, traktApiConfiguration); });
+            Assert.Throws<ArgumentNullException>(() => { new TraktService(userManager, httpContextAccessor, traktApiConfiguration, userLimitService, imDbRepository); });
         }
 
         [Fact]
@@ -34,9 +35,11 @@ namespace Listrr.Tests.Services
             var userManagerMock = UserManagerHelpers.MockUserManager<User>();
             var httpContextAccessorMock = Mock.Of<IHttpContextAccessor>();
             var traktApiConfigurationMock = Mock.Of<TraktAPIConfiguration>();
+            var userLimitServiceMock = Mock.Of<IUserLimitService>();
+            var imdbRespositoryeMock = Mock.Of<IIMDbRepository>();
 
             // Act
-            var traktService = new TraktService(userManagerMock.Object, httpContextAccessorMock, traktApiConfigurationMock);
+            var traktService = new TraktService(userManagerMock.Object, httpContextAccessorMock, traktApiConfigurationMock, userLimitServiceMock, imdbRespositoryeMock);
 
             // Assert
             Assert.NotNull(traktService);
@@ -49,9 +52,11 @@ namespace Listrr.Tests.Services
             var userManagerMock = UserManagerHelpers.MockUserManager<User>();
             var httpContextAccessorMock = Mock.Of<IHttpContextAccessor>();
             var traktApiConfigurationMock = Mock.Of<TraktAPIConfiguration>();
+            var userLimitServiceMock = Mock.Of<IUserLimitService>();
+            var imdbRespositoryeMock = Mock.Of<IIMDbRepository>();
 
             // Act
-            var traktService = new TraktService(userManagerMock.Object, httpContextAccessorMock, traktApiConfigurationMock);
+            var traktService = new TraktService(userManagerMock.Object, httpContextAccessorMock, traktApiConfigurationMock, userLimitServiceMock, imdbRespositoryeMock);
 
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(async () => { await traktService.Create(null); });
@@ -60,9 +65,11 @@ namespace Listrr.Tests.Services
 
         public static IEnumerable<object[]> NullParameterData()
         {
-            yield return new object[] { null, Mock.Of<HttpContextAccessor>(), Mock.Of<TraktAPIConfiguration>() };
-            yield return new object[] { UserManagerHelpers.TestUserManager<User>(), null, Mock.Of<TraktAPIConfiguration>() };
-            yield return new object[] { UserManagerHelpers.TestUserManager<User>(), Mock.Of<HttpContextAccessor>(), null };
+            yield return new object[] { null, Mock.Of<HttpContextAccessor>(), Mock.Of<TraktAPIConfiguration>(), Mock.Of<IUserLimitService>(), Mock.Of<IIMDbRepository>() };
+            yield return new object[] { UserManagerHelpers.TestUserManager<User>(), null, Mock.Of<TraktAPIConfiguration>(), Mock.Of<IUserLimitService>(), Mock.Of<IIMDbRepository>() };
+            yield return new object[] { UserManagerHelpers.TestUserManager<User>(), Mock.Of<HttpContextAccessor>(), null, Mock.Of<IUserLimitService>(), Mock.Of<IIMDbRepository>() };
+            yield return new object[] { UserManagerHelpers.TestUserManager<User>(), Mock.Of<HttpContextAccessor>(), Mock.Of<TraktAPIConfiguration>(), null, Mock.Of<IIMDbRepository>() };
+            yield return new object[] { UserManagerHelpers.TestUserManager<User>(), Mock.Of<HttpContextAccessor>(), Mock.Of<TraktAPIConfiguration>(), Mock.Of<IUserLimitService>(), null };
         }
     }
 }

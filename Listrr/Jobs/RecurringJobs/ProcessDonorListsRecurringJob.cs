@@ -1,12 +1,13 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Repositories;
 using Listrr.Services;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -26,7 +27,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             foreach (var limitConfiguration in _limitConfigurationList.LimitConfigurations.Where(x => x.Level != UserLevel.User))
             {

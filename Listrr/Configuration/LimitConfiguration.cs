@@ -12,5 +12,6 @@ namespace Listrr.Configuration
         public bool ListsFromNames { get; set; }
         public string QueueName { get; set; }
         public UserLevel Level { get; set; }
+        public bool IMDbRatings { get; set; }
     }
 }

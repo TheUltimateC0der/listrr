@@ -7,6 +7,7 @@ using HangfireBasicAuthenticationFilter;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Jobs.RecurringJobs;
+using Listrr.Jobs.RecurringJobs.IMDb;
 using Listrr.Repositories;
 using Listrr.Services;
 
@@ -59,6 +60,10 @@ namespace Listrr
             var githubApiConfiguration = new GithubAPIConfiguration();
             Configuration.Bind("GitHub", githubApiConfiguration);
             services.AddSingleton(githubApiConfiguration);
+
+            var discordApiConfiguration = new DiscordAPIConfiguration();
+            Configuration.Bind("Discord", discordApiConfiguration);
+            services.AddSingleton(discordApiConfiguration);
 
             var limitConfigurationList = new LimitConfigurationList();
             Configuration.Bind("LimitConfig", limitConfigurationList);
@@ -147,6 +152,23 @@ namespace Listrr
                         ctx.Properties.StoreTokens(tokens);
                         return Task.CompletedTask;
                     };
+                })
+                .AddDiscord(options =>
+                {
+                    options.ClientId = discordApiConfiguration.ClientId;
+                    options.ClientSecret = discordApiConfiguration.ClientSecret;
+                    options.SaveTokens = true;
+                    options.Events.OnCreatingTicket = ctx =>
+                    {
+                        List<AuthenticationToken> tokens = ctx.Properties.GetTokens() as List<AuthenticationToken>;
+                        tokens.Add(new AuthenticationToken()
+                        {
+                            Name = "TicketCreated",
+                            Value = DateTime.Now.ToString()
+                        });
+                        ctx.Properties.StoreTokens(tokens);
+                        return Task.CompletedTask;
+                    };
                 });
 
             services.ConfigureApplicationCookie(options =>
@@ -177,6 +199,8 @@ namespace Listrr
             services.AddScoped<ITraktCodeRepository, TraktCodeRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITraktService, TraktService>();
+            services.AddScoped<IIMDbRepository, IMDbRepository>();
+            services.AddScoped<IUserLimitService, UserLimitService>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -269,21 +293,23 @@ namespace Listrr
                 } }
             });
 
-            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>(x => x.Execute(), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieCertificationsRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowCertificationsRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetMovieGenresRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowGenresRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetCountryCodesRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetLanguageCodesRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowNetworksRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<GetShowStatusRecurringJob>(x => x.Execute(null), Cron.Daily);
 
-            RecurringJob.AddOrUpdate<ProcessDonorListsRecurringJob>(x => x.Execute(), Cron.Daily);
-            RecurringJob.AddOrUpdate<ProcessUserListsRecurringJob>(x => x.Execute(), Cron.Never);
-            RecurringJob.AddOrUpdate<UpdateAllListsRecurringJob>(x => x.Execute(), Cron.Never);
+            RecurringJob.AddOrUpdate<ProcessDonorListsRecurringJob>(x => x.Execute(null), Cron.Daily);
+            RecurringJob.AddOrUpdate<ProcessUserListsRecurringJob>(x => x.Execute(null), Cron.Never);
+            RecurringJob.AddOrUpdate<UpdateAllListsRecurringJob>(x => x.Execute(null), Cron.Never);
 
-            RecurringJob.AddOrUpdate<EnforceListLimitRecurringJob>(x => x.Execute(), "*/5 * * * *");
-            RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(), "*/5 * * * *");
+            RecurringJob.AddOrUpdate<EnforceListLimitRecurringJob>(x => x.Execute(null), "*/5 * * * *");
+            RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(null), "*/5 * * * *");
+
+            RecurringJob.AddOrUpdate<IMDbRatingsRecurringJob>(x => x.Execute(null), "0 3 * * *");
 
             //BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(XXXXXXXXX, null, false, false));
 

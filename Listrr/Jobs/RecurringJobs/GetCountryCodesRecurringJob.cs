@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Hangfire;
+using Hangfire.Server;
+
+using Listrr.Data;
+using Listrr.Repositories;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Hangfire;
-
-using Listrr.Data;
-using Listrr.Repositories;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -23,7 +24,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             var countries = new List<RegionInfo>();
             foreach (var culture in CultureInfo.GetCultures(CultureTypes.SpecificCultures))

@@ -262,3 +262,5 @@ __pycache__/
 *.pubxml
 
 appsettings.Development.json
+/Listrr/title.ratings.tsv
+/Listrr/title.ratings.tsv.gz

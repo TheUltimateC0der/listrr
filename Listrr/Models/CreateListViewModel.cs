@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.API.Trakt.Models.Filters;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
+
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Listrr.Models
 {
@@ -15,7 +15,7 @@ namespace Listrr.Models
 
         [Display(Name = "Create another?", Prompt = "Create another?")]
         public bool CreateAnother { get; set; }
-        
+
         [Display(Name = "Search query", Prompt = "Search query")]
         public string Query { get; set; }
 
@@ -44,7 +44,7 @@ namespace Listrr.Models
 
         [Display(Name = "Search by title", Prompt = "Search by title")]
         public bool SearchByTitle { get; set; }
-        
+
         [Display(Name = "Search by translations", Prompt = "Search by translations")]
         public bool SearchByTranslations { get; set; }
 
@@ -63,8 +63,11 @@ namespace Listrr.Models
         [Display(Name = "Runtime", Prompt = "30-200")]
         public RuntimesCommonFilter Filter_Runtimes { get; set; }
 
-        [Display(Name = "Rating", Prompt = "0-10 or 5")]
-        public RatingsCommonFilter Filter_Ratings { get; set; }
+        [Display(Name = "Trakt Rating", Prompt = "0-10 or 5")]
+        public RatingsCommonFilter Filter_Ratings_Trakt { get; set; }
+
+        [Display(Name = "IMDb Rating", Prompt = "0-10 or 5")]
+        public RatingsCommonFilter Filter_Ratings_IMDb { get; set; }
 
         [Display(Name = "Languages", Prompt = "en,de,ru")]
         public IEnumerable<string> Filter_Languages { get; set; }
