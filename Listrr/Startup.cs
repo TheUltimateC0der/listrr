@@ -7,6 +7,7 @@ using HangfireBasicAuthenticationFilter;
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Jobs.RecurringJobs;
+using Listrr.Jobs.RecurringJobs.IMDb;
 using Listrr.Repositories;
 using Listrr.Services;
 
@@ -59,6 +60,10 @@ namespace Listrr
             var githubApiConfiguration = new GithubAPIConfiguration();
             Configuration.Bind("GitHub", githubApiConfiguration);
             services.AddSingleton(githubApiConfiguration);
+
+            var discordApiConfiguration = new DiscordAPIConfiguration();
+            Configuration.Bind("Discord", discordApiConfiguration);
+            services.AddSingleton(discordApiConfiguration);
 
             var limitConfigurationList = new LimitConfigurationList();
             Configuration.Bind("LimitConfig", limitConfigurationList);
@@ -147,6 +152,23 @@ namespace Listrr
                         ctx.Properties.StoreTokens(tokens);
                         return Task.CompletedTask;
                     };
+                })
+                .AddDiscord(options =>
+                {
+                    options.ClientId = discordApiConfiguration.ClientId;
+                    options.ClientSecret = discordApiConfiguration.ClientSecret;
+                    options.SaveTokens = true;
+                    options.Events.OnCreatingTicket = ctx =>
+                    {
+                        List<AuthenticationToken> tokens = ctx.Properties.GetTokens() as List<AuthenticationToken>;
+                        tokens.Add(new AuthenticationToken()
+                        {
+                            Name = "TicketCreated",
+                            Value = DateTime.Now.ToString()
+                        });
+                        ctx.Properties.StoreTokens(tokens);
+                        return Task.CompletedTask;
+                    };
                 });
 
             services.ConfigureApplicationCookie(options =>
@@ -177,6 +199,7 @@ namespace Listrr
             services.AddScoped<ITraktCodeRepository, TraktCodeRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITraktService, TraktService>();
+            services.AddScoped<IIMDbRepository, IMDbRepository>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -284,6 +307,8 @@ namespace Listrr
 
             RecurringJob.AddOrUpdate<EnforceListLimitRecurringJob>(x => x.Execute(), "*/5 * * * *");
             RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(), "*/5 * * * *");
+
+            RecurringJob.AddOrUpdate<IMDbRatingsRecurringJob>(x => x.Execute(), "0 3 * * *");
 
             //BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(XXXXXXXXX, null, false, false));
 

@@ -1,7 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Listrr.API.Trakt.Models.Filters;
 
-using Listrr.API.Trakt.Models.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using Newtonsoft.Json;
+
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Listrr.Data.Trakt
 {
@@ -251,5 +256,157 @@ namespace Listrr.Data.Trakt
             return result;
         }
 
+    }
+
+    public class TraktListConfiguration : IEntityTypeConfiguration<TraktList>
+    {
+        public void Configure(EntityTypeBuilder<TraktList> builder)
+        {
+            builder
+                .HasIndex(x => new { x.Slug, x.Name })
+                .IsUnique();
+
+            builder
+                .HasOne<User>(x => x.Owner)
+                .WithMany(x => x.TraktLists)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .Property(x => x.ScanState)
+                .HasDefaultValue(ScanState.None);
+
+            builder
+                .Property(x => x.Filter_Countries)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CountriesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Certifications_Movie)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Certifications_Show)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Networks)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Status)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Genres)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<GenresCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Languages)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<LanguagesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Ratings)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RatingsCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Runtimes)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<RuntimesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Years)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<YearsCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.Filter_Translations)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
+                );
+            // Reverse filters
+            builder
+                .Property(x => x.ReverseFilter_Certifications_Movie)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Certifications_Show)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Countries)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<CountriesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Genres)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<GenresCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Languages)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<LanguagesCommonFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Networks)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Status)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ReverseFilter_Translations)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
+                );
+        }
     }
 }
