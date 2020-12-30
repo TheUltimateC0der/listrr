@@ -1,13 +1,13 @@
 ﻿@model CreateShowListFileViewModel
 @inject UserManager<User> userManager
-@inject LimitConfigurationList LimitConfigurationList
+@inject IUserLimitService UserLimitService
 
 @{
     ViewData["Title"] = "Show list";
     ViewData["Message"] = "Create a new list for shows from a list of show names";
 
     var user = await userManager.GetUserAsync(User);
-    var userLimitConfiguration = LimitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
+    var userLimitConfiguration = UserLimitService.Get(user.Level);
 }
 
 <partial name="_LimitNotification" />

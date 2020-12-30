@@ -1,13 +1,13 @@
 ﻿@model CreateMovieListFileViewModel
 @inject UserManager<User> userManager
-@inject LimitConfigurationList LimitConfigurationList
+@inject IUserLimitService UserLimitService
 
 @{
     ViewData["Title"] = "Movie list";
     ViewData["Message"] = "Create a new list for movies from a list of movie names";
 
     var user = await userManager.GetUserAsync(User);
-    var userLimitConfiguration = LimitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
+    var userLimitConfiguration = UserLimitService.Get(user.Level);
 }
 
 <partial name="_LimitNotification" />

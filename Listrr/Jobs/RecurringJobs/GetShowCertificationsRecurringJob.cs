@@ -1,11 +1,12 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Configuration;
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 using TraktNet;
 
@@ -29,7 +30,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             var result = await _traktClient.Certifications.GetShowCertificationsAsync();
 

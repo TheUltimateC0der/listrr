@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Data.Trakt;
 using Listrr.Repositories;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -21,7 +22,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             var result = new List<string>
             {

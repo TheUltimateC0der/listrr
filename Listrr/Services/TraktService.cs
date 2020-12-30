@@ -3,6 +3,7 @@ using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
 using Listrr.Exceptions;
+using Listrr.Repositories;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -30,14 +31,18 @@ namespace Listrr.Services
         private readonly TraktClient _traktClient;
         private readonly UserManager<User> _userManager;
         private readonly TraktAPIConfiguration _traktApiConfiguration;
+        private readonly IUserLimitService _userLimitService;
+        private readonly IIMDbRepository _imDbRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-        public TraktService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration)
+        public TraktService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, TraktAPIConfiguration traktApiConfiguration, IUserLimitService userLimitService, IIMDbRepository imDbRepository)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _traktApiConfiguration = traktApiConfiguration ?? throw new ArgumentNullException(nameof(traktApiConfiguration));
+            _userLimitService = userLimitService ?? throw new ArgumentNullException(nameof(userLimitService));
+            _imDbRepository = imDbRepository ?? throw new ArgumentNullException(nameof(imDbRepository));
 
             _traktClient = new TraktClient(_traktApiConfiguration.ClientId, traktApiConfiguration.ClientSecret);
         }
@@ -154,8 +159,8 @@ namespace Listrr.Services
                             model.Filter_Runtimes.To
                         ),
                         new Range<int>(
-                            model.Filter_Ratings.From,
-                            model.Filter_Ratings.To
+                            model.Filter_Ratings_Trakt.From,
+                            model.Filter_Ratings_Trakt.To
                         )
                     ), new TraktExtendedInfo().SetFull(),
                     new TraktPagedParameters(page, _traktApiConfiguration.FetchLimitSearch)
@@ -163,31 +168,69 @@ namespace Listrr.Services
 
                 if (!result.IsSuccess) throw result.Exception;
 
+                var userLimits = _userLimitService.Get(model.Owner.Level);
+
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (traktSearchResult.Movie?.Votes != null && model.Filter_Ratings.Votes > 0)
-                        if (!(traktSearchResult.Movie.Votes >= model.Filter_Ratings.Votes))
+                    if (traktSearchResult.Movie?.Votes != null && model.Filter_Ratings_Trakt.Votes > 0)
+                        if (!(traktSearchResult.Movie.Votes >= model.Filter_Ratings_Trakt.Votes))
                             continue;
 
-                    if (model.ReverseFilter_Certifications_Movie?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
-                        if (model.ReverseFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
-                            continue;
+                    if (userLimits.ExclusionFilters)
+                    {
+                        if (model.ReverseFilter_Certifications_Movie?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
+                            if (model.ReverseFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
+                                continue;
 
-                    if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
-                        if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
-                            continue;
+                        if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
+                            if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
+                                continue;
 
-                    if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Movie.Genres != null)
-                        if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
-                            continue;
+                        if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Movie.Genres != null)
+                            if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
+                                continue;
 
-                    if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
-                        if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
-                            continue;
+                        if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
+                            if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
+                                continue;
 
-                    if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
-                        if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
-                            continue;
+                        if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
+                            if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
+                                continue;
+                    }
+
+                    if (userLimits.IMDbRatings)
+                    {
+                        if (model.Filter_Ratings_IMDb != null)
+                        {
+                            if (!string.IsNullOrEmpty(traktSearchResult.Movie.Ids.Imdb))
+                            {
+                                var imdbRating = await _imDbRepository.Get(traktSearchResult.Movie.Ids.Imdb);
+                                if (imdbRating != null)
+                                {
+                                    if (model.Filter_Ratings_IMDb.Votes > 0)
+                                        if (!(imdbRating.Votes >= model.Filter_Ratings_IMDb.Votes))
+                                            continue;
+
+                                    if (model.Filter_Ratings_IMDb.From > 0)
+                                        if (!(imdbRating.Rating >= model.Filter_Ratings_IMDb.From))
+                                            continue;
+
+                                    if (model.Filter_Ratings_IMDb.To > 0)
+                                        if (!(imdbRating.Rating <= model.Filter_Ratings_IMDb.To))
+                                            continue;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                    }
 
                     if (!list.Contains(traktSearchResult.Movie, new TraktMovieComparer()))
                         list.Add(traktSearchResult.Movie);
@@ -459,8 +502,8 @@ namespace Listrr.Services
                             model.Filter_Runtimes.To
                         ),
                         new Range<int>(
-                            model.Filter_Ratings.From,
-                            model.Filter_Ratings.To
+                            model.Filter_Ratings_Trakt.From,
+                            model.Filter_Ratings_Trakt.To
                         ),
                         model.Filter_Certifications_Show.Certifications,
                         model.Filter_Networks.Networks,
@@ -472,40 +515,77 @@ namespace Listrr.Services
 
                 if (!result.IsSuccess) throw result.Exception;
 
+                var userLimits = _userLimitService.Get(model.Owner.Level);
+
                 foreach (var traktSearchResult in result.Value)
                 {
-                    if (traktSearchResult.Show?.Votes != null && model.Filter_Ratings.Votes > 0)
-                        if (!(traktSearchResult.Show.Votes >= model.Filter_Ratings.Votes))
+                    if (traktSearchResult.Show?.Votes != null && model.Filter_Ratings_Trakt.Votes > 0)
+                        if (!(traktSearchResult.Show.Votes >= model.Filter_Ratings_Trakt.Votes))
                             continue;
 
-                    if (model.ReverseFilter_Certifications_Show?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
-                        if (model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
-                            continue;
+                    if (userLimits.ExclusionFilters)
+                    {
+                        if (model.ReverseFilter_Certifications_Show?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
+                            if (model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
+                                continue;
 
-                    if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
-                        if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
-                            continue;
+                        if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
+                            if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
+                                continue;
 
-                    if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Show.Genres != null)
-                        if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
-                            continue;
+                        if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Show.Genres != null)
+                            if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
+                                continue;
 
-                    if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
-                        if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
-                            continue;
+                        if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
+                            if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
+                                continue;
 
-                    if (model.ReverseFilter_Networks?.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
-                        if (model.ReverseFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
-                            continue;
+                        if (model.ReverseFilter_Networks?.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
+                            if (model.ReverseFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
+                                continue;
 
-                    if (model.ReverseFilter_Status?.Status != null && traktSearchResult.Show.Status != null)
-                        if (model.ReverseFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
-                            continue;
+                        if (model.ReverseFilter_Status?.Status != null && traktSearchResult.Show.Status != null)
+                            if (model.ReverseFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
+                                continue;
 
-                    if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
-                        if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
-                            continue;
+                        if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
+                            if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
+                                continue;
+                    }
 
+                    if (userLimits.IMDbRatings)
+                    {
+                        if (model.Filter_Ratings_IMDb != null)
+                        {
+                            if (!string.IsNullOrEmpty(traktSearchResult.Show.Ids.Imdb))
+                            {
+                                var imdbRating = await _imDbRepository.Get(traktSearchResult.Show.Ids.Imdb);
+                                if (imdbRating != null)
+                                {
+                                    if (model.Filter_Ratings_IMDb.Votes > 0)
+                                        if (!(imdbRating.Votes >= model.Filter_Ratings_IMDb.Votes))
+                                            continue;
+
+                                    if (model.Filter_Ratings_IMDb.From > 0)
+                                        if (!(imdbRating.Rating >= model.Filter_Ratings_IMDb.From))
+                                            continue;
+
+                                    if (model.Filter_Ratings_IMDb.To > 0)
+                                        if (!(imdbRating.Rating <= model.Filter_Ratings_IMDb.To))
+                                            continue;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                    }
 
                     if (!list.Contains(traktSearchResult.Show, new TraktShowComparer()))
                         list.Add(traktSearchResult.Show);

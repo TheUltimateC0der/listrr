@@ -7,7 +7,7 @@ namespace Listrr.Data.IMDb
     {
         public string IMDbId { get; set; }
 
-        public float Rating { get; set; }
+        public int Rating { get; set; }
 
         public int Votes { get; set; }
 

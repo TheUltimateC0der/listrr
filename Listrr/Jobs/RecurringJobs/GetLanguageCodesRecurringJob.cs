@@ -1,10 +1,11 @@
-﻿using System.Globalization;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Data;
 using Listrr.Repositories;
+
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -20,7 +21,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
             {

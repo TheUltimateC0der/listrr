@@ -1,13 +1,14 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Services;
 
 using Microsoft.EntityFrameworkCore;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -26,7 +27,7 @@ namespace Listrr.Jobs.RecurringJobs
             _userMappingConfigurationList = userMappingConfigurationList;
         }
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             var newDonors = await _gitHubGraphService.GetDonor();
             var currentDonors = await _appDbContext.Users.Where(x => x.Level != UserLevel.User).ToListAsync();
@@ -43,7 +44,7 @@ namespace Listrr.Jobs.RecurringJobs
 
                 await _appDbContext.SaveChangesAsync();
             }
-            
+
             //Activate donors
             foreach (var newDonor in newDonors)
             {

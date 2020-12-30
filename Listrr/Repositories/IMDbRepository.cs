@@ -3,6 +3,7 @@ using Listrr.Data.IMDb;
 
 using Microsoft.EntityFrameworkCore;
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Listrr.Repositories
@@ -28,6 +29,13 @@ namespace Listrr.Repositories
             await _appDbContext.SaveChangesAsync();
 
             return result.Entity;
+        }
+
+        public async Task Create(IEnumerable<IMDbRating> models)
+        {
+            await _appDbContext.ImDbRatings.AddRangeAsync(models);
+
+            await _appDbContext.SaveChangesAsync();
         }
 
         public async Task<IMDbRating> Update(IMDbRating model)

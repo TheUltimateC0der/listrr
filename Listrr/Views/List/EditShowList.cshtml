@@ -1,5 +1,6 @@
 ﻿@model EditShowListViewModel
 @inject UserManager<User> userManager
+@inject IUserLimitService UserLimitService
 
 @{
     ViewData["Title"] = "Show list";
@@ -146,22 +147,22 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Between</span>
                                     </div>
-                                    <input asp-for="Filter_Ratings.From" class="form-control" />
+                                    <input asp-for="Filter_Ratings_Trakt.From" class="form-control" />
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="border-left: 0; border-right: 0;">and</span>
                                     </div>
-                                    <input asp-for="Filter_Ratings.To" class="form-control" />
+                                    <input asp-for="Filter_Ratings_Trakt.To" class="form-control" />
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" style="border-left: 0; border-right: 0;">with at least</span>
                                     </div>
-                                    <input asp-for="Filter_Ratings.Votes" class="form-control" />
+                                    <input asp-for="Filter_Ratings_Trakt.Votes" class="form-control" />
                                     <div class="input-group-append">
                                         <span class="input-group-text" style="border-left: 0;">votes</span>
                                     </div>
                                 </div>
                                 <small class="form-text text-muted">Ratings filter e.g. <code>75-100</code> for a rating between 75-100</small>
-                                <span asp-validation-for="Filter_Ratings.From" class="text-danger"></span>
-                                <span asp-validation-for="Filter_Ratings.To" class="text-danger"></span>
+                                <span asp-validation-for="Filter_Ratings_Trakt.From" class="text-danger"></span>
+                                <span asp-validation-for="Filter_Ratings_Trakt.To" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
@@ -196,12 +197,59 @@
 
             <div class="card">
                 <div class="card-body">
+                    <h5 class="card-title">IMDb filters</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">CPU heavy filters for extensive filtering by using IMDb data</h6>
+
+                    <hr />
+
+                    @if (UserLimitService.Get((await userManager.GetUserAsync(User)).Level).IMDbRatings)
+                    {
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="input-group mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Between</span>
+                                        </div>
+                                        <input asp-for="Filter_Ratings_IMDb.From" class="form-control" />
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" style="border-left: 0; border-right: 0;">and</span>
+                                        </div>
+                                        <input asp-for="Filter_Ratings_IMDb.To" class="form-control" />
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" style="border-left: 0; border-right: 0;">with at least</span>
+                                        </div>
+                                        <input asp-for="Filter_Ratings_IMDb.Votes" class="form-control" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" style="border-left: 0;">votes</span>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Ratings filter e.g. <code>75-100</code> for a rating between 75-100</small>
+                                    <span asp-validation-for="Filter_Ratings_IMDb.From" class="text-danger"></span>
+                                    <span asp-validation-for="Filter_Ratings_IMDb.To" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @await Html.PartialAsync("_DonorPerkExplanationPartial")
+
+                        @await Html.PartialAsync("_ReverseFiltersExplanationPartial")
+                    }
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="card">
+                <div class="card-body">
                     <h5 class="card-title">Exclusion filters</h5>
                     <h6 class="card-subtitle mb-2 text-muted">CPU heavy filters for extensive filtering</h6>
 
                     <hr />
 
-                    @if ((await userManager.GetUserAsync(User)).IsDonor)
+                    @if (UserLimitService.Get((await userManager.GetUserAsync(User)).Level).ExclusionFilters)
                     {
                         <div class="row">
                             <div class="col-md-6">

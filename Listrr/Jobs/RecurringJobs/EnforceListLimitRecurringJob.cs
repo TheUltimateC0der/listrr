@@ -1,10 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Hangfire;
+﻿using Hangfire;
+using Hangfire.Server;
 
 using Listrr.Configuration;
 using Listrr.Repositories;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Jobs.RecurringJobs
 {
@@ -13,7 +14,7 @@ namespace Listrr.Jobs.RecurringJobs
     {
         private readonly IUserRepository _userRepository;
         private readonly ITraktListRepository _traktRepository;
-        
+
         private readonly LimitConfigurationList _limitConfigurationList;
 
         public EnforceListLimitRecurringJob(LimitConfigurationList limitConfigurationList, IUserRepository userRepository, ITraktListRepository traktRepository)
@@ -24,7 +25,7 @@ namespace Listrr.Jobs.RecurringJobs
         }
 
 
-        public async Task Execute()
+        public async Task Execute(PerformContext context)
         {
             var users = await _userRepository.Get();
 
@@ -32,7 +33,7 @@ namespace Listrr.Jobs.RecurringJobs
             {
                 var limitConfig = _limitConfigurationList.LimitConfigurations.First(x => x.Level == user.Level);
                 var lists = await _traktRepository.Get(user);
-                
+
                 if (lists.Count > limitConfig.ListLimit)
                 {
                     foreach (var traktList in lists.Where(x => x.Process))

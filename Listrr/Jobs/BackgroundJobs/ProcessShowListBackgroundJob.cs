@@ -154,7 +154,7 @@ namespace Listrr.Jobs.BackgroundJobs
             }
 
             if (queueNext)
-                BackgroundJob.Schedule<ProcessUserListsRecurringJob>(x => x.Execute(), TimeSpan.FromSeconds(_traktApiConfiguration.DelayRequeue));
+                BackgroundJob.Schedule<ProcessUserListsRecurringJob>(x => x.Execute(null), TimeSpan.FromSeconds(_traktApiConfiguration.DelayRequeue));
         }
 
         [Queue("donor")]

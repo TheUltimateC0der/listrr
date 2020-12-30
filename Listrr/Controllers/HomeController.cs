@@ -1,12 +1,12 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-
-using Listrr.Configuration;
+﻿using Listrr.Configuration;
 using Listrr.Data.Trakt;
 using Listrr.Models;
 using Listrr.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
+
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Listrr.Controllers
 {
@@ -39,12 +39,12 @@ namespace Listrr.Controllers
 
             return View(new PaginationViewModel<TraktList>
             {
-                Items = lists, 
-                Pages = pageCount, 
+                Items = lists,
+                Pages = pageCount,
                 Page = id
             });
         }
-        
+
         public IActionResult Privacy()
         {
             return View();
