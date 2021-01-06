@@ -98,15 +98,17 @@ namespace Listrr.Data.Trakt
 
         #endregion
 
-        #region Reverse Common Filter
+        #region Exclusion Common Filter
 
-        public LanguagesCommonFilter ReverseFilter_Languages { get; set; }
+        public LanguagesCommonFilter ExclusionFilter_Languages { get; set; }
 
-        public GenresCommonFilter ReverseFilter_Genres { get; set; }
+        public GenresCommonFilter ExclusionFilter_Genres { get; set; }
 
-        public CountriesCommonFilter ReverseFilter_Countries { get; set; }
+        public CountriesCommonFilter ExclusionFilter_Countries { get; set; }
 
-        public TranslationsBasicFilter ReverseFilter_Translations { get; set; }
+        public TranslationsBasicFilter ExclusionFilter_Translations { get; set; }
+
+        public string[] ExclusionFilter_Keywords { get; set; }
 
         #endregion
 
@@ -117,9 +119,9 @@ namespace Listrr.Data.Trakt
 
         #endregion
 
-        #region Reverse Movie Filter
+        #region Exclusion Movie Filter
 
-        public CertificationsMovieFilter ReverseFilter_Certifications_Movie { get; set; }
+        public CertificationsMovieFilter ExclusionFilter_Certifications_Movie { get; set; }
 
         #endregion
 
@@ -134,13 +136,13 @@ namespace Listrr.Data.Trakt
 
         #endregion
 
-        #region Revsere Show Filter
+        #region Exclusion Show Filter
 
-        public CertificationsShowFilter ReverseFilter_Certifications_Show { get; set; }
+        public CertificationsShowFilter ExclusionFilter_Certifications_Show { get; set; }
 
-        public NetworksShowFilter ReverseFilter_Networks { get; set; }
+        public NetworksShowFilter ExclusionFilter_Networks { get; set; }
 
-        public StatusShowFilter ReverseFilter_Status { get; set; }
+        public StatusShowFilter ExclusionFilter_Status { get; set; }
 
         #endregion
 
@@ -200,40 +202,40 @@ namespace Listrr.Data.Trakt
                         result += $"Years: Between {Filter_Years?.From} and {Filter_Years?.To}\r\n";
                     }
 
-                    if (ReverseFilter_Certifications_Movie?.Certifications != null ||
-                        ReverseFilter_Certifications_Show?.Certifications != null ||
-                        ReverseFilter_Countries?.Languages != null ||
-                        ReverseFilter_Genres?.Genres != null ||
-                        ReverseFilter_Languages?.Languages != null ||
-                        ReverseFilter_Networks?.Networks != null ||
-                        ReverseFilter_Status?.Status != null ||
-                        ReverseFilter_Translations?.Translations != null)
-                        result += "\r\n\r\n\r\nReverse filters:\r\n";
+                    if (ExclusionFilter_Certifications_Movie?.Certifications != null ||
+                        ExclusionFilter_Certifications_Show?.Certifications != null ||
+                        ExclusionFilter_Countries?.Languages != null ||
+                        ExclusionFilter_Genres?.Genres != null ||
+                        ExclusionFilter_Languages?.Languages != null ||
+                        ExclusionFilter_Networks?.Networks != null ||
+                        ExclusionFilter_Status?.Status != null ||
+                        ExclusionFilter_Translations?.Translations != null)
+                        result += "\r\n\r\n\r\nExclusion filters:\r\n";
 
 
-                    if (ReverseFilter_Certifications_Movie?.Certifications != null)
-                        result += $"Certifications: {string.Join(", ", ReverseFilter_Certifications_Movie?.Certifications)}\r\n";
+                    if (ExclusionFilter_Certifications_Movie?.Certifications != null)
+                        result += $"Certifications: {string.Join(", ", ExclusionFilter_Certifications_Movie?.Certifications)}\r\n";
 
-                    if (ReverseFilter_Certifications_Show?.Certifications != null)
-                        result += $"Certifications: {string.Join(", ", ReverseFilter_Certifications_Show?.Certifications)}\r\n";
+                    if (ExclusionFilter_Certifications_Show?.Certifications != null)
+                        result += $"Certifications: {string.Join(", ", ExclusionFilter_Certifications_Show?.Certifications)}\r\n";
 
-                    if (ReverseFilter_Countries?.Languages != null)
-                        result += $"Countries: {string.Join(", ", ReverseFilter_Countries?.Languages)}\r\n";
+                    if (ExclusionFilter_Countries?.Languages != null)
+                        result += $"Countries: {string.Join(", ", ExclusionFilter_Countries?.Languages)}\r\n";
 
-                    if (ReverseFilter_Genres?.Genres != null)
-                        result += $"Genres: {string.Join(", ", ReverseFilter_Genres?.Genres)}\r\n";
+                    if (ExclusionFilter_Genres?.Genres != null)
+                        result += $"Genres: {string.Join(", ", ExclusionFilter_Genres?.Genres)}\r\n";
 
-                    if (ReverseFilter_Languages?.Languages != null)
-                        result += $"Languages: {string.Join(", ", ReverseFilter_Languages?.Languages)}\r\n";
+                    if (ExclusionFilter_Languages?.Languages != null)
+                        result += $"Languages: {string.Join(", ", ExclusionFilter_Languages?.Languages)}\r\n";
 
-                    if (ReverseFilter_Networks?.Networks != null)
-                        result += $"Networks: {string.Join(", ", ReverseFilter_Networks?.Networks)}\r\n";
+                    if (ExclusionFilter_Networks?.Networks != null)
+                        result += $"Networks: {string.Join(", ", ExclusionFilter_Networks?.Networks)}\r\n";
 
-                    if (ReverseFilter_Status?.Status != null)
-                        result += $"States: {string.Join(", ", ReverseFilter_Status?.Status)}\r\n";
+                    if (ExclusionFilter_Status?.Status != null)
+                        result += $"States: {string.Join(", ", ExclusionFilter_Status?.Status)}\r\n";
 
-                    if (ReverseFilter_Translations?.Translations != null)
-                        result += $"Translations: {string.Join(", ", ReverseFilter_Translations?.Translations)}\r\n";
+                    if (ExclusionFilter_Translations?.Translations != null)
+                        result += $"Translations: {string.Join(", ", ExclusionFilter_Translations?.Translations)}\r\n";
 
 
                     break;
@@ -364,59 +366,66 @@ namespace Listrr.Data.Trakt
                 );
             // Reverse filters
             builder
-                .Property(x => x.ReverseFilter_Certifications_Movie)
+                .Property(x => x.ExclusionFilter_Certifications_Movie)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<CertificationsMovieFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Certifications_Show)
+                .Property(x => x.ExclusionFilter_Certifications_Show)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<CertificationsShowFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Countries)
+                .Property(x => x.ExclusionFilter_Countries)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<CountriesCommonFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Genres)
+                .Property(x => x.ExclusionFilter_Genres)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<GenresCommonFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Languages)
+                .Property(x => x.ExclusionFilter_Languages)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<LanguagesCommonFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Networks)
+                .Property(x => x.ExclusionFilter_Networks)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<NetworksShowFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Status)
+                .Property(x => x.ExclusionFilter_Status)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<StatusShowFilter>(x)
                 );
 
             builder
-                .Property(x => x.ReverseFilter_Translations)
+                .Property(x => x.ExclusionFilter_Translations)
                 .HasConversion(
                     x => JsonConvert.SerializeObject(x),
                     x => JsonConvert.DeserializeObject<TranslationsBasicFilter>(x)
+                );
+
+            builder
+                .Property(x => x.ExclusionFilter_Keywords)
+                .HasConversion(
+                    x => JsonConvert.SerializeObject(x),
+                    x => JsonConvert.DeserializeObject<string[]>(x)
                 );
         }
     }
