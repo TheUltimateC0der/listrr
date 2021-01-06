@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Listrr.Models
 {
@@ -18,8 +18,8 @@ namespace Listrr.Models
         #region Reverse Common filter
 
         [Display(Name = "Genres", Prompt = "action,adventure")]
-        public IEnumerable<string> ReverseFilter_Genres { get; set; }
-        public MultiSelectList ReverseGenres { get; set; }
+        public IEnumerable<string> ExclusionFilter_Genres { get; set; }
+        public MultiSelectList ExclusionGenres { get; set; }
 
         #endregion
 
@@ -36,8 +36,8 @@ namespace Listrr.Models
         #region Reverse Movie filter
 
         [Display(Name = "Certifications", Prompt = "r,pg-13")]
-        public IEnumerable<string> ReverseFilter_Certifications { get; set; }
-        public MultiSelectList ReverseCertifications { get; set; }
+        public IEnumerable<string> ExclusionFilter_Certifications { get; set; }
+        public MultiSelectList ExclusionCertifications { get; set; }
 
         #endregion
 

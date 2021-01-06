@@ -178,25 +178,40 @@ namespace Listrr.Services
 
                     if (userLimits.ExclusionFilters)
                     {
-                        if (model.ReverseFilter_Certifications_Movie?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
-                            if (model.ReverseFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
+                        if (model.ExclusionFilter_Certifications_Movie?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Movie.Certification))
+                            if (model.ExclusionFilter_Certifications_Movie.Certifications.Contains(traktSearchResult.Movie.Certification))
                                 continue;
 
-                        if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
-                            if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
+                        if (model.ExclusionFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.CountryCode))
+                            if (model.ExclusionFilter_Countries.Languages.Contains(traktSearchResult.Movie.CountryCode))
                                 continue;
 
-                        if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Movie.Genres != null)
-                            if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
+                        if (model.ExclusionFilter_Genres?.Genres != null && traktSearchResult.Movie.Genres != null)
+                            if (model.ExclusionFilter_Genres.Genres.Any(traktSearchResult.Movie.Genres.Contains))
                                 continue;
 
-                        if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
-                            if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
+                        if (model.ExclusionFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Movie.LanguageCode))
+                            if (model.ExclusionFilter_Languages.Languages.Contains(traktSearchResult.Movie.LanguageCode))
                                 continue;
 
-                        if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
-                            if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
+                        if (model.ExclusionFilter_Translations?.Translations != null && traktSearchResult.Movie.AvailableTranslationLanguageCodes != null)
+                            if (model.ExclusionFilter_Translations.Translations.Any(traktSearchResult.Movie.AvailableTranslationLanguageCodes.Contains))
                                 continue;
+
+                        var hasKeyword = false;
+                        if (model.ExclusionFilter_Keywords != null && model.ExclusionFilter_Keywords.Length > 0)
+                            foreach (var keyWord in model.ExclusionFilter_Keywords)
+                            {
+                                if (!string.IsNullOrWhiteSpace(keyWord))
+                                    if (traktSearchResult.Movie.Title.ToLower().Contains(keyWord.ToLower()))
+                                    {
+                                        hasKeyword = true;
+                                        break;
+                                    }
+                            }
+                        if (hasKeyword)
+                            continue;
+
                     }
 
                     if (userLimits.IMDbRatings)
@@ -209,16 +224,18 @@ namespace Listrr.Services
                                 if (imdbRating != null)
                                 {
                                     if (model.Filter_Ratings_IMDb.Votes > 0)
+                                    {
                                         if (!(imdbRating.Votes >= model.Filter_Ratings_IMDb.Votes))
                                             continue;
 
-                                    if (model.Filter_Ratings_IMDb.From > 0)
-                                        if (!(imdbRating.Rating >= model.Filter_Ratings_IMDb.From))
-                                            continue;
+                                        if (model.Filter_Ratings_IMDb.From > 0)
+                                            if (!(imdbRating.Rating >= model.Filter_Ratings_IMDb.From))
+                                                continue;
 
-                                    if (model.Filter_Ratings_IMDb.To > 0)
-                                        if (!(imdbRating.Rating <= model.Filter_Ratings_IMDb.To))
-                                            continue;
+                                        if (model.Filter_Ratings_IMDb.To > 0)
+                                            if (!(imdbRating.Rating <= model.Filter_Ratings_IMDb.To))
+                                                continue;
+                                    }
                                 }
                                 else
                                 {
@@ -525,33 +542,47 @@ namespace Listrr.Services
 
                     if (userLimits.ExclusionFilters)
                     {
-                        if (model.ReverseFilter_Certifications_Show?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
-                            if (model.ReverseFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
+                        if (model.ExclusionFilter_Certifications_Show?.Certifications != null && !string.IsNullOrEmpty(traktSearchResult.Show.Certification))
+                            if (model.ExclusionFilter_Certifications_Show.Certifications.Contains(traktSearchResult.Show.Certification))
                                 continue;
 
-                        if (model.ReverseFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
-                            if (model.ReverseFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
+                        if (model.ExclusionFilter_Countries?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.CountryCode))
+                            if (model.ExclusionFilter_Countries.Languages.Contains(traktSearchResult.Show.CountryCode))
                                 continue;
 
-                        if (model.ReverseFilter_Genres?.Genres != null && traktSearchResult.Show.Genres != null)
-                            if (model.ReverseFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
+                        if (model.ExclusionFilter_Genres?.Genres != null && traktSearchResult.Show.Genres != null)
+                            if (model.ExclusionFilter_Genres.Genres.Any(traktSearchResult.Show.Genres.Contains))
                                 continue;
 
-                        if (model.ReverseFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
-                            if (model.ReverseFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
+                        if (model.ExclusionFilter_Languages?.Languages != null && !string.IsNullOrEmpty(traktSearchResult.Show.LanguageCode))
+                            if (model.ExclusionFilter_Languages.Languages.Contains(traktSearchResult.Show.LanguageCode))
                                 continue;
 
-                        if (model.ReverseFilter_Networks?.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
-                            if (model.ReverseFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
+                        if (model.ExclusionFilter_Networks?.Networks != null && !string.IsNullOrEmpty(traktSearchResult.Show.Network))
+                            if (model.ExclusionFilter_Networks.Networks.Contains(traktSearchResult.Show.Network))
                                 continue;
 
-                        if (model.ReverseFilter_Status?.Status != null && traktSearchResult.Show.Status != null)
-                            if (model.ReverseFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
+                        if (model.ExclusionFilter_Status?.Status != null && traktSearchResult.Show.Status != null)
+                            if (model.ExclusionFilter_Status.Status.Contains(traktSearchResult.Show.Status.ObjectName))
                                 continue;
 
-                        if (model.ReverseFilter_Translations?.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
-                            if (model.ReverseFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
+                        if (model.ExclusionFilter_Translations?.Translations != null && traktSearchResult.Show.AvailableTranslationLanguageCodes != null)
+                            if (model.ExclusionFilter_Translations.Translations.Any(traktSearchResult.Show.AvailableTranslationLanguageCodes.Contains))
                                 continue;
+
+                        var hasKeyword = false;
+                        if (model.ExclusionFilter_Keywords != null && model.ExclusionFilter_Keywords.Length > 0)
+                            foreach (var keyWord in model.ExclusionFilter_Keywords)
+                            {
+                                if (!string.IsNullOrWhiteSpace(keyWord))
+                                    if (traktSearchResult.Show.Title.ToLower().Contains(keyWord.ToLower()))
+                                    {
+                                        hasKeyword = true;
+                                        break;
+                                    }
+                            }
+                        if (hasKeyword)
+                            continue;
                     }
 
                     if (userLimits.IMDbRatings)
@@ -564,16 +595,18 @@ namespace Listrr.Services
                                 if (imdbRating != null)
                                 {
                                     if (model.Filter_Ratings_IMDb.Votes > 0)
+                                    {
                                         if (!(imdbRating.Votes >= model.Filter_Ratings_IMDb.Votes))
                                             continue;
 
-                                    if (model.Filter_Ratings_IMDb.From > 0)
-                                        if (!(imdbRating.Rating >= model.Filter_Ratings_IMDb.From))
-                                            continue;
+                                        if (model.Filter_Ratings_IMDb.From > 0)
+                                            if (!(imdbRating.Rating >= model.Filter_Ratings_IMDb.From))
+                                                continue;
 
-                                    if (model.Filter_Ratings_IMDb.To > 0)
-                                        if (!(imdbRating.Rating <= model.Filter_Ratings_IMDb.To))
-                                            continue;
+                                        if (model.Filter_Ratings_IMDb.To > 0)
+                                            if (!(imdbRating.Rating <= model.Filter_Ratings_IMDb.To))
+                                                continue;
+                                    }
                                 }
                                 else
                                 {

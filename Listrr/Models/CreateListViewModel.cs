@@ -79,19 +79,22 @@ namespace Listrr.Models
 
         #endregion
 
-        #region Reverse Common Filter
+        #region Exclusion Common Filter
 
         [Display(Name = "Languages", Prompt = "en,de,ru")]
-        public IEnumerable<string> ReverseFilter_Languages { get; set; }
-        public MultiSelectList ReverseLanguages { get; set; }
+        public IEnumerable<string> ExclusionFilter_Languages { get; set; }
+        public MultiSelectList ExclusionLanguages { get; set; }
 
         [Display(Name = "Countries", Prompt = "uk,us,de,ru")]
-        public IEnumerable<string> ReverseFilter_Countries { get; set; }
-        public MultiSelectList ReverseCountries { get; set; }
+        public IEnumerable<string> ExclusionFilter_Countries { get; set; }
+        public MultiSelectList ExclusionCountries { get; set; }
 
         [Display(Name = "Translations", Prompt = "de,en,ru")]
-        public IEnumerable<string> ReverseFilter_Translations { get; set; }
-        public MultiSelectList ReverseTranslations { get; set; }
+        public IEnumerable<string> ExclusionFilter_Translations { get; set; }
+        public MultiSelectList ExclusionTranslations { get; set; }
+
+        [Display(Name = "Keywords to exclude from title", Prompt = "ufc,wwe,disney")]
+        public string ExclusionFilter_Keywords { get; set; }
 
         #endregion
 
