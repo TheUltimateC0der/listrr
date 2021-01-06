@@ -174,11 +174,12 @@ namespace Listrr.Controllers
 
             if (user.IsDonor)
             {
-                result.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
-                result.ReverseFilter_Languages = new LanguagesCommonFilter(model.ReverseFilter_Languages);
-                result.ReverseFilter_Countries = new CountriesCommonFilter(model.ReverseFilter_Countries);
-                result.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
-                result.ReverseFilter_Certifications_Movie = new CertificationsMovieFilter(model.ReverseFilter_Certifications);
+                result.ExclusionFilter_Genres = new GenresCommonFilter(model.ExclusionFilter_Genres);
+                result.ExclusionFilter_Languages = new LanguagesCommonFilter(model.ExclusionFilter_Languages);
+                result.ExclusionFilter_Countries = new CountriesCommonFilter(model.ExclusionFilter_Countries);
+                result.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
+                result.ExclusionFilter_Certifications_Movie = new CertificationsMovieFilter(model.ExclusionFilter_Certifications);
+                result.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
             }
 
             await _traktRepository.Create(result);
@@ -275,11 +276,12 @@ namespace Listrr.Controllers
                     Filter_Countries = list.Filter_Countries.Languages,
                     Filter_Languages = list.Filter_Languages.Languages,
                     Filter_Translations = list.Filter_Translations.Translations,
-                    ReverseFilter_Genres = list.ReverseFilter_Genres?.Genres,
-                    ReverseFilter_Certifications = list.ReverseFilter_Certifications_Movie?.Certifications,
-                    ReverseFilter_Countries = list.ReverseFilter_Countries?.Languages,
-                    ReverseFilter_Languages = list.ReverseFilter_Languages?.Languages,
-                    ReverseFilter_Translations = list.ReverseFilter_Translations?.Translations
+                    ExclusionFilter_Genres = list.ExclusionFilter_Genres?.Genres,
+                    ExclusionFilter_Certifications = list.ExclusionFilter_Certifications_Movie?.Certifications,
+                    ExclusionFilter_Countries = list.ExclusionFilter_Countries?.Languages,
+                    ExclusionFilter_Languages = list.ExclusionFilter_Languages?.Languages,
+                    ExclusionFilter_Translations = list.ExclusionFilter_Translations?.Translations,
+                    ExclusionFilter_Keywords = list.ExclusionFilter_Keywords == null ? string.Empty : string.Join(",", list.ExclusionFilter_Keywords)
                 });
             }
 
@@ -329,11 +331,12 @@ namespace Listrr.Controllers
 
                 if (list.Owner.IsDonor)
                 {
-                    list.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
-                    list.ReverseFilter_Languages = new LanguagesCommonFilter(model.ReverseFilter_Languages);
-                    list.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
-                    list.ReverseFilter_Certifications_Movie = new CertificationsMovieFilter(model.ReverseFilter_Certifications);
-                    list.ReverseFilter_Countries = new CountriesCommonFilter(model.ReverseFilter_Countries);
+                    list.ExclusionFilter_Genres = new GenresCommonFilter(model.ExclusionFilter_Genres);
+                    list.ExclusionFilter_Languages = new LanguagesCommonFilter(model.ExclusionFilter_Languages);
+                    list.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
+                    list.ExclusionFilter_Certifications_Movie = new CertificationsMovieFilter(model.ExclusionFilter_Certifications);
+                    list.ExclusionFilter_Countries = new CountriesCommonFilter(model.ExclusionFilter_Countries);
+                    list.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
                 }
 
                 await _traktService.Update(list);
@@ -458,13 +461,14 @@ namespace Listrr.Controllers
 
             if (user.IsDonor)
             {
-                result.ReverseFilter_Status = new StatusShowFilter(model.ReverseFilter_Status);
-                result.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
-                result.ReverseFilter_Networks = new NetworksShowFilter(model.ReverseFilter_Networks);
-                result.ReverseFilter_Countries = new CountriesCommonFilter(model.ReverseFilter_Countries);
-                result.ReverseFilter_Languages = new LanguagesCommonFilter(model.ReverseFilter_Languages);
-                result.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
-                result.ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.ReverseFilter_Certifications);
+                result.ExclusionFilter_Status = new StatusShowFilter(model.ExclusionFilter_Status);
+                result.ExclusionFilter_Genres = new GenresCommonFilter(model.ExclusionFilter_Genres);
+                result.ExclusionFilter_Networks = new NetworksShowFilter(model.ExclusionFilter_Networks);
+                result.ExclusionFilter_Countries = new CountriesCommonFilter(model.ExclusionFilter_Countries);
+                result.ExclusionFilter_Languages = new LanguagesCommonFilter(model.ExclusionFilter_Languages);
+                result.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
+                result.ExclusionFilter_Certifications_Show = new CertificationsShowFilter(model.ExclusionFilter_Certifications);
+                result.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
             }
 
             await _traktRepository.Create(result);
@@ -570,13 +574,14 @@ namespace Listrr.Controllers
                     Filter_Translations = list.Filter_Translations.Translations,
                     Filter_Networks = list.Filter_Networks.Networks,
                     Filter_Status = list.Filter_Status.Status,
-                    ReverseFilter_Genres = list.ReverseFilter_Genres?.Genres,
-                    ReverseFilter_Certifications = list.ReverseFilter_Certifications_Show?.Certifications,
-                    ReverseFilter_Countries = list.ReverseFilter_Countries?.Languages,
-                    ReverseFilter_Languages = list.ReverseFilter_Languages?.Languages,
-                    ReverseFilter_Translations = list.ReverseFilter_Translations?.Translations,
-                    ReverseFilter_Networks = list.ReverseFilter_Networks?.Networks,
-                    ReverseFilter_Status = list.ReverseFilter_Status?.Status
+                    ExclusionFilter_Genres = list.ExclusionFilter_Genres?.Genres,
+                    ExclusionFilter_Certifications = list.ExclusionFilter_Certifications_Show?.Certifications,
+                    ExclusionFilter_Countries = list.ExclusionFilter_Countries?.Languages,
+                    ExclusionFilter_Languages = list.ExclusionFilter_Languages?.Languages,
+                    ExclusionFilter_Translations = list.ExclusionFilter_Translations?.Translations,
+                    ExclusionFilter_Networks = list.ExclusionFilter_Networks?.Networks,
+                    ExclusionFilter_Status = list.ExclusionFilter_Status?.Status,
+                    ExclusionFilter_Keywords = list.ExclusionFilter_Keywords == null ? string.Empty : string.Join(",", list.ExclusionFilter_Keywords)
                 });
             }
 
@@ -626,13 +631,14 @@ namespace Listrr.Controllers
 
                 if (list.Owner.IsDonor)
                 {
-                    list.ReverseFilter_Status = new StatusShowFilter(model.ReverseFilter_Status);
-                    list.ReverseFilter_Genres = new GenresCommonFilter(model.ReverseFilter_Genres);
-                    list.ReverseFilter_Networks = new NetworksShowFilter(model.ReverseFilter_Networks);
-                    list.ReverseFilter_Countries = new CountriesCommonFilter(model.ReverseFilter_Countries);
-                    list.ReverseFilter_Languages = new LanguagesCommonFilter(model.ReverseFilter_Languages);
-                    list.ReverseFilter_Translations = new TranslationsBasicFilter(model.ReverseFilter_Translations);
-                    list.ReverseFilter_Certifications_Show = new CertificationsShowFilter(model.ReverseFilter_Certifications);
+                    list.ExclusionFilter_Status = new StatusShowFilter(model.ExclusionFilter_Status);
+                    list.ExclusionFilter_Genres = new GenresCommonFilter(model.ExclusionFilter_Genres);
+                    list.ExclusionFilter_Networks = new NetworksShowFilter(model.ExclusionFilter_Networks);
+                    list.ExclusionFilter_Countries = new CountriesCommonFilter(model.ExclusionFilter_Countries);
+                    list.ExclusionFilter_Languages = new LanguagesCommonFilter(model.ExclusionFilter_Languages);
+                    list.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
+                    list.ExclusionFilter_Certifications_Show = new CertificationsShowFilter(model.ExclusionFilter_Certifications);
+                    list.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
                 }
 
                 await _traktService.Update(list);
