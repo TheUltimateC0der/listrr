@@ -309,7 +309,7 @@ namespace Listrr
             RecurringJob.AddOrUpdate<EnforceListLimitRecurringJob>(x => x.Execute(null), "*/5 * * * *");
             RecurringJob.AddOrUpdate<SetDonorsRecurringJob>(x => x.Execute(null), "*/5 * * * *");
 
-            RecurringJob.AddOrUpdate<IMDbRatingsRecurringJob>(x => x.Execute(null), "0 3 * * *");
+            RecurringJob.AddOrUpdate<IMDbRatingsRecurringJob>(x => x.Execute(null), "0 0 */3 * *");
 
             //BackgroundJob.Enqueue<ProcessMovieListBackgroundJob>(x => x.ExecutePriorized(XXXXXXXXX, null, false, false));
 
