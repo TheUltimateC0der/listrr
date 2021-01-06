@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using Listrr.Configuration;
+﻿using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Listrr.Controllers
 {
@@ -20,7 +20,7 @@ namespace Listrr.Controllers
             _appDbContext = appDbContext;
             _limitConfigurationList = limitConfigurationList;
         }
-        
+
 
 
         //public IActionResult LinkGitHubAccount()
@@ -32,14 +32,14 @@ namespace Listrr.Controllers
         {
             var lists = await _appDbContext.TraktLists.Include(x => x.Owner).ToListAsync();
             var listsWithExclusionFilters = lists.Where(x =>
-                x.ReverseFilter_Certifications_Movie?.Certifications?.Length > 0 ||
-                x.ReverseFilter_Certifications_Show?.Certifications?.Length > 0 ||
-                x.ReverseFilter_Countries?.Languages?.Length > 0 ||
-                x.ReverseFilter_Genres?.Genres?.Length > 0 ||
-                x.ReverseFilter_Languages?.Languages?.Length > 0 ||
-                x.ReverseFilter_Networks?.Networks?.Length > 0 ||
-                x.ReverseFilter_Status?.Status?.Length > 0 ||
-                x.ReverseFilter_Translations?.Translations?.Length > 0
+                x.ExclusionFilter_Certifications_Movie?.Certifications?.Length > 0 ||
+                x.ExclusionFilter_Certifications_Show?.Certifications?.Length > 0 ||
+                x.ExclusionFilter_Countries?.Languages?.Length > 0 ||
+                x.ExclusionFilter_Genres?.Genres?.Length > 0 ||
+                x.ExclusionFilter_Languages?.Languages?.Length > 0 ||
+                x.ExclusionFilter_Networks?.Networks?.Length > 0 ||
+                x.ExclusionFilter_Status?.Status?.Length > 0 ||
+                x.ExclusionFilter_Translations?.Translations?.Length > 0
             ).ToList();
 
             var userConfiguration = _limitConfigurationList.LimitConfigurations.FirstOrDefault(x => x.Level == UserLevel.User);
@@ -51,7 +51,7 @@ namespace Listrr.Controllers
                 Users = await _appDbContext.Users.CountAsync(),
                 ListsWithExclusionFilters = listsWithExclusionFilters.Count(),
                 UsersWithExclusionFilters = listsWithExclusionFilters.Select(x => x.Owner).Distinct().Count(),
-                UserListLimit = userConfiguration?.ListLimit ?? 0 
+                UserListLimit = userConfiguration?.ListLimit ?? 0
             });
         }
     }
