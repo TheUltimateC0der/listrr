@@ -29,25 +29,25 @@ namespace Listrr.Migrations
             migrationBuilder.RenameColumn(
                 name: "ReverseFilter_Genres",
                 table: "TraktLists",
-                newName: "ExclusionFilter_Keywords");
+                newName: "ExclusionFilter_Genres");
 
             migrationBuilder.RenameColumn(
                 name: "ReverseFilter_Countries",
                 table: "TraktLists",
-                newName: "ExclusionFilter_Genres");
+                newName: "ExclusionFilter_Countries");
 
             migrationBuilder.RenameColumn(
                 name: "ReverseFilter_Certifications_Show",
                 table: "TraktLists",
-                newName: "ExclusionFilter_Countries");
+                newName: "ExclusionFilter_Certifications_Show");
 
             migrationBuilder.RenameColumn(
                 name: "ReverseFilter_Certifications_Movie",
                 table: "TraktLists",
-                newName: "ExclusionFilter_Certifications_Show");
+                newName: "ExclusionFilter_Certifications_Movie");
 
             migrationBuilder.AddColumn<string>(
-                name: "ExclusionFilter_Certifications_Movie",
+                name: "ExclusionFilter_Keywords",
                 table: "TraktLists",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -56,7 +56,7 @@ namespace Listrr.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ExclusionFilter_Certifications_Movie",
+                name: "ExclusionFilter_Keywords",
                 table: "TraktLists");
 
             migrationBuilder.RenameColumn(
@@ -80,22 +80,22 @@ namespace Listrr.Migrations
                 newName: "ReverseFilter_Languages");
 
             migrationBuilder.RenameColumn(
-                name: "ExclusionFilter_Keywords",
+                name: "ExclusionFilter_Genres",
                 table: "TraktLists",
                 newName: "ReverseFilter_Genres");
 
             migrationBuilder.RenameColumn(
-                name: "ExclusionFilter_Genres",
+                name: "ExclusionFilter_Countries",
                 table: "TraktLists",
                 newName: "ReverseFilter_Countries");
 
             migrationBuilder.RenameColumn(
-                name: "ExclusionFilter_Countries",
+                name: "ExclusionFilter_Certifications_Show",
                 table: "TraktLists",
                 newName: "ReverseFilter_Certifications_Show");
 
             migrationBuilder.RenameColumn(
-                name: "ExclusionFilter_Certifications_Show",
+                name: "ExclusionFilter_Certifications_Movie",
                 table: "TraktLists",
                 newName: "ReverseFilter_Certifications_Movie");
         }

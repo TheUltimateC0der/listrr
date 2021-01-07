@@ -179,7 +179,7 @@ namespace Listrr.Controllers
                 result.ExclusionFilter_Countries = new CountriesCommonFilter(model.ExclusionFilter_Countries);
                 result.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
                 result.ExclusionFilter_Certifications_Movie = new CertificationsMovieFilter(model.ExclusionFilter_Certifications);
-                result.ExclusionFilter_Keywords = model.ExclusionFilter_Keywords.Split(",");
+                result.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
             }
 
             await _traktRepository.Create(result);
@@ -281,7 +281,7 @@ namespace Listrr.Controllers
                     ExclusionFilter_Countries = list.ExclusionFilter_Countries?.Languages,
                     ExclusionFilter_Languages = list.ExclusionFilter_Languages?.Languages,
                     ExclusionFilter_Translations = list.ExclusionFilter_Translations?.Translations,
-                    ExclusionFilter_Keywords = string.Join(",", list.ExclusionFilter_Keywords)
+                    ExclusionFilter_Keywords = list.ExclusionFilter_Keywords == null ? string.Empty : string.Join(",", list.ExclusionFilter_Keywords)
                 });
             }
 
@@ -336,7 +336,7 @@ namespace Listrr.Controllers
                     list.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
                     list.ExclusionFilter_Certifications_Movie = new CertificationsMovieFilter(model.ExclusionFilter_Certifications);
                     list.ExclusionFilter_Countries = new CountriesCommonFilter(model.ExclusionFilter_Countries);
-                    list.ExclusionFilter_Keywords = model.ExclusionFilter_Keywords.Split(",");
+                    list.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
                 }
 
                 await _traktService.Update(list);
@@ -468,7 +468,7 @@ namespace Listrr.Controllers
                 result.ExclusionFilter_Languages = new LanguagesCommonFilter(model.ExclusionFilter_Languages);
                 result.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
                 result.ExclusionFilter_Certifications_Show = new CertificationsShowFilter(model.ExclusionFilter_Certifications);
-                result.ExclusionFilter_Keywords = model.ExclusionFilter_Keywords.Split(",");
+                result.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
             }
 
             await _traktRepository.Create(result);
@@ -581,7 +581,7 @@ namespace Listrr.Controllers
                     ExclusionFilter_Translations = list.ExclusionFilter_Translations?.Translations,
                     ExclusionFilter_Networks = list.ExclusionFilter_Networks?.Networks,
                     ExclusionFilter_Status = list.ExclusionFilter_Status?.Status,
-                    ExclusionFilter_Keywords = string.Join(",", list.ExclusionFilter_Keywords)
+                    ExclusionFilter_Keywords = list.ExclusionFilter_Keywords == null ? string.Empty : string.Join(",", list.ExclusionFilter_Keywords)
                 });
             }
 
@@ -638,7 +638,7 @@ namespace Listrr.Controllers
                     list.ExclusionFilter_Languages = new LanguagesCommonFilter(model.ExclusionFilter_Languages);
                     list.ExclusionFilter_Translations = new TranslationsBasicFilter(model.ExclusionFilter_Translations);
                     list.ExclusionFilter_Certifications_Show = new CertificationsShowFilter(model.ExclusionFilter_Certifications);
-                    list.ExclusionFilter_Keywords = model.ExclusionFilter_Keywords.Split(",");
+                    list.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
                 }
 
                 await _traktService.Update(list);
