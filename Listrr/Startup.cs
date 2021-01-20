@@ -80,12 +80,13 @@ namespace Listrr
 
             // Multi Instance LB
             services.AddDbContext<DataProtectionDbContext>(options =>
-                options.UseSqlServer(connectionString)
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionDbContext>()
                 .SetApplicationName("Listrr");
-            services.AddDistributedSqlServerCache(options =>
+
+            services.AddDistributedMySqlCache(options =>
             {
                 options.ConnectionString = connectionString;
                 options.SchemaName = "dbo";
@@ -101,7 +102,7 @@ namespace Listrr
 
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString)
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
             services.AddDefaultIdentity<User>(options =>
             {
@@ -109,7 +110,7 @@ namespace Listrr
             }).AddEntityFrameworkStores<AppDbContext>();
             services.AddHangfire(x =>
             {
-                x.UseSqlServerStorage(connectionString)
+                x.UseInMemoryStorage()
                     .WithJobExpirationTimeout(TimeSpan.FromHours(24));
 
                 x.UseConsole();
