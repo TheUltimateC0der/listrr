@@ -4,14 +4,16 @@ using Listrr.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Listrr.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201230040106_Added imdb ratings, and renamed trakt")]
+    partial class Addedimdbratingsandrenamedtrakt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,8 +44,8 @@ namespace Listrr.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("Updated")
                         .HasColumnType("datetime2");
@@ -81,33 +83,6 @@ namespace Listrr.Migrations
 
                     b.Property<int>("ContentType")
                         .HasColumnType("int");
-
-                    b.Property<string>("ExclusionFilter_Certifications_Movie")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Certifications_Show")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Countries")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Genres")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Keywords")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Languages")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Networks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Translations")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Filter_Certifications_Movie")
                         .HasColumnType("nvarchar(max)");
@@ -167,6 +142,30 @@ namespace Listrr.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Query")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Certifications_Movie")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Certifications_Show")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Countries")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Genres")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Languages")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Networks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Translations")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ScanState")

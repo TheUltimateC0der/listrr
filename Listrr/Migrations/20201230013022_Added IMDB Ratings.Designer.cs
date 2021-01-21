@@ -4,20 +4,22 @@ using Listrr.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Listrr.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201230013022_Added IMDB Ratings")]
+    partial class AddedIMDBRatings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
+                .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.1");
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Listrr.Data.CountryCode", b =>
                 {
@@ -42,8 +44,8 @@ namespace Listrr.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("Updated")
                         .HasColumnType("datetime2");
@@ -82,33 +84,6 @@ namespace Listrr.Migrations
                     b.Property<int>("ContentType")
                         .HasColumnType("int");
 
-                    b.Property<string>("ExclusionFilter_Certifications_Movie")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Certifications_Show")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Countries")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Genres")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Keywords")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Languages")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Networks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExclusionFilter_Translations")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Filter_Certifications_Movie")
                         .HasColumnType("nvarchar(max)");
 
@@ -127,10 +102,7 @@ namespace Listrr.Migrations
                     b.Property<string>("Filter_Networks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filter_Ratings_IMDb")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Filter_Ratings_Trakt")
+                    b.Property<string>("Filter_Ratings")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Filter_Runtimes")
@@ -167,6 +139,30 @@ namespace Listrr.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Query")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Certifications_Movie")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Certifications_Show")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Countries")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Genres")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Languages")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Networks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReverseFilter_Translations")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ScanState")
@@ -328,8 +324,8 @@ namespace Listrr.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -346,12 +342,12 @@ namespace Listrr.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -369,17 +365,17 @@ namespace Listrr.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
+                        .HasName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
+                        .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
@@ -395,18 +391,18 @@ namespace Listrr.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
+                        .HasName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
@@ -417,7 +413,7 @@ namespace Listrr.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -441,7 +437,7 @@ namespace Listrr.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -463,12 +459,12 @@ namespace Listrr.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -505,12 +501,12 @@ namespace Listrr.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -526,8 +522,6 @@ namespace Listrr.Migrations
                         .WithMany("TraktLists")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -579,11 +573,6 @@ namespace Listrr.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Listrr.Data.User", b =>
-                {
-                    b.Navigation("TraktLists");
                 });
 #pragma warning restore 612, 618
         }
