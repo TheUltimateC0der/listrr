@@ -12,8 +12,9 @@ using System.Threading.Tasks;
 
 namespace Listrr.Data
 {
-    public class AppDbContext : IdentityDbContext<User>
+    public class MsSQLDbContext : IdentityDbContext<User>
     {
+
         public DbSet<TraktList> TraktLists { get; set; }
 
         public DbSet<TraktMovieCertification> TraktMovieCertifications { get; set; }
@@ -31,7 +32,7 @@ namespace Listrr.Data
 
         public DbSet<IMDbRating> ImDbRatings { get; set; }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public MsSQLDbContext(DbContextOptions<MsSQLDbContext> options) : base(options)
         {
             //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }

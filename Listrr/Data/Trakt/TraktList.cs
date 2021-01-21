@@ -269,10 +269,6 @@ namespace Listrr.Data.Trakt
         public void Configure(EntityTypeBuilder<TraktList> builder)
         {
             builder
-                .HasIndex(x => new { x.Slug, x.Name })
-                .IsUnique();
-
-            builder
                 .HasOne<User>(x => x.Owner)
                 .WithMany(x => x.TraktLists)
                 .OnDelete(DeleteBehavior.Cascade);

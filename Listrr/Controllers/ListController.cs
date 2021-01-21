@@ -300,12 +300,7 @@ namespace Listrr.Controllers
 
             if (list.Owner.UserName == User.Identity.Name)
             {
-                var forceRefresh = false;
-
-                if (list.Name != model.Name)
-                {
-                    forceRefresh = true;
-                }
+                var forceRefresh = list.Name != model.Name;
 
                 list.Name = model.Name;
                 list.Query = model.Query ?? "";
@@ -339,7 +334,15 @@ namespace Listrr.Controllers
                     list.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
                 }
 
-                await _traktService.Update(list);
+                try
+                {
+                    await _traktService.Update(list);
+                }
+                catch (TraktBadGatewayException)
+                {
+                    return View("TraktBadGatewayException");
+                }
+
                 await _traktRepository.Update(list);
 
                 if (list.ScanState == ScanState.None)
@@ -600,12 +603,7 @@ namespace Listrr.Controllers
 
             if (list.Owner.UserName == User.Identity.Name)
             {
-                var forceRefresh = false;
-
-                if (list.Name != model.Name)
-                {
-                    forceRefresh = true;
-                }
+                var forceRefresh = list.Name != model.Name;
 
                 list.Name = model.Name;
                 list.Query = model.Query ?? "";
@@ -641,7 +639,15 @@ namespace Listrr.Controllers
                     list.ExclusionFilter_Keywords = string.IsNullOrEmpty(model.ExclusionFilter_Keywords) ? null : model.ExclusionFilter_Keywords.Split(",");
                 }
 
-                await _traktService.Update(list);
+                try
+                {
+                    await _traktService.Update(list);
+                }
+                catch (TraktBadGatewayException)
+                {
+                    return View("TraktBadGatewayException");
+                }
+
                 await _traktRepository.Update(list);
 
                 if (list.ScanState == ScanState.None)
