@@ -45,7 +45,7 @@ namespace Listrr
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionStringMsSql = Configuration.GetConnectionString("mssql");
-            var connectionStringMariaDb = Configuration.GetConnectionString("mariadb");
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
             // Config
             var hangfireConfiguration = new HangFireConfiguration();
@@ -83,7 +83,7 @@ namespace Listrr
 
             // Multi Instance LB
             services.AddDbContext<DataProtectionDbContext>(options =>
-                options.UseMySql(connectionStringMariaDb, ServerVersion.AutoDetect(connectionStringMariaDb))
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionDbContext>()
@@ -105,7 +105,7 @@ namespace Listrr
 
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseMySql(connectionStringMariaDb, ServerVersion.AutoDetect(connectionStringMariaDb))
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
             services.AddDbContext<MsSQLDbContext>(options =>
                 options.UseSqlServer(connectionStringMsSql)

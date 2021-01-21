@@ -11,6 +11,8 @@
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="5.0.0" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.0" />
     <PackageReference Include="AspNet.Security.OAuth.Trakt" Version="5.0.0" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="2.3.1" />
     <PackageReference Include="GraphQL.Client" Version="3.2.1" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="3.2.1" />
