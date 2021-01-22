@@ -13,5 +13,7 @@ namespace Listrr.Repositories
         Task Create(IEnumerable<IMDbRating> models);
 
         Task<IMDbRating> Update(IMDbRating model);
+
+        Task Purge();
     }
 }
