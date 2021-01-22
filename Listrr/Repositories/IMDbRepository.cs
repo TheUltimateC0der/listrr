@@ -1,4 +1,5 @@
-﻿using Listrr.Data;
+﻿
+using Listrr.Data;
 using Listrr.Data.IMDb;
 
 using Microsoft.EntityFrameworkCore;
@@ -56,9 +57,7 @@ namespace Listrr.Repositories
 
         public async Task Purge()
         {
-            _appDbContext.ImDbRatings.RemoveRange(await _appDbContext.ImDbRatings.ToListAsync());
-
-            await _appDbContext.SaveChangesAsync();
+            await _appDbContext.Database.ExecuteSqlRawAsync($"TRUNCATE TABLE {nameof(AppDbContext.ImDbRatings)}");
         }
 
     }
