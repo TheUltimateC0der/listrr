@@ -10,6 +10,9 @@ namespace Listrr.Repositories
         Task<IMDbRating> Get(string imdbId);
 
         Task<IMDbRating> Create(IMDbRating model);
+        Task CreateRange(ICollection<IMDbRating> model);
+
+
         Task Create(IEnumerable<IMDbRating> models);
 
         Task<IMDbRating> Update(IMDbRating model);

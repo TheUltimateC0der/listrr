@@ -10,6 +10,7 @@ using Listrr.Repositories;
 using Microsoft.Extensions.Logging;
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -39,7 +40,7 @@ namespace Listrr.Jobs.RecurringJobs.IMDb
             ExtractGZip("title.ratings.tsv.gz", Directory.GetCurrentDirectory());
 
             var votingLines = await File.ReadAllLinesAsync("title.ratings.tsv");
-
+            var items = new List<IMDbRating>();
 
             await _imDbRepository.Purge();
 
@@ -55,17 +56,19 @@ namespace Listrr.Jobs.RecurringJobs.IMDb
                         var imdbVotes = Convert.ToInt32(votingParts[2]);
 
 
-                        await _imDbRepository.Create(
-                            new IMDbRating
-                            {
-                                IMDbId = imdbId,
-                                Votes = imdbVotes,
-                                Rating = imdbRating
-                            }
-                        );
+                        items.Add(new IMDbRating
+                        {
+                            IMDbId = imdbId,
+                            Votes = imdbVotes,
+                            Rating = imdbRating
+                        });
+
                     }
                 }
             }
+
+
+            await _imDbRepository.CreateRange(items);
         }
 
 
