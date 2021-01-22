@@ -14,7 +14,6 @@ namespace Listrr.Data
 {
     public class AppDbContext : IdentityDbContext<User>
     {
-
         public DbSet<TraktList> TraktLists { get; set; }
 
         public DbSet<TraktMovieCertification> TraktMovieCertifications { get; set; }

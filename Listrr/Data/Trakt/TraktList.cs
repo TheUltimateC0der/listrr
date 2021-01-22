@@ -1,4 +1,4 @@
-﻿using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.Data.Trakt.Filters;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -268,10 +268,6 @@ namespace Listrr.Data.Trakt
     {
         public void Configure(EntityTypeBuilder<TraktList> builder)
         {
-            builder
-                .HasIndex(x => new { x.Slug, x.Name })
-                .IsUnique();
-
             builder
                 .HasOne<User>(x => x.Owner)
                 .WithMany(x => x.TraktLists)

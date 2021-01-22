@@ -1,3 +1,5 @@
+using EFCoreSecondLevelCacheInterceptor;
+
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Dashboard.Dark;
@@ -42,6 +44,7 @@ namespace Listrr
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionStringMsSql = Configuration.GetConnectionString("mssql");
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
             // Config
@@ -80,16 +83,17 @@ namespace Listrr
 
             // Multi Instance LB
             services.AddDbContext<DataProtectionDbContext>(options =>
-                options.UseSqlServer(connectionString)
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionDbContext>()
                 .SetApplicationName("Listrr");
-            services.AddDistributedSqlServerCache(options =>
+
+            services.AddEFSecondLevelCache(options =>
             {
-                options.ConnectionString = connectionString;
-                options.SchemaName = "dbo";
-                options.TableName = "Cache";
+                options.UseMemoryCacheProvider(CacheExpirationMode.Sliding, TimeSpan.FromDays(5))
+                    .DisableLogging(true)
+                    .CacheAllQueries(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(30));
             });
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -101,15 +105,17 @@ namespace Listrr
 
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString)
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
+
             services.AddDefaultIdentity<User>(options =>
             {
                 options.User.AllowedUserNameCharacters = null;
             }).AddEntityFrameworkStores<AppDbContext>();
+
             services.AddHangfire(x =>
             {
-                x.UseSqlServerStorage(connectionString)
+                x.UseInMemoryStorage()
                     .WithJobExpirationTimeout(TimeSpan.FromHours(24));
 
                 x.UseConsole();

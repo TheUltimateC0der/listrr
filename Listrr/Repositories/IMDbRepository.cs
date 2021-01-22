@@ -1,4 +1,5 @@
-﻿using Listrr.Data;
+﻿
+using Listrr.Data;
 using Listrr.Data.IMDb;
 
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,12 @@ namespace Listrr.Repositories
             return result.Entity;
         }
 
+        public async Task CreateRange(ICollection<IMDbRating> model)
+        {
+            await _appDbContext.ImDbRatings.AddRangeAsync(model);
+            await _appDbContext.SaveChangesAsync();
+        }
+
         public async Task Create(IEnumerable<IMDbRating> models)
         {
             await _appDbContext.ImDbRatings.AddRangeAsync(models);
@@ -46,5 +53,12 @@ namespace Listrr.Repositories
 
             return result.Entity;
         }
+
+
+        public async Task Purge()
+        {
+            await _appDbContext.Database.ExecuteSqlRawAsync($"TRUNCATE TABLE {nameof(AppDbContext.ImDbRatings)}");
+        }
+
     }
 }
