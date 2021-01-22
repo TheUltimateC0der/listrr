@@ -10,7 +10,6 @@ using Listrr.Repositories;
 using Microsoft.Extensions.Logging;
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -41,7 +40,8 @@ namespace Listrr.Jobs.RecurringJobs.IMDb
 
             var votingLines = await File.ReadAllLinesAsync("title.ratings.tsv");
 
-            var itemsToAdd = new HashSet<IMDbRating>();
+
+            await _imDbRepository.Purge();
 
             foreach (var votingLine in votingLines.WithProgress(pb))
             {
@@ -54,36 +54,18 @@ namespace Listrr.Jobs.RecurringJobs.IMDb
                         var imdbRating = Convert.ToInt32(Convert.ToDouble(votingParts[1], CultureInfo.InvariantCulture) * 10);
                         var imdbVotes = Convert.ToInt32(votingParts[2]);
 
-                        var existingVoting = await _imDbRepository.Get(imdbId);
-                        if (existingVoting != null)
-                        {
-                            if (existingVoting.Rating != imdbRating ||
-                                existingVoting.Votes != imdbVotes)
-                            {
-                                existingVoting.Rating = imdbRating;
-                                existingVoting.Votes = imdbVotes;
 
-                                await _imDbRepository.Update(existingVoting);
-                            }
-                        }
-                        else
-                        {
-                            itemsToAdd.Add(new IMDbRating
+                        await _imDbRepository.Create(
+                            new IMDbRating
                             {
                                 IMDbId = imdbId,
                                 Votes = imdbVotes,
                                 Rating = imdbRating
-                            });
-                        }
+                            }
+                        );
                     }
                 }
             }
-
-            if (itemsToAdd.Count > 0)
-            {
-                await _imDbRepository.Create(itemsToAdd);
-            }
-
         }
 
 

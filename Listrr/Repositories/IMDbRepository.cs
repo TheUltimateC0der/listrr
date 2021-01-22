@@ -46,5 +46,14 @@ namespace Listrr.Repositories
 
             return result.Entity;
         }
+
+
+        public async Task Purge()
+        {
+            _appDbContext.ImDbRatings.RemoveRange(await _appDbContext.ImDbRatings.ToListAsync());
+
+            await _appDbContext.SaveChangesAsync();
+        }
+
     }
 }
