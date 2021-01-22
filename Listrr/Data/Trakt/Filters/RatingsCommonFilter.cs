@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Listrr.API.Trakt.Models.Filters
+namespace Listrr.Data.Trakt.Filters
 {
     public class RatingsCommonFilter
     {
 
-        [Range(0,100)]
+        [Range(0, 100)]
         [Display(Name = "Min rating", Prompt = "0")]
         public int From { get; set; } = 0;
 

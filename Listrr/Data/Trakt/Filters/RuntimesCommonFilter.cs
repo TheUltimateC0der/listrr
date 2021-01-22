@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Listrr.API.Trakt.Models.Filters
+namespace Listrr.Data.Trakt.Filters
 {
     public class RuntimesCommonFilter
     {

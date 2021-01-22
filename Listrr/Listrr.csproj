@@ -59,4 +59,9 @@
     </Content>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="API\Trakt\Models\" />
+  </ItemGroup>
+
 </Project>

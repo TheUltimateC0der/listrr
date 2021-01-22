@@ -1,7 +1,7 @@
-﻿using Listrr.API.Trakt.Models.Filters;
-using Listrr.Configuration;
+﻿using Listrr.Configuration;
 using Listrr.Data;
 using Listrr.Data.Trakt;
+using Listrr.Data.Trakt.Filters;
 using Listrr.Models;
 using Listrr.Repositories;
 using Listrr.Services;

@@ -116,6 +116,7 @@ namespace Listrr
             {
                 options.User.AllowedUserNameCharacters = null;
             }).AddEntityFrameworkStores<AppDbContext>();
+
             services.AddHangfire(x =>
             {
                 x.UseInMemoryStorage()
