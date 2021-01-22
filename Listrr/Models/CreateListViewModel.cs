@@ -1,4 +1,4 @@
-﻿using Listrr.API.Trakt.Models.Filters;
+﻿using Listrr.Data.Trakt.Filters;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
 
