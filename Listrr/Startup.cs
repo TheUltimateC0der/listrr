@@ -107,10 +107,6 @@ namespace Listrr
             services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
             );
-            services.AddDbContext<MsSQLDbContext>(options =>
-                options.UseSqlServer(connectionStringMsSql)
-            );
-
 
             services.AddDefaultIdentity<User>(options =>
             {
