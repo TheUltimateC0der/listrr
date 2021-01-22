@@ -31,6 +31,12 @@ namespace Listrr.Repositories
             return result.Entity;
         }
 
+        public async Task CreateRange(ICollection<IMDbRating> model)
+        {
+            await _appDbContext.ImDbRatings.AddRangeAsync(model);
+            await _appDbContext.SaveChangesAsync();
+        }
+
         public async Task Create(IEnumerable<IMDbRating> models)
         {
             await _appDbContext.ImDbRatings.AddRangeAsync(models);
