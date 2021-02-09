@@ -1,10 +1,10 @@
-﻿@model CreateShowListFileViewModel
+﻿@model EditShowListFileViewModel
 @inject UserManager<User> userManager
 @inject IUserLimitService UserLimitService
 
 @{
     ViewData["Title"] = "Show list";
-    ViewData["Message"] = "Create a new list for shows from a list of show names";
+    ViewData["Message"] = $"Edit your '{Model.Name}' list";
 
     var user = await userManager.GetUserAsync(User);
     var userLimitConfiguration = UserLimitService.Get(user.Level);
@@ -19,7 +19,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="ShowListFile" method="post">
+        <form asp-action="EditShowListFile" method="post">
 
             <div class="card">
                 <div class="card-body">
@@ -29,7 +29,7 @@
                     <hr />
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <input asp-for="Name" class="form-control" />
                                 <small class="form-text text-muted">* Give your list a name that makes it easier to find after creating.</small>
@@ -51,6 +51,14 @@ Stranger Things (2016)
 Suits (2011)"></textarea>
                             <span asp-validation-for="ItemList" class="text-danger"></span>
                             <small class="form-text text-muted">Example of how your list should look like</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="alert alert-info" role="alert">
+                                This is the report to show which show matched to which show in the trakt.tv database.
+                            </div>
+                            <textarea asp-for="Report" class="form-control" rows="12" disabled></textarea>
+                            <span asp-validation-for="Report" class="text-danger"></span>
                         </div>
                     </div>
                 </div>

@@ -186,7 +186,7 @@ namespace Listrr.Controllers
 
             _backgroundJobQueueService.Queue(result);
 
-            return RedirectToAction(nameof(MovieList));
+            return RedirectToAction(nameof(My));
         }
 
         [HttpGet]
@@ -224,8 +224,72 @@ namespace Listrr.Controllers
 
             _backgroundJobQueueService.Queue(result);
 
-            return RedirectToAction(nameof(MovieListFile));
+            return RedirectToAction(nameof(My));
         }
+
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditMovieListFile(uint id)
+        {
+            var list = await _traktRepository.Get(id);
+
+            if (list == null) return RedirectToAction(nameof(My));
+            if (list.Type != ListType.Movie) return RedirectToAction(nameof(My));
+
+            if (list.Owner.UserName == User.Identity.Name)
+            {
+                return View(new EditMovieListFileViewModel
+                {
+                    Id = list.Id,
+                    Name = list.Name,
+                    ItemList = list.ItemList,
+                    Report = list.ItemsByNameReport
+                });
+            }
+
+            return RedirectToAction(nameof(My));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> EditMovieListFile(EditMovieListFileViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var list = await _traktRepository.Get(model.Id);
+            if (list == null) return RedirectToAction(nameof(My));
+            if (list.Type != ListType.Movie) return RedirectToAction(nameof(My));
+
+            if (list.Owner.UserName == User.Identity.Name)
+            {
+                var forceRefresh = list.Name != model.Name;
+
+                list.Name = model.Name;
+                list.ContentType = ListContentType.Names;
+                list.ItemList = model.ItemList;
+
+                try
+                {
+                    await _traktService.Update(list);
+                }
+                catch (TraktBadGatewayException)
+                {
+                    return View("TraktBadGatewayException");
+                }
+
+                await _traktRepository.Update(list);
+
+                if (list.ScanState == ScanState.None)
+                    _backgroundJobQueueService.Queue(list, forceRefresh: forceRefresh);
+
+
+                return RedirectToAction(nameof(EditMovieListFile), new { list.Id });
+            }
+
+            return RedirectToAction(nameof(My));
+        }
+
 
         [HttpGet]
         [Authorize]
@@ -478,7 +542,7 @@ namespace Listrr.Controllers
 
             _backgroundJobQueueService.Queue(result);
 
-            return RedirectToAction(nameof(ShowList));
+            return RedirectToAction(nameof(My));
         }
 
         [HttpGet]
@@ -516,7 +580,69 @@ namespace Listrr.Controllers
 
             _backgroundJobQueueService.Queue(result);
 
-            return RedirectToAction(nameof(ShowListFile));
+            return RedirectToAction(nameof(My));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditShowListFile(uint id)
+        {
+            var list = await _traktRepository.Get(id);
+
+            if (list == null) return RedirectToAction(nameof(My));
+            if (list.Type != ListType.Show) return RedirectToAction(nameof(My));
+
+            if (list.Owner.UserName == User.Identity.Name)
+            {
+                return View(new EditShowListFileViewModel
+                {
+                    Id = list.Id,
+                    Name = list.Name,
+                    ItemList = list.ItemList,
+                    Report = list.ItemsByNameReport
+                });
+            }
+
+            return RedirectToAction(nameof(My));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> EditShowListFile(EditShowListFileViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var list = await _traktRepository.Get(model.Id);
+            if (list == null) return RedirectToAction(nameof(My));
+            if (list.Type != ListType.Show) return RedirectToAction(nameof(My));
+
+            if (list.Owner.UserName == User.Identity.Name)
+            {
+                var forceRefresh = list.Name != model.Name;
+
+                list.Name = model.Name;
+                list.ContentType = ListContentType.Names;
+                list.ItemList = model.ItemList;
+
+                try
+                {
+                    await _traktService.Update(list);
+                }
+                catch (TraktBadGatewayException)
+                {
+                    return View("TraktBadGatewayException");
+                }
+
+                await _traktRepository.Update(list);
+
+                if (list.ScanState == ScanState.None)
+                    _backgroundJobQueueService.Queue(list, forceRefresh: forceRefresh);
+
+
+                return RedirectToAction(nameof(EditShowListFile), new { list.Id });
+            }
+
+            return RedirectToAction(nameof(My));
         }
 
         [HttpGet]
