@@ -48,6 +48,9 @@
     <Content Update="Views\List\Delete.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\List\EditShowListFile.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\List\EditShowList.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

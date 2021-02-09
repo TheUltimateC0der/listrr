@@ -100,7 +100,14 @@ namespace Listrr.Jobs.BackgroundJobs
                                         add.Add(itemResult);
                                     }
 
-                                    report += $"{line.Trim()} -> {itemResult.Title} ({itemResult.Year})";
+                                    if (line.Trim() != $"{itemResult.Title} ({itemResult.Year})")
+                                    {
+                                        report += $"{line.Trim()} != {itemResult.Title} ({itemResult.Year})\r\n";
+                                    }
+                                    else
+                                    {
+                                        report += $"{line.Trim()} == {itemResult.Title} ({itemResult.Year})\r\n";
+                                    }
                                 }
 
                                 await Task.Delay(_traktApiConfiguration.DelayIdSearch);

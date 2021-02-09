@@ -41,28 +41,41 @@
                         <td>@list.Items</td>
                         <td>
                             <a href="https://trakt.tv/users/@list.Owner.UserName.ToLower()/lists/@list.Slug" target="_blank" class="btn btn-primary btn-sm">Show</a>
-                            @if (list.ContentType == ListContentType.Filters)
+
+                            @switch (list.Type)
                             {
-
-                                switch (list.Type)
-                                {
-                                    case ListType.Movie:
+                                case ListType.Movie:
+                                    if (list.ContentType == ListContentType.Filters)
+                                    {
                                         <a asp-action="EditMovieList" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="EditMovieListFile" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+                                    }
 
-                                        break;
-                                    case ListType.Show:
+
+                                    break;
+                                case ListType.Show:
+                                    if (list.ContentType == ListContentType.Filters)
+                                    {
                                         <a asp-action="EditShowList" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="EditShowListFile" asp-route-Id="@list.Id" class="btn btn-secondary btn-sm">Edit</a>
+                                    }
 
-                                        break;
-                                    default:
-                                        throw new ArgumentOutOfRangeException();
-                                }
-
-                                if (list.ScanState == ScanState.None && list.Owner.IsDonor)
-                                {
-                                    <a asp-action="Scan" asp-route-id="@list.Id" class="btn btn-success btn-sm">Update</a>
-                                }
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
+
+                            @if (list.ScanState == ScanState.None && list.Owner.IsDonor)
+                            {
+                                <a asp-action="Scan" asp-route-id="@list.Id" class="btn btn-success btn-sm">Update</a>
+                            }
+
                             <a asp-action="Delete" asp-route-Id="@list.Id" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>

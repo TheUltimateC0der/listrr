@@ -1,10 +1,10 @@
-﻿@model CreateShowListFileViewModel
+﻿@model EditMovieListFileViewModel
 @inject UserManager<User> userManager
 @inject IUserLimitService UserLimitService
 
 @{
-    ViewData["Title"] = "Show list";
-    ViewData["Message"] = "Create a new list for shows from a list of show names";
+    ViewData["Title"] = "Movie list";
+    ViewData["Message"] = $"Edit your '{Model.Name}' list";
 
     var user = await userManager.GetUserAsync(User);
     var userLimitConfiguration = UserLimitService.Get(user.Level);
@@ -19,7 +19,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="ShowListFile" method="post">
+        <form asp-action="EditMovieListFile" method="post">
 
             <div class="card">
                 <div class="card-body">
@@ -29,7 +29,7 @@
                     <hr />
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <input asp-for="Name" class="form-control" />
                                 <small class="form-text text-muted">* Give your list a name that makes it easier to find after creating.</small>
@@ -40,17 +40,32 @@
                             <div class="alert alert-info" role="alert">
                                 Please stick to the pattern as shown below to minimize false positives. Everything that is not this pattern will be ignored.
                             </div>
-                            <textarea asp-for="ItemList" class="form-control" rows="12" placeholder="Game of Thrones (2011)
-Breaking Bad (2008)
-The Walking Dead (2010)
-The Big Bang Theory (2007)
-Sherlock (2010)
-House (2004)
-Homeland (2011)
-Stranger Things (2016)
-Suits (2011)"></textarea>
+                            <textarea asp-for="ItemList" class="form-control" rows="12" placeholder="2-Headed Shark Attack (2012)
+20 Feet from Stardom (2013)
+20,000 Leagues Under the Sea (1954)
+88 Minutes (2007)
+89 (2017)
+Command Performance (2009)
+Commando (1985)
+The Commitments (1991)
+Cosy Dens (1999)
+Cottage Country (2013)
+The Cotton Club (1984)
+Knock Down the House (2019)
+Knock Knock (2015)
+Once Upon a Time in Mexico (2003)
+Once Upon a Time in the West (1968)
+Once Upon a Time in Venice (2017)"></textarea>
                             <span asp-validation-for="ItemList" class="text-danger"></span>
                             <small class="form-text text-muted">Example of how your list should look like</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="alert alert-info" role="alert">
+                                This is the report to show which movie matched to which movie in the trakt.tv database.
+                            </div>
+                            <textarea asp-for="Report" class="form-control" rows="12" disabled></textarea>
+                            <span asp-validation-for="Report" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
