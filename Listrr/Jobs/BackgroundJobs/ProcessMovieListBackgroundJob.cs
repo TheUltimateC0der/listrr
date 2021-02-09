@@ -79,6 +79,8 @@ namespace Listrr.Jobs.BackgroundJobs
                 {
                     var add = new List<ITraktMovie>();
                     var regex = new Regex(@"(.*)\(([0-9]{4})\)");
+                    var existing = await _traktService.GetMovies(traktList);
+                    var report = "";
 
                     foreach (var line in traktList.ItemList.Split("\r\n"))
                     {
@@ -92,7 +94,13 @@ namespace Listrr.Jobs.BackgroundJobs
                                 var itemResult = await _traktService.MovieSearch(traktList, cleanMovieName, movieYear);
                                 if (itemResult != null)
                                 {
-                                    add.Add(itemResult);
+                                    var existingItem = existing.FirstOrDefault(x => x.Ids.Trakt != itemResult.Ids.Trakt);
+                                    if (existingItem == null)
+                                    {
+                                        add.Add(itemResult);
+                                    }
+
+                                    report += $"{line.Trim()} -> {itemResult.Title} ({itemResult.Year})";
                                 }
 
                                 await Task.Delay(_traktApiConfiguration.DelayIdSearch);
@@ -107,6 +115,10 @@ namespace Listrr.Jobs.BackgroundJobs
                             await _traktService.AddMovies(toAddChunk, traktList);
                         }
                     }
+
+                    traktList.ItemsByNameReport = report;
+
+                    await _traktRepository.Update(traktList);
                 }
             }
             catch (Exception ex)

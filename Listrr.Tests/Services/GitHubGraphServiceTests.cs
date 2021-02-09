@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Listrr.Configuration;
+﻿using Listrr.Configuration;
 using Listrr.Services;
 
 using Moq;
+
+using System;
+using System.Collections.Generic;
 
 using Xunit;
 
@@ -26,8 +26,8 @@ namespace Listrr.Tests.Services
 
         public static IEnumerable<object[]> NullParameterData()
         {
-            yield return new[] { null, Mock.Of<LimitConfigurationList>() };
-            yield return new[] { Mock.Of<GithubAPIConfiguration>(), null };
+            yield return new[] { (object)null, Mock.Of<LimitConfigurationList>() };
+            yield return new[] { Mock.Of<GithubAPIConfiguration>(), (object)null };
         }
     }
 }

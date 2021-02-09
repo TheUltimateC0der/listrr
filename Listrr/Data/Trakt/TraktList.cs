@@ -61,6 +61,8 @@ namespace Listrr.Data.Trakt
 
         public User Owner { get; set; }
 
+        public string ItemsByNameReport { get; set; }
+
 
         #region Basic Filter
 
