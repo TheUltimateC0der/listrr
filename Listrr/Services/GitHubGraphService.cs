@@ -49,11 +49,11 @@ namespace Listrr.Services
                 }"
             };
 
-            var grapqlClient = new GraphQLHttpClient("https://api.github.com/graphql", new NewtonsoftJsonSerializer());
-            grapqlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_githubApiConfiguration.Token}");
-            grapqlClient.HttpClient.DefaultRequestHeaders.Add("User-Agent", "listrr.pro graphql client");
+            var graphqlClient = new GraphQLHttpClient("https://api.github.com/graphql", new NewtonsoftJsonSerializer());
+            graphqlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_githubApiConfiguration.Token}");
+            graphqlClient.HttpClient.DefaultRequestHeaders.Add("User-Agent", "listrr.pro graphql client");
 
-            var graphqlResponse = await grapqlClient.SendQueryAsync<GitHubDonorResponse>(donorRequest);
+            var graphqlResponse = await graphqlClient.SendQueryAsync<GitHubDonorResponse>(donorRequest);
 
             foreach (var node in graphqlResponse.Data.Viewer.SponsorshipsAsMaintainer.Nodes)
             {
